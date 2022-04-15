@@ -1,11 +1,27 @@
-import { observer } from 'mobx-react';
+import './app.scss';
+
 import React from 'react';
+import { observable } from 'mobx';
+import { observer } from 'mobx-react';
+
 import { AppState } from './AppState';
 
 @observer
 export class App extends React.PureComponent {
-  private readonly appState = new AppState();
+  private canvasRef = React.createRef<HTMLCanvasElement>();
+  @observable private appState: AppState;
+
+  componentDidMount() {
+    if (this.canvasRef.current) {
+      this.appState = new AppState(this.canvasRef.current);
+    }
+  }
+
   public render() {
-    return <button onClick={() => this.appState.incCount()}>Clicks: {this.appState.count}</button>;
+    return (
+      <div className={'app'}>
+        <canvas className={'main-canvas'} ref={this.canvasRef}></canvas>
+      </div>
+    );
   }
 }
