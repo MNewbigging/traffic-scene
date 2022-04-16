@@ -40,15 +40,16 @@ export class SceneState {
     const end = new Road(RoadName.END, this.modelLoader.getModel(RoadName.END));
 
     // Road pieces are 2x2 on x/z, space apart evenly
-    start.model.position.x = -2;
-    end.model.position.x = 2;
+    start.setPositionX(-2);
+    end.setPositionX(2);
 
-    // Rotate end piece
+    // Rotate start piece
     start.model.rotation.y = Math.PI;
 
     [start, mid, end].forEach((r) => {
       this.roads.push(r);
       this.scene.add(r.model);
+      this.scene.add(r.node);
     });
 
     // Now ready to start
