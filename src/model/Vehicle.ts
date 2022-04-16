@@ -11,17 +11,18 @@ export class Vehicle {
   public nextWaypoint?: RoadWaypoint;
 
   public routeLine?: THREE.Line;
+  public dirArrow: THREE.ArrowHelper;
   public forward = new THREE.Vector3();
 
   constructor(public name: VehicleName, public model: THREE.Group) {
-    // TODO - this is hacky, fix some other way
-    this.model.lookAt(1, 0, 0);
     model.getWorldDirection(this.forward);
     console.log('model forward', this.forward);
 
     const mat = new THREE.LineBasicMaterial({ color: 'yellow' });
     const geom = new THREE.BufferGeometry();
     this.routeLine = new THREE.Line(geom, mat);
+
+    this.dirArrow = new THREE.ArrowHelper(this.forward, this.position, 1.5, 0xff0000);
   }
 
   public get position() {
@@ -56,6 +57,8 @@ export class Vehicle {
 
     // Update route line
     this.updateRouteLine();
+
+    // Update direction line
   }
 
   private driveRoute(deltaTime: number) {
@@ -85,5 +88,14 @@ export class Vehicle {
     const speed = deltaTime * this.speed;
     this.position.x += direction.x * speed;
     this.position.z += direction.z * speed;
+
+    const lookDir = this.nextWaypoint.point.clone();
+    lookDir.y = this.position.y;
+    this.model.lookAt(lookDir);
+
+    this.model.getWorldDirection(this.forward);
+    this.dirArrow.setDirection(this.forward);
+    this.dirArrow.position.x = this.position.x;
+    this.dirArrow.position.z = this.position.z;
   }
 }

@@ -48,8 +48,8 @@ export class SceneState {
     this.setupCamera();
 
     // Axes helper - The X axis is red. The Y axis is green. The Z axis is blue.
-    const axesHelper = new THREE.AxesHelper(50);
-    this.scene.add(axesHelper);
+    // const axesHelper = new THREE.AxesHelper(50);
+    // this.scene.add(axesHelper);
 
     // lights
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
@@ -194,5 +194,6 @@ export class SceneState {
 
     // TEMP - focus on bend
     this.controls.target = bend.position;
+    this.scene.add(vehicle.dirArrow);
   }
 }
