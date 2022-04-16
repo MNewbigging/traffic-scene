@@ -1,21 +1,19 @@
 import * as THREE from 'three';
-import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 import { CanvasListener } from './utils/CanvasListener';
-import { ModelLoader, RoadName, VehicleName } from './utils/ModelLoader';
+import { SceneState } from './state/SceneState';
 
+/**
+ * High level state class, handles renderer and main game loop
+ */
 export class AppState {
   private canvasListener: CanvasListener;
   private renderer: THREE.WebGLRenderer;
-  private scene = new THREE.Scene();
   private camera: THREE.PerspectiveCamera;
   private controls: OrbitControls;
   private masterClock = new THREE.Clock();
-  private modelLoader = new ModelLoader();
-
-  private road: THREE.Group;
-  private roadCont: THREE.Box3;
+  private sceneState = new SceneState();
 
   constructor(canvas: HTMLCanvasElement) {
     // Setup screen listener
@@ -29,28 +27,12 @@ export class AppState {
 
     // Setup camera
     this.setupCamera();
-    this.setupLights();
 
-    // Axes helper - The X axis is red. The Y axis is green. The Z axis is blue.
-    const axesHelper = new THREE.AxesHelper(5);
-    this.scene.add(axesHelper);
-
-    // Load models
-    this.modelLoader.loadModels(() => this.start());
+    // Setup scene
+    this.sceneState.initScene(() => this.start());
   }
 
-  // Called on load complete
   private start() {
-    console.log('starting');
-
-    // const sedan = this.modelLoader.getModel(VehicleName.SEDAN);
-    // console.log('sedan', sedan);
-    // this.scene.add(sedan);
-
-    const road = this.modelLoader.getModel(RoadName.END);
-    this.road = road;
-    this.scene.add(road);
-
     // Start render loop
     this.animate();
   }
@@ -76,26 +58,13 @@ export class AppState {
     this.controls.enableDamping = true;
   }
 
-  private setupLights() {
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-    this.scene.add(ambientLight);
-
-    // const pointLight = new THREE.PointLight(0xffffff, 0.5);
-    // pointLight.position.x = 2;
-    // pointLight.position.y = 3;
-    // pointLight.position.z = 4;
-    // this.scene.add(pointLight);
-  }
-
   private animate = () => {
     requestAnimationFrame(this.animate);
 
     this.controls.update();
 
-    const deltaTime = this.masterClock.getDelta();
+    //const deltaTime = this.masterClock.getDelta();
 
-    //this.road.rotation.y += 0.2 * deltaTime;
-
-    this.renderer.render(this.scene, this.camera);
+    this.renderer.render(this.sceneState.scene, this.camera);
   };
 }

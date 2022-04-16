@@ -1,8 +1,16 @@
 import * as THREE from 'three';
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { group } from 'console';
 
-export type ModelName = VehicleName | RoadName;
+export class ModelNames {
+  vehicles: VehicleName[] = [];
+  roads: RoadName[] = [];
+
+  get modelCount() {
+    return this.vehicles.length + this.roads.length;
+  }
+}
+
+type ModelName = VehicleName | RoadName;
 
 export enum VehicleName {
   SEDAN = 'sedan',
@@ -24,23 +32,20 @@ export class ModelLoader {
   private modelsToLoad = 0;
   private onLoad?: () => void;
 
-  public loadModels(onLoad: () => void) {
+  public loadModels(modelNames: ModelNames, onLoad: () => void) {
     this.onLoad = onLoad;
 
-    // The names of models to load
-    const vehicleNames = Object.values(VehicleName);
-    const roadNames = Object.values(RoadName);
-
     // Setup load counters
-    this.modelsToLoad = vehicleNames.length + roadNames.length;
+    this.loadedModels = 0;
+    this.modelsToLoad = modelNames.modelCount;
 
     const loader = new GLTFLoader();
 
     // Load vehicles
-    vehicleNames.forEach((vName) => this.loadVehicle(vName, loader));
+    modelNames.vehicles.forEach((vName) => this.loadVehicle(vName, loader));
 
     // Load roads
-    roadNames.forEach((rName) => this.loadRoad(rName, loader));
+    modelNames.roads.forEach((rName) => this.loadRoad(rName, loader));
   }
 
   public get models(): THREE.Group[] {
@@ -48,7 +53,7 @@ export class ModelLoader {
   }
 
   public getModel(name: ModelName): THREE.Group {
-    return this.modelMap.get(name);
+    return this.modelMap.get(name).clone();
   }
 
   private onLoadError = (error: any) => {
@@ -58,7 +63,7 @@ export class ModelLoader {
   private onLoadModel = (name: ModelName, group: THREE.Group) => {
     this.loadedModels++;
     this.modelMap.set(name, group);
-    console.log(`loaded ${name}, current models:`, this.modelMap);
+    //console.log(`loaded ${name}, current models:`, this.modelMap);
 
     // Check if all models are now loaded
     if (this.loadedModels === this.modelsToLoad) {
@@ -119,6 +124,7 @@ export class ModelLoader {
 
         // Wrap in another group for rotating around its center
         const parent = new THREE.Group();
+
         parent.add(model.scene);
 
         this.onLoadModel(rName, parent);
