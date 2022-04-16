@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
 import { ModelLoader, ModelNames, RoadName, VehicleName } from '../utils/ModelLoader';
 import { Pathfinder } from '../utils/Pathfinder';
-import { Road } from '../model/Road';
+import { Road, RoadWaypoint } from '../model/Road';
 import { Vehicle } from '../model/Vehicle';
 
 /**
@@ -41,11 +41,14 @@ export class SceneState {
     // Roads
     const start = new Road(RoadName.END, this.modelLoader.getModel(RoadName.END));
     const mid = new Road(RoadName.STRAIGHT, this.modelLoader.getModel(RoadName.STRAIGHT));
+    const mid2 = new Road(RoadName.STRAIGHT, this.modelLoader.getModel(RoadName.STRAIGHT));
     const end = new Road(RoadName.END, this.modelLoader.getModel(RoadName.END));
 
     // Road pieces are 2x2 on x/z, space apart evenly
     start.setPositionX(-2);
-    end.setPositionX(2);
+    // mid already at 0
+    mid2.setPositionX(2);
+    end.setPositionX(4);
 
     // Rotate start piece
     start.model.rotation.y = Math.PI;
@@ -53,11 +56,13 @@ export class SceneState {
     // Connect roads
     start.neighbours.push(mid);
     mid.neighbours.push(start);
-    mid.neighbours.push(end);
-    end.neighbours.push(mid);
+    mid.neighbours.push(mid2);
+    mid2.neighbours.push(mid);
+    mid2.neighbours.push(end);
+    end.neighbours.push(mid2);
 
     // Add to scene
-    [start, mid, end].forEach((r) => {
+    [start, mid, mid2, end].forEach((r) => {
       this.roads.push(r);
       this.scene.add(r.model);
       this.scene.add(r.node);
@@ -72,8 +77,9 @@ export class SceneState {
     // Find route test
     const route = Pathfinder.findRoute(start, end);
     console.log('route', route);
+
     // Create the waypoints for this route
-    const waypoints: THREE.Vector3[] = [];
+    const waypoints: RoadWaypoint[] = [];
     route.forEach((r) => {
       r.waypoints.forEach((rwp) => waypoints.push(rwp));
     });

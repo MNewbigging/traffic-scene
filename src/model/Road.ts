@@ -3,6 +3,11 @@ import * as THREE from 'three';
 import { NumberUtils } from '../utils/NumberUtils';
 import { RoadName } from '../utils/ModelLoader';
 
+export interface RoadWaypoint {
+  roadId: string;
+  point: THREE.Vector3;
+}
+
 export class Road {
   public id = NumberUtils.createId();
   public node: THREE.Points;
@@ -39,10 +44,15 @@ export class Road {
     return this.bounds.max.z - this.bounds.min.z;
   }
 
-  public get waypoints(): THREE.Vector3[] {
+  public get waypoints(): RoadWaypoint[] {
     // TODO - each road may have different waypoints
     // Straight/end roads don't for now
-    return [this.model.position.clone()];
+    const centerWaypoint: RoadWaypoint = {
+      roadId: this.id,
+      point: this.position,
+    };
+
+    return [centerWaypoint];
   }
 
   private generateNodePoint() {
