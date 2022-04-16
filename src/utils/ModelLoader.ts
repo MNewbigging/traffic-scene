@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { group } from 'console';
 
 export type ModelName = VehicleName | RoadName;
 
@@ -9,6 +10,7 @@ export enum VehicleName {
 
 export enum RoadName {
   STRAIGHT = 'road_straight',
+  END = 'road_end',
 }
 
 /**
@@ -41,8 +43,12 @@ export class ModelLoader {
     roadNames.forEach((rName) => this.loadRoad(rName, loader));
   }
 
-  public get models() {
+  public get models(): THREE.Group[] {
     return Array.from(this.modelMap.values());
+  }
+
+  public getModel(name: ModelName): THREE.Group {
+    return this.modelMap.get(name);
   }
 
   private onLoadError = (error: any) => {
@@ -107,7 +113,15 @@ export class ModelLoader {
           this.roadScaleModifier
         );
 
-        this.onLoadModel(rName, model.scene);
+        // Adjust origin
+        const box = new THREE.Box3().setFromObject(model.scene);
+        box.getCenter(model.scene.position).multiplyScalar(-1);
+
+        // Wrap in another group for rotating around its center
+        const parent = new THREE.Group();
+        parent.add(model.scene);
+
+        this.onLoadModel(rName, parent);
       },
       undefined,
       this.onLoadError

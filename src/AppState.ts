@@ -3,7 +3,7 @@ import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 import { CanvasListener } from './utils/CanvasListener';
-import { ModelLoader } from './utils/ModelLoader';
+import { ModelLoader, RoadName, VehicleName } from './utils/ModelLoader';
 
 export class AppState {
   private canvasListener: CanvasListener;
@@ -13,6 +13,9 @@ export class AppState {
   private controls: OrbitControls;
   private masterClock = new THREE.Clock();
   private modelLoader = new ModelLoader();
+
+  private road: THREE.Group;
+  private roadCont: THREE.Box3;
 
   constructor(canvas: HTMLCanvasElement) {
     // Setup screen listener
@@ -28,20 +31,25 @@ export class AppState {
     this.setupCamera();
     this.setupLights();
 
-    // Load models
-    this.modelLoader.loadModels(() => this.start());
-
     // Axes helper - The X axis is red. The Y axis is green. The Z axis is blue.
     const axesHelper = new THREE.AxesHelper(5);
     this.scene.add(axesHelper);
+
+    // Load models
+    this.modelLoader.loadModels(() => this.start());
   }
 
   // Called on load complete
   private start() {
     console.log('starting');
 
-    // Add all models to scene
-    this.modelLoader.models.forEach((m) => this.scene.add(m));
+    // const sedan = this.modelLoader.getModel(VehicleName.SEDAN);
+    // console.log('sedan', sedan);
+    // this.scene.add(sedan);
+
+    const road = this.modelLoader.getModel(RoadName.END);
+    this.road = road;
+    this.scene.add(road);
 
     // Start render loop
     this.animate();
@@ -79,25 +87,14 @@ export class AppState {
     // this.scene.add(pointLight);
   }
 
-  private addRoad() {
-    const loader = new GLTFLoader();
-    loader.load('/src/assets/roads/road_straight.glb', (model: GLTF) => {
-      model.scene.traverse((node) => {
-        if (node instanceof THREE.Mesh) {
-          node.material.metalness = 0;
-        }
-      });
-      model.scene.scale.set(2, 2, 2);
-      this.scene.add(model.scene);
-    });
-  }
-
   private animate = () => {
     requestAnimationFrame(this.animate);
 
     this.controls.update();
 
-    //const deltaTime = this.masterClock.getDelta();
+    const deltaTime = this.masterClock.getDelta();
+
+    //this.road.rotation.y += 0.2 * deltaTime;
 
     this.renderer.render(this.scene, this.camera);
   };
