@@ -63,8 +63,8 @@ export class AppState {
 
     this.controls.update();
 
-    // const deltaTime = this.masterClock.getDelta();
-    // this.sceneState.vehicles.forEach((v) => (v.model.rotation.y += deltaTime));
+    const deltaTime = this.masterClock.getDelta();
+    this.sceneState.updateScene(deltaTime);
 
     this.renderer.render(this.sceneState.scene, this.camera);
   };

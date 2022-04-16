@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 
 import { ModelLoader, ModelNames, RoadName, VehicleName } from '../utils/ModelLoader';
+import { Pathfinder } from '../utils/Pathfinder';
 import { Road } from '../model/Road';
 import { Vehicle } from '../model/Vehicle';
 
@@ -49,6 +50,13 @@ export class SceneState {
     // Rotate start piece
     start.model.rotation.y = Math.PI;
 
+    // Connect roads
+    start.neighbours.push(mid);
+    mid.neighbours.push(start);
+    mid.neighbours.push(end);
+    end.neighbours.push(mid);
+
+    // Add to scene
     [start, mid, end].forEach((r) => {
       this.roads.push(r);
       this.scene.add(r.model);
@@ -61,10 +69,27 @@ export class SceneState {
     // Place at first node
     vehicle.model.position.set(start.position.x, start.position.y, start.position.z);
 
+    // Find route test
+    const route = Pathfinder.findRoute(start, end);
+    console.log('route', route);
+    // Create the waypoints for this route
+    const waypoints: THREE.Vector3[] = [];
+    route.forEach((r) => {
+      r.waypoints.forEach((rwp) => waypoints.push(rwp));
+    });
+    console.log('waypoints', waypoints);
+    vehicle.setRouteWaypoints(waypoints);
+
     this.vehicles.push(vehicle);
     this.scene.add(vehicle.model);
+    this.scene.add(vehicle.routeLine);
 
     // Now ready to start
     this.onReady?.();
+  }
+
+  public updateScene(deltaTime: number) {
+    // Move vehicles along their route
+    this.vehicles.forEach((v) => v.update(deltaTime));
   }
 }
