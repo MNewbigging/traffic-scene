@@ -35,6 +35,14 @@ export class SceneState {
     this.modelLoader.loadModels(modelNames, () => this.buildScene());
   }
 
+  public updateScene(deltaTime: number) {
+    this.controls.target = this.vehicles[0].position;
+    this.controls.update();
+
+    // Move vehicles along their route
+    this.vehicles.forEach((v) => v.update(deltaTime));
+  }
+
   // Once models are loaded, can then piece them together as per scene
   private buildScene() {
     this.setupCamera();
@@ -47,6 +55,29 @@ export class SceneState {
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     this.scene.add(ambientLight);
 
+    this.basicTestScene();
+
+    // Now ready to start
+    this.onReady?.();
+  }
+
+  private setupCamera() {
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      this.canvasListener.width / this.canvasListener.height,
+      0.1,
+      1000
+    );
+    camera.position.x = 2;
+    camera.position.y = 2;
+    camera.position.z = 2;
+
+    this.camera = camera;
+    this.controls = new OrbitControls(this.camera, this.canvasListener.canvas);
+    this.controls.enableDamping = true;
+  }
+
+  private basicTestScene() {
     // Roads
     const start = new Road(RoadName.END, this.modelLoader.getModel(RoadName.END));
     const mid = new Road(RoadName.STRAIGHT, this.modelLoader.getModel(RoadName.STRAIGHT));
@@ -97,32 +128,5 @@ export class SceneState {
     this.vehicles.push(vehicle);
     this.scene.add(vehicle.model);
     this.scene.add(vehicle.routeLine);
-
-    // Now ready to start
-    this.onReady?.();
-  }
-
-  private setupCamera() {
-    const camera = new THREE.PerspectiveCamera(
-      75,
-      this.canvasListener.width / this.canvasListener.height,
-      0.1,
-      1000
-    );
-    camera.position.x = 2;
-    camera.position.y = 2;
-    camera.position.z = 2;
-
-    this.camera = camera;
-    this.controls = new OrbitControls(this.camera, this.canvasListener.canvas);
-    this.controls.enableDamping = true;
-  }
-
-  public updateScene(deltaTime: number) {
-    this.controls.target = this.vehicles[0].position;
-    this.controls.update();
-
-    // Move vehicles along their route
-    this.vehicles.forEach((v) => v.update(deltaTime));
   }
 }

@@ -17,7 +17,7 @@ export class Vehicle {
     // TODO - this is hacky, fix some other way
     this.model.lookAt(1, 0, 0);
     model.getWorldDirection(this.forward);
-    //console.log('model forward', this.forward);
+    console.log('model forward', this.forward);
 
     const mat = new THREE.LineBasicMaterial({ color: 'yellow' });
     const geom = new THREE.BufferGeometry();

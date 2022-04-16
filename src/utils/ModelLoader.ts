@@ -130,7 +130,6 @@ export class ModelLoader {
 
         // Wrap in another group for rotating around its center
         const parent = new THREE.Group();
-
         parent.add(model.scene);
 
         this.onLoadModel(rName, parent);
