@@ -25,12 +25,14 @@ class RoadSearch {
     this.endDistance = end.road.position.distanceTo(this.road.position);
 
     // Weight per road type
-    switch (this.road.name) {
-      case RoadName.END:
-      case RoadName.STRAIGHT:
-        this.weight = 1;
-        break;
-    }
+    this.weight = 1;
+    // switch (this.road.name) {
+    //   case RoadName.END:
+    //   case RoadName.STRAIGHT:
+
+    //     this.weight = 1;
+    //     break;
+    // }
 
     // Total the values for this node and last node
     this.totalWeight = this.weight + this.speedLimitDelta + this.endDistance + last.totalWeight;

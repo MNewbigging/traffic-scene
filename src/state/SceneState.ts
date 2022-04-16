@@ -36,7 +36,7 @@ export class SceneState {
   }
 
   public updateScene(deltaTime: number) {
-    this.controls.target = this.vehicles[0].position;
+    //this.controls.target = this.vehicles[0].position;
     this.controls.update();
 
     // Move vehicles along their route
@@ -48,14 +48,14 @@ export class SceneState {
     this.setupCamera();
 
     // Axes helper - The X axis is red. The Y axis is green. The Z axis is blue.
-    const axesHelper = new THREE.AxesHelper(5);
+    const axesHelper = new THREE.AxesHelper(50);
     this.scene.add(axesHelper);
 
     // lights
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     this.scene.add(ambientLight);
 
-    this.basicTestScene();
+    this.bendTestScene();
 
     // Now ready to start
     this.onReady?.();
@@ -83,14 +83,12 @@ export class SceneState {
     const mid = new Road(RoadName.STRAIGHT, this.modelLoader.getModel(RoadName.STRAIGHT));
     const mid2 = new Road(RoadName.STRAIGHT, this.modelLoader.getModel(RoadName.STRAIGHT));
     const end = new Road(RoadName.END, this.modelLoader.getModel(RoadName.END));
-    const bend = new Road(RoadName.BEND, this.modelLoader.getModel(RoadName.BEND));
 
     // Road pieces are 2x2 on x/z, space apart evenly
-    start.setPositionX(-2);
+    start.position.x = -2;
     // mid already at 0
-    mid2.setPositionX(2);
-    end.setPositionX(4);
-    bend.setPositionX(6);
+    mid2.position.x = 2;
+    end.position.x = 4;
 
     // Rotate start piece
     start.model.rotation.y = Math.PI;
@@ -104,7 +102,7 @@ export class SceneState {
     end.neighbours.push(mid2);
 
     // Add to scene
-    [start, mid, mid2, end, bend].forEach((r) => {
+    [start, mid, mid2, end].forEach((r) => {
       this.roads.push(r);
       this.scene.add(r.model);
     });
@@ -128,5 +126,73 @@ export class SceneState {
     this.vehicles.push(vehicle);
     this.scene.add(vehicle.model);
     this.scene.add(vehicle.routeLine);
+  }
+
+  private bendTestScene() {
+    // Roads
+    const start = new Road(RoadName.END, this.modelLoader.getModel(RoadName.END));
+    const mid = new Road(RoadName.STRAIGHT, this.modelLoader.getModel(RoadName.STRAIGHT));
+    const mid2 = new Road(RoadName.STRAIGHT, this.modelLoader.getModel(RoadName.STRAIGHT));
+    const bend = new Road(RoadName.BEND, this.modelLoader.getModel(RoadName.BEND));
+    const leg = new Road(RoadName.STRAIGHT, this.modelLoader.getModel(RoadName.STRAIGHT));
+    const end = new Road(RoadName.END, this.modelLoader.getModel(RoadName.END));
+
+    // Create an L shape
+    start.position.x = 0;
+    mid.position.x = 2;
+    mid2.position.x = 4;
+    bend.position.x = 6;
+    bend.rotation.y = Math.PI;
+    leg.position.x = 6;
+    leg.position.z = 2;
+    leg.rotation.y = Math.PI / 2;
+    end.position.x = 6;
+    end.position.z = 4;
+    end.rotation.y = -Math.PI / 2;
+
+    // Rotate start piece
+    start.model.rotation.y = Math.PI;
+
+    // Connect roads
+    start.neighbours.push(mid);
+    mid.neighbours.push(start);
+    mid.neighbours.push(mid2);
+    mid2.neighbours.push(mid);
+    mid2.neighbours.push(bend);
+    bend.neighbours.push(mid2);
+    bend.neighbours.push(leg);
+    leg.neighbours.push(bend);
+    leg.neighbours.push(end);
+    end.neighbours.push(leg);
+
+    // Add to scene
+    [start, mid, mid2, end, bend, leg].forEach((r) => {
+      r.updateWaypoints(); // do this after moving them
+      this.roads.push(r);
+      this.scene.add(r.model);
+    });
+
+    // Vehicle
+    const vehicle = new Vehicle(VehicleName.SEDAN, this.modelLoader.getModel(VehicleName.SEDAN));
+
+    // Place at first node
+    vehicle.model.position.set(start.position.x, start.position.y, start.position.z);
+
+    // Find route test
+    const route = Pathfinder.findRoute(start, end);
+
+    // Create the waypoints for this route
+    const waypoints: RoadWaypoint[] = [];
+    route.forEach((r) => {
+      r.waypoints.forEach((rwp) => waypoints.push(rwp));
+    });
+    vehicle.setRouteWaypoints(waypoints);
+
+    this.vehicles.push(vehicle);
+    this.scene.add(vehicle.model);
+    this.scene.add(vehicle.routeLine);
+
+    // TEMP - focus on bend
+    this.controls.target = bend.position;
   }
 }
