@@ -1,5 +1,7 @@
 import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
+import { CanvasListener } from '../utils/CanvasListener';
 import { ModelLoader, ModelNames, RoadName, VehicleName } from '../utils/ModelLoader';
 import { Pathfinder } from '../utils/Pathfinder';
 import { Road, RoadWaypoint } from '../model/Road';
@@ -10,10 +12,14 @@ import { Vehicle } from '../model/Vehicle';
  */
 export class SceneState {
   public scene = new THREE.Scene();
+  public camera: THREE.PerspectiveCamera;
+  private controls: OrbitControls;
   public roads: Road[] = [];
   public vehicles: Vehicle[] = [];
   private modelLoader = new ModelLoader();
   private onReady?: () => void;
+
+  constructor(private canvasListener: CanvasListener) {}
 
   // This kicks off the model loading required for this scene
   public initScene(onReady: () => void) {
@@ -30,6 +36,8 @@ export class SceneState {
 
   // Once models are loaded, can then piece them together as per scene
   private buildScene() {
+    this.setupCamera();
+
     // Axes helper - The X axis is red. The Y axis is green. The Z axis is blue.
     const axesHelper = new THREE.AxesHelper(5);
     this.scene.add(axesHelper);
@@ -94,7 +102,26 @@ export class SceneState {
     this.onReady?.();
   }
 
+  private setupCamera() {
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      this.canvasListener.width / this.canvasListener.height,
+      0.1,
+      1000
+    );
+    camera.position.x = 2;
+    camera.position.y = 2;
+    camera.position.z = 2;
+
+    this.camera = camera;
+    this.controls = new OrbitControls(this.camera, this.canvasListener.canvas);
+    this.controls.enableDamping = true;
+  }
+
   public updateScene(deltaTime: number) {
+    this.controls.target = this.vehicles[0].position;
+    this.controls.update();
+
     // Move vehicles along their route
     this.vehicles.forEach((v) => v.update(deltaTime));
   }

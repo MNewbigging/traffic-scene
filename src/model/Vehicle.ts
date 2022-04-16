@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 import { NumberUtils } from '../utils/NumberUtils';
-import { Road, RoadWaypoint } from './Road';
+import { RoadWaypoint } from './Road';
 import { VehicleName } from '../utils/ModelLoader';
 
 export class Vehicle {
