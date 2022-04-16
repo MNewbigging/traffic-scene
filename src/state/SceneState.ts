@@ -2,6 +2,7 @@ import * as THREE from 'three';
 
 import { ModelLoader, ModelNames, RoadName, VehicleName } from '../utils/ModelLoader';
 import { Road } from '../model/Road';
+import { Vehicle } from '../model/Vehicle';
 
 /**
  * Contains all the objects in the scene
@@ -9,6 +10,7 @@ import { Road } from '../model/Road';
 export class SceneState {
   public scene = new THREE.Scene();
   public roads: Road[] = [];
+  public vehicles: Vehicle[] = [];
   private modelLoader = new ModelLoader();
   private onReady?: () => void;
 
@@ -20,6 +22,7 @@ export class SceneState {
     // This is where proc gen comes in - hardcoded for now
     const modelNames = new ModelNames();
     modelNames.roads = [RoadName.END, RoadName.STRAIGHT];
+    modelNames.vehicles = [VehicleName.SEDAN];
 
     this.modelLoader.loadModels(modelNames, () => this.buildScene());
   }
@@ -34,7 +37,7 @@ export class SceneState {
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     this.scene.add(ambientLight);
 
-    // First basic scene - end piece, straight piece, end piece
+    // Roads
     const start = new Road(RoadName.END, this.modelLoader.getModel(RoadName.END));
     const mid = new Road(RoadName.STRAIGHT, this.modelLoader.getModel(RoadName.STRAIGHT));
     const end = new Road(RoadName.END, this.modelLoader.getModel(RoadName.END));
@@ -51,6 +54,15 @@ export class SceneState {
       this.scene.add(r.model);
       this.scene.add(r.node);
     });
+
+    // Vehicle
+    const vehicle = new Vehicle(VehicleName.SEDAN, this.modelLoader.getModel(VehicleName.SEDAN));
+
+    // Place at first node
+    vehicle.model.position.set(start.position.x, start.position.y, start.position.z);
+
+    this.vehicles.push(vehicle);
+    this.scene.add(vehicle.model);
 
     // Now ready to start
     this.onReady?.();

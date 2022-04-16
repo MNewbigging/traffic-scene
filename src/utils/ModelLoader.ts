@@ -91,7 +91,12 @@ export class ModelLoader {
           this.vehicleScaleModifer
         );
 
-        this.onLoadModel(vName, model.scene);
+        // Wrap in parent to set proper facing direction
+        const parent = new THREE.Group();
+        model.scene.rotation.y = Math.PI;
+        parent.add(model.scene);
+
+        this.onLoadModel(vName, parent);
       },
       undefined,
       this.onLoadError

@@ -12,11 +12,10 @@ export class Road {
     this.bounds.getSize(this.size);
 
     this.generateNodePoint();
-    console.log('node', this.node.position);
 
-    // const forward = new THREE.Vector3();
-    // model.getWorldDirection(forward);
-    // console.log('model forward', forward);
+    const forward = new THREE.Vector3();
+    model.getWorldDirection(forward);
+    console.log('model forward', forward);
   }
 
   public get position(): THREE.Vector3 {
