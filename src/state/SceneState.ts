@@ -13,9 +13,10 @@ import { Vehicle } from '../model/Vehicle';
 export class SceneState {
   public scene = new THREE.Scene();
   public camera: THREE.PerspectiveCamera;
-  private controls: OrbitControls;
   public roads: Road[] = [];
   public vehicles: Vehicle[] = [];
+
+  private controls: OrbitControls;
   private modelLoader = new ModelLoader();
   private onReady?: () => void;
 
@@ -28,7 +29,7 @@ export class SceneState {
     // Work out which models we need to load for this scene
     // This is where proc gen comes in - hardcoded for now
     const modelNames = new ModelNames();
-    modelNames.roads = [RoadName.END, RoadName.STRAIGHT];
+    modelNames.roads = [RoadName.END, RoadName.STRAIGHT, RoadName.BEND];
     modelNames.vehicles = [VehicleName.SEDAN];
 
     this.modelLoader.loadModels(modelNames, () => this.buildScene());
@@ -51,12 +52,14 @@ export class SceneState {
     const mid = new Road(RoadName.STRAIGHT, this.modelLoader.getModel(RoadName.STRAIGHT));
     const mid2 = new Road(RoadName.STRAIGHT, this.modelLoader.getModel(RoadName.STRAIGHT));
     const end = new Road(RoadName.END, this.modelLoader.getModel(RoadName.END));
+    const bend = new Road(RoadName.BEND, this.modelLoader.getModel(RoadName.BEND));
 
     // Road pieces are 2x2 on x/z, space apart evenly
     start.setPositionX(-2);
     // mid already at 0
     mid2.setPositionX(2);
     end.setPositionX(4);
+    bend.setPositionX(6);
 
     // Rotate start piece
     start.model.rotation.y = Math.PI;
@@ -70,10 +73,9 @@ export class SceneState {
     end.neighbours.push(mid2);
 
     // Add to scene
-    [start, mid, mid2, end].forEach((r) => {
+    [start, mid, mid2, end, bend].forEach((r) => {
       this.roads.push(r);
       this.scene.add(r.model);
-      this.scene.add(r.node);
     });
 
     // Vehicle
@@ -84,14 +86,12 @@ export class SceneState {
 
     // Find route test
     const route = Pathfinder.findRoute(start, end);
-    console.log('route', route);
 
     // Create the waypoints for this route
     const waypoints: RoadWaypoint[] = [];
     route.forEach((r) => {
       r.waypoints.forEach((rwp) => waypoints.push(rwp));
     });
-    console.log('waypoints', waypoints);
     vehicle.setRouteWaypoints(waypoints);
 
     this.vehicles.push(vehicle);

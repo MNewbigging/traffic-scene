@@ -66,7 +66,6 @@ export class Vehicle {
 
     // Have we reached the next waypoint?
     if (NumberUtils.vectorsEqual(this.position, this.nextWaypoint.point)) {
-      console.log('reached next waypoint', this.position);
       // Remove this waypoint
       // Note - this has last visited road id
       this.routeWaypoints.shift();
@@ -74,27 +73,17 @@ export class Vehicle {
 
       // Was that the last waypoint on this route?
       if (!this.routeWaypoints.length) {
-        console.log('reached last waypoint');
         return;
       }
 
       // Target next waypoint in list
       this.nextWaypoint = this.routeWaypoints[0];
-      console.log('moving to ', this.nextWaypoint);
     }
 
     // Otherwise, keep moving towards next target
-
-    // Note - this slows down as it approaches the target
-    // Direction from here to target
     const direction = this.nextWaypoint.point.clone().sub(this.position).normalize();
     const speed = deltaTime * this.speed;
     this.position.x += direction.x * speed;
     this.position.z += direction.z * speed;
-
-    // this.nextWaypointTime += deltaTime * this.speed;
-    // this.position.lerp(this.nextWaypoint, this.nextWaypointTime);
-
-    //console.log('pos', this.position);
   }
 }
