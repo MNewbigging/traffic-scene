@@ -33,6 +33,8 @@ export class ModelLoader {
   private modelsToLoad = 0;
   private onLoad?: () => void;
 
+  private waypointLineMat = new THREE.LineBasicMaterial({ color: 'blue' });
+
   public loadModels(modelNames: ModelNames, onLoad: () => void) {
     this.onLoad = onLoad;
 
@@ -149,6 +151,8 @@ export class ModelLoader {
     // The transform origin is offset; this solves that so it's at 0
     const box = new THREE.Box3().setFromObject(road);
     box.getCenter(road.position).multiplyScalar(-1);
+    const roadSize = new THREE.Vector3();
+    box.getSize(roadSize);
 
     // The rotatio norigin is still offset; wrap it in a parent, then
     // Rotate that parent so that it faces 0,0,1
@@ -156,27 +160,68 @@ export class ModelLoader {
     parent.add(road);
     parent.rotation.y = -Math.PI / 2;
 
+    const waypoints = this.createRoadWaypoints(rName, parent, roadSize);
+
     // Parent for the road(parent) and the waypoints
     const grandparent = new THREE.Group();
     grandparent.add(parent);
-
-    // Create waypoints as necessary
-    const waypoints = this.createRoadWaypoints(rName);
     if (waypoints) {
-      parent.add(waypoints);
+      grandparent.add(waypoints);
     }
 
     return grandparent;
   }
 
-  private createRoadWaypoints(rName: RoadName): THREE.Group | undefined {
+  private createRoadWaypoints(rName: RoadName, road: THREE.Group, roadSize: THREE.Vector3) {
     switch (rName) {
+      case RoadName.STRAIGHT:
+        return this.createRoadStraightWaypoints(road, roadSize);
+        break;
       case RoadName.BEND:
+        this.createRoadBendWaypoints(road);
         break;
     }
 
     return undefined;
   }
 
-  private createRoadBendWaypoints() {}
+  private createRoadStraightWaypoints(road: THREE.Group, size: THREE.Vector3) {
+    // Create two lines; one for each lane of this road
+    const width = size.x;
+    console.log('width', width);
+    const quarter = width * 0.25;
+    console.log('quarter', quarter);
+
+    // Allow for pavement
+    const halfWidth = width * 0.5; // Center line
+    const laneCenter = halfWidth * 0.4; // Pavement roughly 10% of a half
+
+    // Lane 1
+    const laneOnePoints = [
+      new THREE.Vector3(road.position.x - laneCenter, road.position.y, road.position.z - 1),
+      new THREE.Vector3(road.position.x - laneCenter, road.position.y, road.position.z),
+      new THREE.Vector3(road.position.x - laneCenter, road.position.y, road.position.z + 1),
+    ];
+
+    // Lane 2
+    const laneTwoPoints = [
+      new THREE.Vector3(road.position.x + laneCenter, road.position.y, road.position.z - 1),
+      new THREE.Vector3(road.position.x + laneCenter, road.position.y, road.position.z),
+      new THREE.Vector3(road.position.x + laneCenter, road.position.y, road.position.z + 1),
+    ];
+
+    const laneOneGeom = new THREE.BufferGeometry().setFromPoints(laneOnePoints);
+    const laneOneLine = new THREE.Line(laneOneGeom, this.waypointLineMat);
+
+    const laneTwoGeom = new THREE.BufferGeometry().setFromPoints(laneTwoPoints);
+    const laneTwoLine = new THREE.Line(laneTwoGeom, this.waypointLineMat);
+
+    const lineGroup = new THREE.Group();
+    lineGroup.add(laneOneLine);
+    lineGroup.add(laneTwoLine);
+
+    return lineGroup;
+  }
+
+  private createRoadBendWaypoints(road: THREE.Group) {}
 }

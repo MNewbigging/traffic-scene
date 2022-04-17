@@ -81,16 +81,15 @@ export class SceneState {
 
   private roadTestScene() {
     const straight = new Road(RoadName.STRAIGHT, this.modelLoader.getModel(RoadName.STRAIGHT));
+    this.scene.add(straight.model);
 
     const sForward = new THREE.Vector3();
     straight.model.getWorldDirection(sForward);
     this.arrow = new THREE.ArrowHelper(sForward, straight.position, 1.5, 0xff0000);
-
-    const axesHelper = new THREE.AxesHelper(5);
-
-    this.scene.add(axesHelper);
-    this.scene.add(straight.model);
     this.scene.add(this.arrow);
+
+    // const axesHelper = new THREE.AxesHelper(5);
+    // this.scene.add(axesHelper);
   }
 
   private basicTestScene() {
