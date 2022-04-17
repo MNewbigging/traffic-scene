@@ -80,16 +80,47 @@ export class SceneState {
   }
 
   private roadTestScene() {
-    const straight = new Road(RoadName.STRAIGHT, this.modelLoader.getModel(RoadName.STRAIGHT));
-    this.scene.add(straight.model);
+    const s1 = new Road(RoadName.STRAIGHT, this.modelLoader.getModel(RoadName.STRAIGHT));
+    const s2 = new Road(RoadName.STRAIGHT, this.modelLoader.getModel(RoadName.STRAIGHT));
+    const s3 = new Road(RoadName.STRAIGHT, this.modelLoader.getModel(RoadName.STRAIGHT));
 
-    const sForward = new THREE.Vector3();
-    straight.model.getWorldDirection(sForward);
-    this.arrow = new THREE.ArrowHelper(sForward, straight.position, 1.5, 0xff0000);
+    s1.rotation.y += Math.PI / 2;
+
+    s2.position.z = -2;
+    s2.rotation.y += Math.PI;
+
+    s3.position.z = -4;
+    //s3.rotation.y -= Math.PI / 2;
+
+    s1.generateLaneLines();
+    s2.generateLaneLines();
+    s3.generateLaneLines();
+
+    const s1dir = new THREE.Vector3();
+    s1.model.getWorldDirection(s1dir);
+    const arrow = new THREE.ArrowHelper(s1dir, s1.position, 1.5);
+    this.scene.add(arrow);
+
+    const dir = new THREE.Vector3();
+    s2.model.getWorldDirection(dir);
+    this.arrow = new THREE.ArrowHelper(dir, s2.position, 1.5);
     this.scene.add(this.arrow);
 
-    // const axesHelper = new THREE.AxesHelper(5);
-    // this.scene.add(axesHelper);
+    // Show road lines
+    const lineMat = new THREE.LineBasicMaterial({ color: 'blue', linewidth: 2 });
+    const l2mat = new THREE.LineBasicMaterial({ color: 'yellow', linewidth: 2 });
+
+    [s1, s2, s3].forEach((s) => {
+      this.scene.add(s.model);
+      // Show road lines
+      const laneOneGeom = new THREE.BufferGeometry().setFromPoints(s.laneOnePoints);
+      const laneOneLine = new THREE.Line(laneOneGeom, lineMat);
+      this.scene.add(laneOneLine);
+
+      const laneTwoGeom = new THREE.BufferGeometry().setFromPoints(s.laneTwoPoints);
+      const laneTwoLine = new THREE.Line(laneTwoGeom, l2mat);
+      this.scene.add(laneTwoLine);
+    });
   }
 
   private basicTestScene() {

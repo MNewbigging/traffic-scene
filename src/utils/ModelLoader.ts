@@ -160,14 +160,14 @@ export class ModelLoader {
     parent.add(road);
     parent.rotation.y = -Math.PI / 2;
 
-    const waypoints = this.createRoadWaypoints(rName, parent, roadSize);
+    //const waypoints = this.createRoadWaypoints(rName, parent, roadSize);
 
     // Parent for the road(parent) and the waypoints
     const grandparent = new THREE.Group();
     grandparent.add(parent);
-    if (waypoints) {
-      grandparent.add(waypoints);
-    }
+    // if (waypoints) {
+    //   grandparent.add(waypoints);
+    // }
 
     return grandparent;
   }

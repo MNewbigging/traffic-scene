@@ -13,16 +13,11 @@ export class Road {
   public neighbours: Road[] = [];
   public speedLimit = 1;
   public _waypoints: THREE.Vector3[] = [];
-  private bounds: THREE.Box3;
-  private size = new THREE.Vector3();
+  public laneOnePoints: THREE.Vector3[] = [];
+  public laneTwoPoints: THREE.Vector3[] = [];
 
   constructor(public name: RoadName, public model: THREE.Group) {
-    this.bounds = new THREE.Box3().setFromObject(model);
-    this.bounds.getSize(this.size);
-
-    const forward = new THREE.Vector3();
-    model.getWorldDirection(forward);
-    console.log('model forward for ' + name, forward);
+    this.generateLaneLines();
   }
 
   public get position(): THREE.Vector3 {
@@ -31,14 +26,6 @@ export class Road {
 
   public get rotation(): THREE.Euler {
     return this.model.rotation;
-  }
-
-  public get width() {
-    return this.bounds.max.x - this.bounds.min.x;
-  }
-
-  public get depth() {
-    return this.bounds.max.z - this.bounds.min.z;
   }
 
   // Must be called after re-positioning this road
@@ -72,6 +59,72 @@ export class Road {
 
         this._waypoints = [first, second, third, fourth, fifth];
         break;
+    }
+  }
+
+  public generateLaneLines() {
+    // Creates this road's waypoints for both lanes
+    const box = new THREE.Box3().setFromObject(this.model);
+    const size = new THREE.Vector3();
+    box.getSize(size);
+
+    const center = size.x * 0.5;
+    const laneCenter = center * 0.4; // Pavement roughly 10% of a half
+
+    // Create lanes relative to forward direction
+    // Below is when forward is (0, 0, 1)
+    // If forward would be (0, 0, -1) - below lanes would be swapped
+    // x or z are -1/1 when facing that way (other will be 2.something)
+    const forward = new THREE.Vector3();
+    this.model.getWorldDirection(forward);
+    console.log('forward', forward);
+
+    // No rotation or 180 degree rotation
+    if (forward.z === 1 || forward.z === -1) {
+      // Lane 1
+      const laneOnePoints = [
+        new THREE.Vector3(this.position.x + laneCenter, this.position.y, this.position.z - 1),
+        new THREE.Vector3(this.position.x + laneCenter, this.position.y, this.position.z),
+        new THREE.Vector3(this.position.x + laneCenter, this.position.y, this.position.z + 1),
+      ];
+      // Lane 2
+      const laneTwoPoints = [
+        new THREE.Vector3(this.position.x - laneCenter, this.position.y, this.position.z - 1),
+        new THREE.Vector3(this.position.x - laneCenter, this.position.y, this.position.z),
+        new THREE.Vector3(this.position.x - laneCenter, this.position.y, this.position.z + 1),
+      ];
+
+      // If 180 degree needs swapping, otherwise above are as lanes 1 and 2
+      if (forward.z === 1) {
+        this.laneOnePoints = laneOnePoints;
+        this.laneTwoPoints = laneTwoPoints;
+      } else if (forward.z === -1) {
+        this.laneOnePoints = laneTwoPoints;
+        this.laneTwoPoints = laneOnePoints;
+      }
+    }
+    // Otherwise, we're facing x axis
+    else {
+      // Lane 1
+      const laneOnePoints = [
+        new THREE.Vector3(this.position.x - 1, this.position.y, this.position.z - laneCenter),
+        new THREE.Vector3(this.position.x, this.position.y, this.position.z - laneCenter),
+        new THREE.Vector3(this.position.x + 1, this.position.y, this.position.z - laneCenter),
+      ];
+      // Lane 2
+      const laneTwoPoints = [
+        new THREE.Vector3(this.position.x - 1, this.position.y, this.position.z + laneCenter),
+        new THREE.Vector3(this.position.x, this.position.y, this.position.z + laneCenter),
+        new THREE.Vector3(this.position.x + 1, this.position.y, this.position.z + laneCenter),
+      ];
+
+      if (forward.x === 1) {
+        this.laneOnePoints = laneOnePoints;
+        this.laneTwoPoints = laneTwoPoints;
+      } else if (forward.x === -1) {
+        this.laneOnePoints = laneTwoPoints;
+        this.laneTwoPoints = laneOnePoints;
+      }
     }
   }
 }
