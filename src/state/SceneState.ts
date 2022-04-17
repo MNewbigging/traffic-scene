@@ -20,6 +20,8 @@ export class SceneState {
   private modelLoader = new ModelLoader();
   private onReady?: () => void;
 
+  private arrow: THREE.ArrowHelper;
+
   constructor(private canvasListener: CanvasListener) {}
 
   // This kicks off the model loading required for this scene
@@ -55,7 +57,7 @@ export class SceneState {
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     this.scene.add(ambientLight);
 
-    this.bendTestScene();
+    this.roadTestScene();
 
     // Now ready to start
     this.onReady?.();
@@ -75,6 +77,20 @@ export class SceneState {
     this.camera = camera;
     this.controls = new OrbitControls(this.camera, this.canvasListener.canvas);
     this.controls.enableDamping = true;
+  }
+
+  private roadTestScene() {
+    const straight = new Road(RoadName.STRAIGHT, this.modelLoader.getModel(RoadName.STRAIGHT));
+
+    const sForward = new THREE.Vector3();
+    straight.model.getWorldDirection(sForward);
+    this.arrow = new THREE.ArrowHelper(sForward, straight.position, 1.5, 0xff0000);
+
+    const axesHelper = new THREE.AxesHelper(5);
+
+    this.scene.add(axesHelper);
+    this.scene.add(straight.model);
+    this.scene.add(this.arrow);
   }
 
   private basicTestScene() {

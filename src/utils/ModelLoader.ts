@@ -117,25 +117,66 @@ export class ModelLoader {
           }
         });
 
-        // Adjust scale of roads
-        model.scene.scale.set(
-          this.roadScaleModifier,
-          this.roadScaleModifier,
-          this.roadScaleModifier
-        );
+        // Setup road
+        const road = this.setupRoad(rName, model.scene);
+        this.onLoadModel(rName, road);
+        // // Adjust scale of roads
+        // model.scene.scale.set(
+        //   this.roadScaleModifier,
+        //   this.roadScaleModifier,
+        //   this.roadScaleModifier
+        // );
 
-        // Adjust origin
-        const box = new THREE.Box3().setFromObject(model.scene);
-        box.getCenter(model.scene.position).multiplyScalar(-1);
+        // // Adjust origin
+        // const box = new THREE.Box3().setFromObject(model.scene);
+        // box.getCenter(model.scene.position).multiplyScalar(-1);
 
-        // Wrap in another group for rotating around its center
-        const parent = new THREE.Group();
-        parent.add(model.scene);
+        // // Wrap in another group for rotating around its center
+        // const parent = new THREE.Group();
+        // parent.add(model.scene);
 
-        this.onLoadModel(rName, parent);
+        // this.onLoadModel(rName, parent);
       },
       undefined,
       this.onLoadError
     );
   }
+
+  private setupRoad(rName: RoadName, road: THREE.Group) {
+    // Adjust scale of roads
+    road.scale.set(this.roadScaleModifier, this.roadScaleModifier, this.roadScaleModifier);
+
+    // The transform origin is offset; this solves that so it's at 0
+    const box = new THREE.Box3().setFromObject(road);
+    box.getCenter(road.position).multiplyScalar(-1);
+
+    // The rotatio norigin is still offset; wrap it in a parent, then
+    // Rotate that parent so that it faces 0,0,1
+    const parent = new THREE.Group();
+    parent.add(road);
+    parent.rotation.y = -Math.PI / 2;
+
+    // Parent for the road(parent) and the waypoints
+    const grandparent = new THREE.Group();
+    grandparent.add(parent);
+
+    // Create waypoints as necessary
+    const waypoints = this.createRoadWaypoints(rName);
+    if (waypoints) {
+      parent.add(waypoints);
+    }
+
+    return grandparent;
+  }
+
+  private createRoadWaypoints(rName: RoadName): THREE.Group | undefined {
+    switch (rName) {
+      case RoadName.BEND:
+        break;
+    }
+
+    return undefined;
+  }
+
+  private createRoadBendWaypoints() {}
 }
