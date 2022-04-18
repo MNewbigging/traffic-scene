@@ -13,12 +13,13 @@ export class Road {
   public neighbours: Road[] = [];
   public speedLimit = 1;
   public _waypoints: THREE.Vector3[] = [];
+  // Left lane according to roads standard forward direction - (0, 0, 1)
   public laneOnePoints: THREE.Vector3[] = [];
   public laneTwoPoints: THREE.Vector3[] = [];
+  public leftLane: THREE.Line;
+  public rightLane: THREE.Line;
 
-  constructor(public name: RoadName, public model: THREE.Group) {
-    this.generateLaneLines();
-  }
+  constructor(public name: RoadName, public model: THREE.Group) {}
 
   public get position(): THREE.Vector3 {
     return this.model.position;
@@ -26,6 +27,12 @@ export class Road {
 
   public get rotation(): THREE.Euler {
     return this.model.rotation;
+  }
+
+  public setRotation(axis: 'x' | 'y' | 'z', value: number) {
+    this.model.rotation[axis] = value;
+    this.leftLane.rotation[axis] = value;
+    this.rightLane.rotation[axis] = value;
   }
 
   // Must be called after re-positioning this road
@@ -68,8 +75,8 @@ export class Road {
     const size = new THREE.Vector3();
     box.getSize(size);
 
-    const center = size.x * 0.5;
-    const laneCenter = center * 0.4; // Pavement roughly 10% of a half
+    const halfWidth = size.x * 0.5;
+    const laneCenter = halfWidth * 0.4; // Pavement roughly 10% of a half
 
     // Create lanes relative to forward direction
     // Below is when forward is (0, 0, 1)
@@ -83,15 +90,31 @@ export class Road {
     if (forward.z === 1 || forward.z === -1) {
       // Lane 1
       const laneOnePoints = [
-        new THREE.Vector3(this.position.x + laneCenter, this.position.y, this.position.z - 1),
+        new THREE.Vector3(
+          this.position.x + laneCenter,
+          this.position.y,
+          this.position.z - halfWidth
+        ),
         new THREE.Vector3(this.position.x + laneCenter, this.position.y, this.position.z),
-        new THREE.Vector3(this.position.x + laneCenter, this.position.y, this.position.z + 1),
+        new THREE.Vector3(
+          this.position.x + laneCenter,
+          this.position.y,
+          this.position.z + halfWidth
+        ),
       ];
       // Lane 2
       const laneTwoPoints = [
-        new THREE.Vector3(this.position.x - laneCenter, this.position.y, this.position.z - 1),
+        new THREE.Vector3(
+          this.position.x - laneCenter,
+          this.position.y,
+          this.position.z - halfWidth
+        ),
         new THREE.Vector3(this.position.x - laneCenter, this.position.y, this.position.z),
-        new THREE.Vector3(this.position.x - laneCenter, this.position.y, this.position.z + 1),
+        new THREE.Vector3(
+          this.position.x - laneCenter,
+          this.position.y,
+          this.position.z + halfWidth
+        ),
       ];
 
       // If 180 degree needs swapping, otherwise above are as lanes 1 and 2
@@ -107,15 +130,31 @@ export class Road {
     else {
       // Lane 1
       const laneOnePoints = [
-        new THREE.Vector3(this.position.x - 1, this.position.y, this.position.z - laneCenter),
+        new THREE.Vector3(
+          this.position.x - halfWidth,
+          this.position.y,
+          this.position.z - laneCenter
+        ),
         new THREE.Vector3(this.position.x, this.position.y, this.position.z - laneCenter),
-        new THREE.Vector3(this.position.x + 1, this.position.y, this.position.z - laneCenter),
+        new THREE.Vector3(
+          this.position.x + halfWidth,
+          this.position.y,
+          this.position.z - laneCenter
+        ),
       ];
       // Lane 2
       const laneTwoPoints = [
-        new THREE.Vector3(this.position.x - 1, this.position.y, this.position.z + laneCenter),
+        new THREE.Vector3(
+          this.position.x - halfWidth,
+          this.position.y,
+          this.position.z + laneCenter
+        ),
         new THREE.Vector3(this.position.x, this.position.y, this.position.z + laneCenter),
-        new THREE.Vector3(this.position.x + 1, this.position.y, this.position.z + laneCenter),
+        new THREE.Vector3(
+          this.position.x + halfWidth,
+          this.position.y,
+          this.position.z + laneCenter
+        ),
       ];
 
       if (forward.x === 1) {

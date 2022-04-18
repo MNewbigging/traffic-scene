@@ -5,6 +5,7 @@ import { CanvasListener } from '../utils/CanvasListener';
 import { ModelLoader, ModelNames, RoadName, VehicleName } from '../utils/ModelLoader';
 import { Pathfinder } from '../utils/Pathfinder';
 import { Road, RoadWaypoint } from '../model/Road';
+import { RoadFactory } from '../utils/RoadFactory';
 import { Vehicle } from '../model/Vehicle';
 
 /**
@@ -57,7 +58,7 @@ export class SceneState {
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     this.scene.add(ambientLight);
 
-    this.roadTestScene();
+    this.lanesTestScene();
 
     // Now ready to start
     this.onReady?.();
@@ -79,46 +80,65 @@ export class SceneState {
     this.controls.enableDamping = true;
   }
 
+  private lanesTestScene() {
+    const s1 = RoadFactory.createRoad(
+      RoadName.STRAIGHT,
+      this.modelLoader.getModel(RoadName.STRAIGHT)
+    );
+
+    s1.setRotation('y', -(Math.PI / 2));
+
+    const face = new THREE.Vector3();
+    s1.model.getWorldDirection(face);
+    const arrow = new THREE.ArrowHelper(face, s1.model.position, 1.5);
+    this.scene.add(arrow);
+
+    // this.scene.add(s1.topGroup);
+    this.scene.add(s1.model);
+    this.scene.add(s1.leftLane);
+    this.scene.add(s1.rightLane);
+  }
+
   private roadTestScene() {
     const s1 = new Road(RoadName.STRAIGHT, this.modelLoader.getModel(RoadName.STRAIGHT));
     const s2 = new Road(RoadName.STRAIGHT, this.modelLoader.getModel(RoadName.STRAIGHT));
     const s3 = new Road(RoadName.STRAIGHT, this.modelLoader.getModel(RoadName.STRAIGHT));
 
-    s1.rotation.y += Math.PI / 2;
-
     s2.position.z = -2;
-    s2.rotation.y += Math.PI;
-
     s3.position.z = -4;
-    //s3.rotation.y -= Math.PI / 2;
 
     s1.generateLaneLines();
     s2.generateLaneLines();
     s3.generateLaneLines();
 
-    const s1dir = new THREE.Vector3();
-    s1.model.getWorldDirection(s1dir);
-    const arrow = new THREE.ArrowHelper(s1dir, s1.position, 1.5);
-    this.scene.add(arrow);
+    s1.neighbours.push(s2);
+    s2.neighbours.push(s1);
+    s2.neighbours.push(s3);
+    s3.neighbours.push(s2);
 
-    const dir = new THREE.Vector3();
-    s2.model.getWorldDirection(dir);
-    this.arrow = new THREE.ArrowHelper(dir, s2.position, 1.5);
-    this.scene.add(this.arrow);
+    const car = new Vehicle(VehicleName.SEDAN, this.modelLoader.getModel(VehicleName.SEDAN));
+    // Find the roads that make up the route
+    const route: Road[] = Pathfinder.findRoute(s1, s3);
+    // Find the waypoints for each road; requires picking the correct (left) lane
+    this.getTravelDirection(route[0], route[1]);
+    // get travel direction from route info
+    // compare with road facing direction - dot product
+    // if same dir, lane one, if opposite dirs, lane two
 
     // Show road lines
-    const lineMat = new THREE.LineBasicMaterial({ color: 'blue', linewidth: 2 });
-    const l2mat = new THREE.LineBasicMaterial({ color: 'yellow', linewidth: 2 });
+    const laneOneMat = new THREE.LineBasicMaterial({ color: 'blue' });
+    const laneTwoMat = new THREE.LineBasicMaterial({ color: 'yellow' });
 
     [s1, s2, s3].forEach((s) => {
       this.scene.add(s.model);
+
       // Show road lines
       const laneOneGeom = new THREE.BufferGeometry().setFromPoints(s.laneOnePoints);
-      const laneOneLine = new THREE.Line(laneOneGeom, lineMat);
+      const laneOneLine = new THREE.Line(laneOneGeom, laneOneMat);
       this.scene.add(laneOneLine);
 
       const laneTwoGeom = new THREE.BufferGeometry().setFromPoints(s.laneTwoPoints);
-      const laneTwoLine = new THREE.Line(laneTwoGeom, l2mat);
+      const laneTwoLine = new THREE.Line(laneTwoGeom, laneTwoMat);
       this.scene.add(laneTwoLine);
     });
   }
@@ -241,5 +261,12 @@ export class SceneState {
     // TEMP - focus on bend
     this.controls.target = bend.position;
     this.scene.add(vehicle.dirArrow);
+  }
+
+  // First two roads in a route
+  private getTravelDirection(firstRoad: Road, secondRoad: Road) {
+    const direction = secondRoad.position.clone().sub(firstRoad.position).normalize();
+    console.log('travel direction', direction);
+    return direction;
   }
 }

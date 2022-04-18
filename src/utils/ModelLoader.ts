@@ -160,68 +160,10 @@ export class ModelLoader {
     parent.add(road);
     parent.rotation.y = -Math.PI / 2;
 
-    //const waypoints = this.createRoadWaypoints(rName, parent, roadSize);
-
-    // Parent for the road(parent) and the waypoints
+    // Parent for the road(parent)
     const grandparent = new THREE.Group();
     grandparent.add(parent);
-    // if (waypoints) {
-    //   grandparent.add(waypoints);
-    // }
 
     return grandparent;
   }
-
-  private createRoadWaypoints(rName: RoadName, road: THREE.Group, roadSize: THREE.Vector3) {
-    switch (rName) {
-      case RoadName.STRAIGHT:
-        return this.createRoadStraightWaypoints(road, roadSize);
-        break;
-      case RoadName.BEND:
-        this.createRoadBendWaypoints(road);
-        break;
-    }
-
-    return undefined;
-  }
-
-  private createRoadStraightWaypoints(road: THREE.Group, size: THREE.Vector3) {
-    // Create two lines; one for each lane of this road
-    const width = size.x;
-    console.log('width', width);
-    const quarter = width * 0.25;
-    console.log('quarter', quarter);
-
-    // Allow for pavement
-    const halfWidth = width * 0.5; // Center line
-    const laneCenter = halfWidth * 0.4; // Pavement roughly 10% of a half
-
-    // Lane 1
-    const laneOnePoints = [
-      new THREE.Vector3(road.position.x - laneCenter, road.position.y, road.position.z - 1),
-      new THREE.Vector3(road.position.x - laneCenter, road.position.y, road.position.z),
-      new THREE.Vector3(road.position.x - laneCenter, road.position.y, road.position.z + 1),
-    ];
-
-    // Lane 2
-    const laneTwoPoints = [
-      new THREE.Vector3(road.position.x + laneCenter, road.position.y, road.position.z - 1),
-      new THREE.Vector3(road.position.x + laneCenter, road.position.y, road.position.z),
-      new THREE.Vector3(road.position.x + laneCenter, road.position.y, road.position.z + 1),
-    ];
-
-    const laneOneGeom = new THREE.BufferGeometry().setFromPoints(laneOnePoints);
-    const laneOneLine = new THREE.Line(laneOneGeom, this.waypointLineMat);
-
-    const laneTwoGeom = new THREE.BufferGeometry().setFromPoints(laneTwoPoints);
-    const laneTwoLine = new THREE.Line(laneTwoGeom, this.waypointLineMat);
-
-    const lineGroup = new THREE.Group();
-    lineGroup.add(laneOneLine);
-    lineGroup.add(laneTwoLine);
-
-    return lineGroup;
-  }
-
-  private createRoadBendWaypoints(road: THREE.Group) {}
 }
