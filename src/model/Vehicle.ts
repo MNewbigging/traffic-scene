@@ -1,42 +1,38 @@
 import * as THREE from 'three';
 
 import { NumberUtils } from '../utils/NumberUtils';
-import { RoadWaypoint } from './Road';
 import { VehicleName } from '../utils/ModelLoader';
 
 export class Vehicle {
   public speed = 0.5;
 
-  public routeWaypoints: RoadWaypoint[] = [];
-  public nextWaypoint?: RoadWaypoint;
+  public routeWaypoints: THREE.Vector3[] = [];
+  public nextWaypoint?: THREE.Vector3;
 
   public routeLine?: THREE.Line;
-  public dirArrow: THREE.ArrowHelper;
   public forward = new THREE.Vector3();
 
   constructor(public name: VehicleName, public model: THREE.Group) {
     model.getWorldDirection(this.forward);
-    console.log('model forward', this.forward);
 
     const mat = new THREE.LineBasicMaterial({ color: 'yellow' });
     const geom = new THREE.BufferGeometry();
     this.routeLine = new THREE.Line(geom, mat);
-
-    this.dirArrow = new THREE.ArrowHelper(this.forward, this.position, 1.5, 0xff0000);
   }
 
   public get position() {
     return this.model.position;
   }
 
-  public setRouteWaypoints(waypoints: RoadWaypoint[]) {
+  public setRouteWaypoints(waypoints: THREE.Vector3[]) {
     this.routeWaypoints = waypoints;
     this.nextWaypoint = this.routeWaypoints[0];
+
     this.setRouteLine();
   }
 
   private setRouteLine() {
-    const points = this.routeWaypoints.map((wp) => wp.point.clone());
+    const points = this.routeWaypoints.map((wp) => wp.clone());
     points.forEach((p) => (p.y += 0.3));
     const pos = this.position.clone();
     pos.y += 0.3;
@@ -68,7 +64,7 @@ export class Vehicle {
     }
 
     // Have we reached the next waypoint?
-    if (NumberUtils.vectorsEqual(this.position, this.nextWaypoint.point)) {
+    if (NumberUtils.vectorsEqual(this.position, this.nextWaypoint)) {
       // Remove this waypoint
       // Note - this has last visited road id
       this.routeWaypoints.shift();
@@ -84,18 +80,15 @@ export class Vehicle {
     }
 
     // Otherwise, keep moving towards next target
-    const direction = this.nextWaypoint.point.clone().sub(this.position).normalize();
+    const direction = this.nextWaypoint.clone().sub(this.position).normalize();
     const speed = deltaTime * this.speed;
     this.position.x += direction.x * speed;
     this.position.z += direction.z * speed;
 
-    const lookDir = this.nextWaypoint.point.clone();
+    const lookDir = this.nextWaypoint.clone();
     lookDir.y = this.position.y;
     this.model.lookAt(lookDir);
 
     this.model.getWorldDirection(this.forward);
-    this.dirArrow.setDirection(this.forward);
-    this.dirArrow.position.x = this.position.x;
-    this.dirArrow.position.z = this.position.z;
   }
 }

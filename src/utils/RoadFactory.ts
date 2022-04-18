@@ -38,9 +38,9 @@ export class RoadFactory {
 
     // Lane 2
     const laneTwoPoints = [
-      new THREE.Vector3(modelPos.x - laneCenter, modelPos.y, modelPos.z - 1),
-      new THREE.Vector3(modelPos.x - laneCenter, modelPos.y, modelPos.z),
       new THREE.Vector3(modelPos.x - laneCenter, modelPos.y, modelPos.z + 1),
+      new THREE.Vector3(modelPos.x - laneCenter, modelPos.y, modelPos.z),
+      new THREE.Vector3(modelPos.x - laneCenter, modelPos.y, modelPos.z - 1),
     ];
 
     const laneOneGeom = new THREE.BufferGeometry().setFromPoints(laneOnePoints);

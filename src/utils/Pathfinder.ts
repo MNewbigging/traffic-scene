@@ -110,4 +110,29 @@ export class Pathfinder {
     // Return roads - not road search classes
     return route.reverse().map((rs) => rs.road);
   }
+
+  // TODO - could roll this into above function if I don't need
+  // to return the road array of a route
+  public static getRouteWaypoints(route: Road[], travelDirection: THREE.Vector3) {
+    const waypoints: THREE.Vector3[] = [];
+
+    // First, determine which lane to use - based on travel direction
+    // Use the first two roads (always at least two)
+    //const travelDir = route[1].position.clone().sub(route[0].position).normalize();
+
+    route.forEach((road) => {
+      const points = road.getLaneWaypoints(travelDirection);
+      console.log('building points', points);
+
+      points.forEach((p) => {
+        // Some roads start and end at the same point; ignore those
+        const exists = waypoints.find((wp) => wp.equals(p));
+        if (!exists) {
+          waypoints.push(p);
+        }
+      });
+    });
+
+    return waypoints;
+  }
 }
