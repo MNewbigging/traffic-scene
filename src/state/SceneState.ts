@@ -50,10 +50,6 @@ export class SceneState {
   private buildScene() {
     this.setupCamera();
 
-    // Axes helper - The X axis is red. The Y axis is green. The Z axis is blue.
-    // const axesHelper = new THREE.AxesHelper(50);
-    // this.scene.add(axesHelper);
-
     // lights
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     this.scene.add(ambientLight);
@@ -86,7 +82,12 @@ export class SceneState {
       this.modelLoader.getModel(RoadName.STRAIGHT)
     );
 
+    console.log('points before rot', s1.leftLanePoints);
+
+    s1.setPosition('z', 2);
     s1.setRotation('y', -(Math.PI / 2));
+
+    console.log('points after rot', s1.leftLanePoints);
 
     const face = new THREE.Vector3();
     s1.model.getWorldDirection(face);
@@ -133,11 +134,11 @@ export class SceneState {
       this.scene.add(s.model);
 
       // Show road lines
-      const laneOneGeom = new THREE.BufferGeometry().setFromPoints(s.laneOnePoints);
+      const laneOneGeom = new THREE.BufferGeometry().setFromPoints(s.leftLanePoints);
       const laneOneLine = new THREE.Line(laneOneGeom, laneOneMat);
       this.scene.add(laneOneLine);
 
-      const laneTwoGeom = new THREE.BufferGeometry().setFromPoints(s.laneTwoPoints);
+      const laneTwoGeom = new THREE.BufferGeometry().setFromPoints(s.rightLanePoints);
       const laneTwoLine = new THREE.Line(laneTwoGeom, laneTwoMat);
       this.scene.add(laneTwoLine);
     });

@@ -13,9 +13,9 @@ export class Road {
   public neighbours: Road[] = [];
   public speedLimit = 1;
   public _waypoints: THREE.Vector3[] = [];
-  // Left lane according to roads standard forward direction - (0, 0, 1)
-  public laneOnePoints: THREE.Vector3[] = [];
-  public laneTwoPoints: THREE.Vector3[] = [];
+  // 'left' is according to the default forward direction (0, 0, 1)
+  public leftLanePoints: THREE.Vector3[] = [];
+  public rightLanePoints: THREE.Vector3[] = [];
   public leftLane: THREE.Line;
   public rightLane: THREE.Line;
 
@@ -29,10 +29,34 @@ export class Road {
     return this.model.rotation;
   }
 
+  public get leftLanePointss(): THREE.Vector3[] {
+    const bufferPositions = this.leftLane.geometry.getAttribute('position');
+    const points: THREE.Vector3[] = [];
+
+    for (let i = 0; i < bufferPositions.count; i++) {
+      const point = new THREE.Vector3().fromBufferAttribute(bufferPositions, i);
+      const worldPoint = this.leftLane.localToWorld(point);
+      points.push(worldPoint);
+    }
+
+    return points;
+  }
+
+  // TODO - one function to set multiple axes so we don't update lane points unnecessarily
+  public setPosition(axis: 'x' | 'y' | 'z', value: number) {
+    this.model.position[axis] = value;
+    this.leftLane.position[axis] = value;
+    this.rightLane.position[axis] = value;
+
+    this.updateLaneWaypoints();
+  }
+
   public setRotation(axis: 'x' | 'y' | 'z', value: number) {
     this.model.rotation[axis] = value;
     this.leftLane.rotation[axis] = value;
     this.rightLane.rotation[axis] = value;
+
+    this.updateLaneWaypoints();
   }
 
   // Must be called after re-positioning this road
@@ -119,11 +143,11 @@ export class Road {
 
       // If 180 degree needs swapping, otherwise above are as lanes 1 and 2
       if (forward.z === 1) {
-        this.laneOnePoints = laneOnePoints;
-        this.laneTwoPoints = laneTwoPoints;
+        this.leftLanePoints = laneOnePoints;
+        this.rightLanePoints = laneTwoPoints;
       } else if (forward.z === -1) {
-        this.laneOnePoints = laneTwoPoints;
-        this.laneTwoPoints = laneOnePoints;
+        this.leftLanePoints = laneTwoPoints;
+        this.rightLanePoints = laneOnePoints;
       }
     }
     // Otherwise, we're facing x axis
@@ -158,12 +182,40 @@ export class Road {
       ];
 
       if (forward.x === 1) {
-        this.laneOnePoints = laneOnePoints;
-        this.laneTwoPoints = laneTwoPoints;
+        this.leftLanePoints = laneOnePoints;
+        this.rightLanePoints = laneTwoPoints;
       } else if (forward.x === -1) {
-        this.laneOnePoints = laneTwoPoints;
-        this.laneTwoPoints = laneOnePoints;
+        this.leftLanePoints = laneTwoPoints;
+        this.rightLanePoints = laneOnePoints;
       }
+    }
+  }
+
+  // Happens after a transform; caches new lane points to avoid costly lookups at runtime
+  private updateLaneWaypoints() {
+    // This follows a transform change; ensure matrices are up to date
+    this.model.updateMatrixWorld();
+    this.leftLane.updateMatrixWorld();
+    this.rightLane.updateMatrixWorld();
+
+    // Left lane
+    const leftPositions = this.leftLane.geometry.getAttribute('position');
+    this.leftLanePoints = [];
+
+    for (let i = 0; i < leftPositions.count; i++) {
+      const point = new THREE.Vector3().fromBufferAttribute(leftPositions, i);
+      const worldPoint = this.leftLane.localToWorld(point);
+      this.leftLanePoints.push(worldPoint);
+    }
+
+    // Right lane
+    const rightPositions = this.leftLane.geometry.getAttribute('position');
+    this.rightLanePoints = [];
+
+    for (let i = 0; i < leftPositions.count; i++) {
+      const point = new THREE.Vector3().fromBufferAttribute(rightPositions, i);
+      const worldPoint = this.leftLane.localToWorld(point);
+      this.rightLanePoints.push(worldPoint);
     }
   }
 }
