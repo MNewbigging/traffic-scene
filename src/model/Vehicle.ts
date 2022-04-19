@@ -85,6 +85,11 @@ export class Vehicle {
     this.position.x += direction.x * speed;
     this.position.z += direction.z * speed;
 
+    const lookDir = this.nextWaypoint.clone();
+    lookDir.y = this.position.y;
+    this.model.lookAt(lookDir);
+
     this.model.getWorldDirection(this.forward);
+    //console.log('car forward', this.forward);
   }
 }

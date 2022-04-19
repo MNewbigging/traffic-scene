@@ -65,7 +65,7 @@ export class RoadFactory {
 
     const pos = road.model.position.clone();
     const halfWidth = size.x * 0.5;
-    const laneCenter = halfWidth * 0.35;
+    const laneCenter = halfWidth * 0.4;
 
     // Lane 1
     const laneOneStart = new THREE.Vector3(pos.x - laneCenter, pos.y, pos.z + halfWidth);
@@ -82,7 +82,7 @@ export class RoadFactory {
     const laneOnePoints = laneOneCurve.getPoints(10);
 
     const laneOneGeom = new THREE.BufferGeometry().setFromPoints(laneOnePoints);
-    const laneOneMat = new THREE.LineBasicMaterial({ color: 'blue' });
+    const laneOneMat = new THREE.LineBasicMaterial({ color: 'red' });
     const laneOne = new THREE.Line(laneOneGeom, laneOneMat);
     road.leftLane = laneOne;
 
@@ -101,7 +101,7 @@ export class RoadFactory {
     const laneTwoPoints = laneTwoCurve.getPoints(10);
 
     const laneTwoGeom = new THREE.BufferGeometry().setFromPoints(laneTwoPoints);
-    const laneTwoMat = new THREE.LineBasicMaterial({ color: 'red' });
+    const laneTwoMat = new THREE.LineBasicMaterial({ color: 'blue' });
     const laneTwo = new THREE.Line(laneTwoGeom, laneTwoMat);
     road.rightLane = laneTwo;
   }

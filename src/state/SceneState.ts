@@ -41,7 +41,7 @@ export class SceneState {
     this.controls.update();
 
     // Move vehicles along their route
-    //this.vehicles.forEach((v) => v.update(deltaTime));
+    this.vehicles.forEach((v) => v.update(deltaTime));
   }
 
   // Once models are loaded, can then piece them together as per scene
@@ -76,46 +76,54 @@ export class SceneState {
   }
 
   private bendRoadScene() {
+    const s1 = RoadFactory.createRoad(
+      RoadName.STRAIGHT,
+      this.modelLoader.getModel(RoadName.STRAIGHT)
+    );
     const b1 = RoadFactory.createRoad(RoadName.BEND, this.modelLoader.getModel(RoadName.BEND));
+    const s2 = RoadFactory.createRoad(
+      RoadName.STRAIGHT,
+      this.modelLoader.getModel(RoadName.STRAIGHT)
+    );
 
-    b1.rotation.y = Math.PI / 2;
+    b1.position.z = -2;
+    s2.position.z = -2;
+    s2.position.x = 2;
+    s2.rotation.y = Math.PI / 2;
+
+    s1.generateLaneWaypoints();
     b1.generateLaneWaypoints();
+    s2.generateLaneWaypoints();
 
-    const forwardArrow = new THREE.ArrowHelper(b1.forward, b1.position, 1.5);
-    const b1Forward = b1.forward.clone();
-    console.log('bend faces', b1Forward);
+    // Connect
+    s1.neighbours.push(b1);
+    b1.neighbours.push(s1);
+    b1.neighbours.push(s2);
+    s2.neighbours.push(b1);
 
-    const posZ = new THREE.Vector3(0, 0, 1);
-    const negZ = new THREE.Vector3(0, 0, -1);
-    const posX = new THREE.Vector3(1, 0, 0);
-    const negX = new THREE.Vector3(-1, 0, 0);
-    [
-      {
-        name: 'posZ',
-        face: posZ,
-      },
-      {
-        name: 'negZ',
-        face: negZ,
-      },
-      {
-        name: 'posX',
-        face: posX,
-      },
-      {
-        name: 'negX',
-        face: negX,
-      },
-    ].forEach((v) => {
-      const dot = b1Forward.dot(v.face);
-      console.log(`${v.name} dot: `, dot);
-    });
+    // Find a route
+    const route = Pathfinder.findRoute(s2, s1);
+    const travelDir = route[1].position.clone().sub(route[0].position).normalize();
+    const waypoints = Pathfinder.getRouteWaypoints(route, travelDir);
+
+    const car = new Vehicle(VehicleName.SEDAN, this.modelLoader.getModel(VehicleName.SEDAN));
+    car.setRouteWaypoints(waypoints);
+    car.model.position.x = waypoints[0].x;
+    car.model.position.z = waypoints[0].z;
+    car.model.lookAt(travelDir);
+    this.vehicles.push(car);
 
     // Add to scene
-    this.scene.add(b1.model);
-    this.scene.add(b1.leftLane);
-    this.scene.add(b1.rightLane);
-    this.scene.add(forwardArrow);
+    [s1, b1, s2].forEach((r) => {
+      this.scene.add(r.model);
+      this.scene.add(r.leftLane);
+      this.scene.add(r.rightLane);
+    });
+    this.scene.add(car.model);
+    this.scene.add(car.routeLine);
+
+    // const forwardArrow = new THREE.ArrowHelper(b1.forward, b1.position, 1.5);
+    // this.scene.add(forwardArrow);
   }
 
   private lanesTestScene() {

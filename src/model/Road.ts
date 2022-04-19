@@ -2,6 +2,7 @@ import * as THREE from 'three';
 
 import { NumberUtils } from '../utils/NumberUtils';
 import { RoadName } from '../utils/ModelLoader';
+import { RoadUtils } from '../utils/RoadUtils';
 
 export class Road {
   public id = NumberUtils.createId();
@@ -32,19 +33,27 @@ export class Road {
    */
   public getLaneWaypoints(travelDir: THREE.Vector3) {
     // TODO - this will likely be different for various road types (like bends)
-    const dot = this.forward.dot(travelDir);
-    // If dot is 1, same direction as forward; use left lane
-    if (dot === 1) {
-      return this.leftLanePoints;
-    }
+    // const dot = this.forward.dot(travelDir);
+    // // If dot is 1, same direction as forward; use left lane
+    // if (dot === 1) {
+    //   return this.leftLanePoints;
+    // }
 
-    // If dot is -1, opposite directions; use right lane
-    if (dot === -1) {
-      return this.rightLanePoints;
-    }
+    // // If dot is -1, opposite directions; use right lane
+    // if (dot === -1) {
+    //   return this.rightLanePoints;
+    // }
 
-    // Otherwise, better choose something!
-    return this.leftLanePoints;
+    // // Otherwise, better choose something!
+    // return this.leftLanePoints;
+
+    return RoadUtils.getCorrectLane(
+      this.name,
+      travelDir,
+      this.forward,
+      this.leftLanePoints,
+      this.rightLanePoints
+    );
   }
 
   public generateLaneWaypoints() {
