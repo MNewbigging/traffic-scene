@@ -136,25 +136,21 @@ export class SceneState {
 
     // Find a route
     const route = Pathfinder.findRoute(s1, s4);
-    const travelDir = route[1].position.clone().sub(route[0].position).normalize();
-    const waypoints = Pathfinder.getRouteWaypoints(route, travelDir);
+    const waypoints = Pathfinder.getRouteWaypoints(route);
 
     const car = new Vehicle(VehicleName.SEDAN, this.modelLoader.getModel(VehicleName.SEDAN));
     car.setRouteWaypoints(waypoints);
     car.model.position.x = waypoints[0].x;
     car.model.position.z = waypoints[0].z;
-    //car.model.lookAt(travelDir);
     this.vehicles.push(car);
 
     // Second car
     const route2 = Pathfinder.findRoute(s4, s1);
-    const travelDir2 = route2[1].position.clone().sub(route2[0].position).normalize();
-    const waypoints2 = Pathfinder.getRouteWaypoints(route2, travelDir2);
+    const waypoints2 = Pathfinder.getRouteWaypoints(route2);
     const car2 = new Vehicle(VehicleName.SEDAN, this.modelLoader.getModel(VehicleName.SEDAN));
     car2.setRouteWaypoints(waypoints2);
     car2.model.position.x = waypoints2[0].x;
     car2.model.position.z = waypoints2[0].z;
-    //car2.model.lookAt(travelDir2);
     this.vehicles.push(car2);
 
     // Add to scene
@@ -205,23 +201,19 @@ export class SceneState {
 
     // Find a route for first car
     const route: Road[] = Pathfinder.findRoute(s3, s1);
-    const travelDir = route[1].position.clone().sub(route[0].position).normalize();
-    const waypoints = Pathfinder.getRouteWaypoints(route, travelDir);
+    const waypoints = Pathfinder.getRouteWaypoints(route);
 
     const car = new Vehicle(VehicleName.SEDAN, this.modelLoader.getModel(VehicleName.SEDAN));
     car.setRouteWaypoints(waypoints);
     car.model.position.x = waypoints[0].x;
     car.model.position.z = waypoints[0].z;
-    car.model.lookAt(travelDir);
 
     const route2 = Pathfinder.findRoute(s1, s3);
-    const travelDir2 = route2[1].position.clone().sub(route2[0].position).normalize();
-    const waypoints2 = Pathfinder.getRouteWaypoints(route2, travelDir2);
+    const waypoints2 = Pathfinder.getRouteWaypoints(route2);
     const car2 = new Vehicle(VehicleName.SEDAN, this.modelLoader.getModel(VehicleName.SEDAN));
     car2.setRouteWaypoints(waypoints2);
     car2.model.position.x = waypoints2[0].x;
     car2.model.position.z = waypoints2[0].z;
-    car2.model.lookAt(travelDir2);
 
     // Add to scene
     this.vehicles.push(car);

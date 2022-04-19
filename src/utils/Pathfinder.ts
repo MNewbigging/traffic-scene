@@ -111,7 +111,7 @@ export class Pathfinder {
 
   // TODO - could roll this into above function if I don't need
   // to return the road array of a route
-  public static getRouteWaypoints(route: Road[], travelDirection: THREE.Vector3) {
+  public static getRouteWaypoints(route: Road[]) {
     const waypoints: THREE.Vector3[] = [];
 
     /**
@@ -121,7 +121,7 @@ export class Pathfinder {
      * Note: taking direction by road position might not yield exact results when
      * road sizes/positions aren't the same
      */
-    let dir = travelDirection;
+    let dir = route[1].position.clone().sub(route[0].position).normalize();
     for (let i = 0; i < route.length; i++) {
       let curIdx = i;
       let nextIdx = i + 1;
