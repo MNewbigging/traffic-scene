@@ -12,10 +12,11 @@ export class Road {
   public rightLanePoints: THREE.Vector3[] = [];
   public leftLane: THREE.Line;
   public rightLane: THREE.Line;
+  public forward = new THREE.Vector3(0, 0, 1);
 
-  private forward = new THREE.Vector3(0, 0, 1);
-
-  constructor(public name: RoadName, public model: THREE.Group) {}
+  constructor(public name: RoadName, public model: THREE.Group) {
+    model.getWorldDirection(this.forward);
+  }
 
   public get position(): THREE.Vector3 {
     return this.model.position;
