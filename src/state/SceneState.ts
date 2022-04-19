@@ -102,7 +102,7 @@ export class SceneState {
     s2.neighbours.push(b1);
 
     // Find a route
-    const route = Pathfinder.findRoute(s2, s1);
+    const route = Pathfinder.findRoute(s1, s2);
     const travelDir = route[1].position.clone().sub(route[0].position).normalize();
     const waypoints = Pathfinder.getRouteWaypoints(route, travelDir);
 

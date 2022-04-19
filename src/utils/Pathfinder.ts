@@ -114,22 +114,33 @@ export class Pathfinder {
   public static getRouteWaypoints(route: Road[], travelDirection: THREE.Vector3) {
     const waypoints: THREE.Vector3[] = [];
 
-    // First, determine which lane to use - based on travel direction
-    // Use the first two roads (always at least two)
-    //const travelDir = route[1].position.clone().sub(route[0].position).normalize();
+    /**
+     * Loop through roads, looking to next road to determine which lane to use
+     * Each road knows what joins it in a given direction, so can tell which lane
+     *
+     * Note: taking direction by road position might not yield exact results when
+     * road sizes/positions aren't the same
+     */
+    let dir = travelDirection;
+    for (let i = 0; i < route.length; i++) {
+      let curIdx = i;
+      let nextIdx = i + 1;
+      const curRoad = route[curIdx];
+      const nextRoad = route[nextIdx];
 
-    route.forEach((road) => {
-      const points = road.getLaneWaypoints(travelDirection);
-      console.log('building points', points);
-
+      const points = curRoad.getLaneWaypoints(dir);
       points.forEach((p) => {
-        // Some roads start and end at the same point; ignore those
         const exists = waypoints.find((wp) => wp.equals(p));
         if (!exists) {
           waypoints.push(p);
         }
       });
-    });
+      console.log('dir', dir);
+      // If we've not yet reached last road
+      if (nextIdx < route.length) {
+        dir = nextRoad.position.clone().sub(curRoad.position).normalize();
+      }
+    }
 
     return waypoints;
   }
