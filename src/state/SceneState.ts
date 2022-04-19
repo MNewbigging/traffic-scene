@@ -85,24 +85,57 @@ export class SceneState {
       RoadName.STRAIGHT,
       this.modelLoader.getModel(RoadName.STRAIGHT)
     );
+    const b2 = RoadFactory.createRoad(RoadName.BEND, this.modelLoader.getModel(RoadName.BEND));
+    const s3 = RoadFactory.createRoad(
+      RoadName.STRAIGHT,
+      this.modelLoader.getModel(RoadName.STRAIGHT)
+    );
+    const b3 = RoadFactory.createRoad(RoadName.BEND, this.modelLoader.getModel(RoadName.BEND));
+    const s4 = RoadFactory.createRoad(
+      RoadName.STRAIGHT,
+      this.modelLoader.getModel(RoadName.STRAIGHT)
+    );
+    const b4 = RoadFactory.createRoad(RoadName.BEND, this.modelLoader.getModel(RoadName.BEND));
+
+    const roads = [s1, b1, s2, b2, s3, b3, s4, b4];
 
     b1.position.z = -2;
     s2.position.z = -2;
     s2.position.x = 2;
     s2.rotation.y = Math.PI / 2;
+    b2.position.z = -2;
+    b2.position.x = 4;
+    b2.rotation.y = -Math.PI / 2;
+    s3.position.x = 4;
+    b3.position.z = 2;
+    b3.position.x = 4;
+    b3.rotation.y = Math.PI;
+    s4.position.x = 2;
+    s4.position.z = 2;
+    s4.rotation.y = Math.PI / 2;
+    b4.position.z = 2;
+    b4.rotation.y = Math.PI / 2;
 
-    s1.generateLaneWaypoints();
-    b1.generateLaneWaypoints();
-    s2.generateLaneWaypoints();
+    // Update lane lines after positioning
+    roads.forEach((r) => r.generateLaneWaypoints());
 
     // Connect
     s1.neighbours.push(b1);
     b1.neighbours.push(s1);
     b1.neighbours.push(s2);
     s2.neighbours.push(b1);
+    s2.neighbours.push(b2);
+    b2.neighbours.push(s2);
+    b2.neighbours.push(s3);
+    s3.neighbours.push(b2);
+    s3.neighbours.push(b3);
+    b3.neighbours.push(s3);
+    b3.neighbours.push(s4);
+    s4.neighbours.push(b3);
+    s4.neighbours.push(b4);
 
     // Find a route
-    const route = Pathfinder.findRoute(s1, s2);
+    const route = Pathfinder.findRoute(s1, s4);
     const travelDir = route[1].position.clone().sub(route[0].position).normalize();
     const waypoints = Pathfinder.getRouteWaypoints(route, travelDir);
 
@@ -110,20 +143,32 @@ export class SceneState {
     car.setRouteWaypoints(waypoints);
     car.model.position.x = waypoints[0].x;
     car.model.position.z = waypoints[0].z;
-    car.model.lookAt(travelDir);
+    //car.model.lookAt(travelDir);
     this.vehicles.push(car);
 
+    // Second car
+    const route2 = Pathfinder.findRoute(s4, s1);
+    const travelDir2 = route2[1].position.clone().sub(route2[0].position).normalize();
+    const waypoints2 = Pathfinder.getRouteWaypoints(route2, travelDir2);
+    const car2 = new Vehicle(VehicleName.SEDAN, this.modelLoader.getModel(VehicleName.SEDAN));
+    car2.setRouteWaypoints(waypoints2);
+    car2.model.position.x = waypoints2[0].x;
+    car2.model.position.z = waypoints2[0].z;
+    //car2.model.lookAt(travelDir2);
+    this.vehicles.push(car2);
+
     // Add to scene
-    [s1, b1, s2].forEach((r) => {
+    roads.forEach((r) => {
       this.scene.add(r.model);
       this.scene.add(r.leftLane);
       this.scene.add(r.rightLane);
     });
     this.scene.add(car.model);
     this.scene.add(car.routeLine);
+    this.scene.add(car2.model);
+    this.scene.add(car2.routeLine);
 
-    // const forwardArrow = new THREE.ArrowHelper(b1.forward, b1.position, 1.5);
-    // this.scene.add(forwardArrow);
+    this.controls.target = new THREE.Vector3(2, 0, 0);
   }
 
   private lanesTestScene() {
@@ -158,21 +203,29 @@ export class SceneState {
     s2.neighbours.push(s3);
     s3.neighbours.push(s2);
 
-    // Find a route from s1 to s3
+    // Find a route for first car
     const route: Road[] = Pathfinder.findRoute(s3, s1);
     const travelDir = route[1].position.clone().sub(route[0].position).normalize();
     const waypoints = Pathfinder.getRouteWaypoints(route, travelDir);
-    console.log('road waypoints', waypoints);
+
     const car = new Vehicle(VehicleName.SEDAN, this.modelLoader.getModel(VehicleName.SEDAN));
     car.setRouteWaypoints(waypoints);
-
-    // Setup car's starting pos
     car.model.position.x = waypoints[0].x;
     car.model.position.z = waypoints[0].z;
     car.model.lookAt(travelDir);
 
+    const route2 = Pathfinder.findRoute(s1, s3);
+    const travelDir2 = route2[1].position.clone().sub(route2[0].position).normalize();
+    const waypoints2 = Pathfinder.getRouteWaypoints(route2, travelDir2);
+    const car2 = new Vehicle(VehicleName.SEDAN, this.modelLoader.getModel(VehicleName.SEDAN));
+    car2.setRouteWaypoints(waypoints2);
+    car2.model.position.x = waypoints2[0].x;
+    car2.model.position.z = waypoints2[0].z;
+    car2.model.lookAt(travelDir2);
+
     // Add to scene
     this.vehicles.push(car);
+    this.vehicles.push(car2);
     [s1, s2, s3].forEach((s) => {
       this.scene.add(s.model);
       this.scene.add(s.leftLane);
@@ -180,5 +233,9 @@ export class SceneState {
     });
     this.scene.add(car.model);
     this.scene.add(car.routeLine);
+    this.scene.add(car2.model);
+    this.scene.add(car2.routeLine);
+
+    this.controls.target = new THREE.Vector3(2, 0, 0);
   }
 }
