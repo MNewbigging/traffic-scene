@@ -4,7 +4,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { CanvasListener } from '../utils/CanvasListener';
 import { ModelLoader, ModelNames, RoadName, VehicleName } from '../utils/ModelLoader';
 import { Pathfinder } from '../utils/Pathfinder';
-import { Road, RoadWaypoint } from '../model/Road';
+import { Road } from '../model/Road';
 import { RoadFactory } from '../utils/RoadFactory';
 import { Vehicle } from '../model/Vehicle';
 
@@ -20,8 +20,6 @@ export class SceneState {
   private controls: OrbitControls;
   private modelLoader = new ModelLoader();
   private onReady?: () => void;
-
-  private arrow: THREE.ArrowHelper;
 
   constructor(private canvasListener: CanvasListener) {}
 
@@ -39,7 +37,7 @@ export class SceneState {
   }
 
   public updateScene(deltaTime: number) {
-    //this.controls.target = this.vehicles[0].position;
+    this.controls.target = this.vehicles[0].position;
     this.controls.update();
 
     // Move vehicles along their route

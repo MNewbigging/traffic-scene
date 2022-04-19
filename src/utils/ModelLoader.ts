@@ -33,8 +33,6 @@ export class ModelLoader {
   private modelsToLoad = 0;
   private onLoad?: () => void;
 
-  private waypointLineMat = new THREE.LineBasicMaterial({ color: 'blue' });
-
   public loadModels(modelNames: ModelNames, onLoad: () => void) {
     this.onLoad = onLoad;
 
@@ -120,31 +118,15 @@ export class ModelLoader {
         });
 
         // Setup road
-        const road = this.setupRoad(rName, model.scene);
+        const road = this.setupRoad(model.scene);
         this.onLoadModel(rName, road);
-        // // Adjust scale of roads
-        // model.scene.scale.set(
-        //   this.roadScaleModifier,
-        //   this.roadScaleModifier,
-        //   this.roadScaleModifier
-        // );
-
-        // // Adjust origin
-        // const box = new THREE.Box3().setFromObject(model.scene);
-        // box.getCenter(model.scene.position).multiplyScalar(-1);
-
-        // // Wrap in another group for rotating around its center
-        // const parent = new THREE.Group();
-        // parent.add(model.scene);
-
-        // this.onLoadModel(rName, parent);
       },
       undefined,
       this.onLoadError
     );
   }
 
-  private setupRoad(rName: RoadName, road: THREE.Group) {
+  private setupRoad(road: THREE.Group) {
     // Adjust scale of roads
     road.scale.set(this.roadScaleModifier, this.roadScaleModifier, this.roadScaleModifier);
 

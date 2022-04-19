@@ -3,11 +3,6 @@ import * as THREE from 'three';
 import { NumberUtils } from '../utils/NumberUtils';
 import { RoadName } from '../utils/ModelLoader';
 
-export interface RoadWaypoint {
-  roadId: string;
-  point: THREE.Vector3;
-}
-
 export class Road {
   public id = NumberUtils.createId();
   public neighbours: Road[] = [];
@@ -51,7 +46,6 @@ export class Road {
     return this.leftLanePoints;
   }
 
-  // Following any transform updates
   public generateLaneWaypoints() {
     // Update the lane lines as per model
     [this.leftLane, this.rightLane].forEach((lane) => {
@@ -73,7 +67,6 @@ export class Road {
     this.updateLaneWaypoints();
   }
 
-  // Happens after a transform; caches new lane points to avoid costly lookups at runtime
   private updateLaneWaypoints() {
     // Left lane
     const leftPositions = this.leftLane.geometry.getAttribute('position');

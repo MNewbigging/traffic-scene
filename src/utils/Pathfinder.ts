@@ -1,8 +1,6 @@
 import * as THREE from 'three';
 
 import { Road } from '../model/Road';
-import { RoadName } from './ModelLoader';
-import { Vehicle } from '../model/Vehicle';
 
 class RoadSearch {
   public weight = 0;
