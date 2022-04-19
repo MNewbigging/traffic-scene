@@ -92,9 +92,15 @@ export class SceneState {
     );
 
     // Position them
-    s1.postTransform();
-    s2.setPosition('z', -2);
-    s3.setPosition('z', -4);
+    s1.rotation.y = Math.PI / 2;
+    s2.rotation.y = Math.PI / 2;
+    s3.rotation.y = Math.PI / 2;
+
+    s2.position.x = 2;
+    s3.position.x = 4;
+
+    // Create lane lines
+    [s1, s2, s3].forEach((s) => s.generateLaneWaypoints());
 
     // Connect them
     s1.neighbours.push(s2);
@@ -103,7 +109,7 @@ export class SceneState {
     s3.neighbours.push(s2);
 
     // Find a route from s1 to s3
-    const route: Road[] = Pathfinder.findRoute(s1, s3);
+    const route: Road[] = Pathfinder.findRoute(s3, s1);
     const travelDir = route[1].position.clone().sub(route[0].position).normalize();
     const waypoints = Pathfinder.getRouteWaypoints(route, travelDir);
     console.log('road waypoints', waypoints);

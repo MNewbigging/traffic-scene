@@ -30,23 +30,6 @@ export class Road {
     return this.model.rotation;
   }
 
-  // TODO - one function to set multiple axes so we don't update lane points unnecessarily
-  public setPosition(axis: 'x' | 'y' | 'z', value: number) {
-    this.model.position[axis] = value;
-    this.leftLane.position[axis] = value;
-    this.rightLane.position[axis] = value;
-
-    this.postTransform();
-  }
-
-  public setRotation(axis: 'x' | 'y' | 'z', value: number) {
-    this.model.rotation[axis] = value;
-    this.leftLane.rotation[axis] = value;
-    this.rightLane.rotation[axis] = value;
-
-    this.postTransform();
-  }
-
   /**
    * Given the vehicle's travel direction, determine which lane to use and return its waypoints.
    * @param travelDir normalised direction of travel of vehicle
@@ -69,13 +52,21 @@ export class Road {
   }
 
   // Following any transform updates
-  public postTransform() {
-    // Update matrices
-    this.model.updateMatrixWorld();
+  public generateLaneWaypoints() {
+    // Update the lane lines as per model
+    [this.leftLane, this.rightLane].forEach((lane) => {
+      const axes: ('x' | 'y' | 'z')[] = ['x', 'y', 'z'];
+      axes.forEach((axis) => {
+        lane.position[axis] = this.model.position[axis];
+        lane.rotation[axis] = this.model.rotation[axis];
+      });
+    });
+    // Update lane matrices after transforms
     this.leftLane.updateMatrixWorld();
     this.rightLane.updateMatrixWorld();
 
     // Update facing direction
+    this.model.updateMatrixWorld();
     this.model.getWorldDirection(this.forward);
 
     // Update lane points
