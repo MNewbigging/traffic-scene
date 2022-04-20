@@ -23,6 +23,11 @@ export class RoadFactory {
         this.createBendRoadEdgePoints(road, size);
         this.createBendRoadLanes(road);
         break;
+      case RoadName.JUNCTION:
+        road.neighbours = [undefined, undefined, undefined];
+        this.createJunctionEdgePoints(road, size);
+        this.createJunctionLanes(road);
+        break;
     }
 
     return road;
@@ -36,22 +41,6 @@ export class RoadFactory {
     const points = [
       new THREE.Vector3(pos.x, pos.y, pos.z + halfDepth),
       new THREE.Vector3(pos.x, pos.y, pos.z - halfDepth),
-    ];
-
-    const edgeGeom = new THREE.BufferGeometry().setFromPoints(points);
-    const edgeMat = new THREE.PointsMaterial({ color: 'white', size: 0.1 });
-    const edgePoints = new THREE.Points(edgeGeom, edgeMat);
-
-    road.edgePoints = edgePoints;
-  }
-
-  private static createBendRoadEdgePoints(road: Road, size: THREE.Vector3) {
-    // Ref points face forward and to its left by 90 deg
-    const pos = road.model.position.clone();
-
-    const points = [
-      new THREE.Vector3(pos.x, pos.y, pos.z + size.z * 0.5),
-      new THREE.Vector3(pos.x + size.x * 0.5, pos.y, pos.z),
     ];
 
     const edgeGeom = new THREE.BufferGeometry().setFromPoints(points);
@@ -99,6 +88,22 @@ export class RoadFactory {
     const laneTwo = new Lane();
     laneTwo.line = laneTwoLine;
     road.lanes.push(laneTwo);
+  }
+
+  private static createBendRoadEdgePoints(road: Road, size: THREE.Vector3) {
+    // Ref points face forward and to its left by 90 deg
+    const pos = road.model.position.clone();
+
+    const points = [
+      new THREE.Vector3(pos.x, pos.y, pos.z + size.z * 0.5),
+      new THREE.Vector3(pos.x + size.x * 0.5, pos.y, pos.z),
+    ];
+
+    const edgeGeom = new THREE.BufferGeometry().setFromPoints(points);
+    const edgeMat = new THREE.PointsMaterial({ color: 'white', size: 0.1 });
+    const edgePoints = new THREE.Points(edgeGeom, edgeMat);
+
+    road.edgePoints = edgePoints;
   }
 
   private static createBendRoadLanes(road: Road) {
@@ -155,4 +160,24 @@ export class RoadFactory {
     laneTwo.line = laneTwoLine;
     road.lanes.push(laneTwo);
   }
+
+  private static createJunctionEdgePoints(road: Road, size: THREE.Vector3) {
+    // Two ref points at center on x and either edge, one on x edge center z
+    const pos = road.model.position.clone();
+    const halfDepth = size.z * 0.5;
+
+    const points = [
+      new THREE.Vector3(pos.x, pos.y, pos.z + halfDepth),
+      new THREE.Vector3(pos.x, pos.y, pos.z - halfDepth),
+      new THREE.Vector3(pos.x + size.x * 0.5, pos.y, pos.z),
+    ];
+
+    const edgeGeom = new THREE.BufferGeometry().setFromPoints(points);
+    const edgeMat = new THREE.PointsMaterial({ color: 'white', size: 0.1 });
+    const edgePoints = new THREE.Points(edgeGeom, edgeMat);
+
+    road.edgePoints = edgePoints;
+  }
+
+  private static createJunctionLanes(road: Road) {}
 }

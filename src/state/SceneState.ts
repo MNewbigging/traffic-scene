@@ -30,7 +30,7 @@ export class SceneState {
     // Work out which models we need to load for this scene
     // This is where proc gen comes in - hardcoded for now
     const modelNames = new ModelNames();
-    modelNames.roads = [RoadName.END, RoadName.STRAIGHT, RoadName.BEND];
+    modelNames.roads = [RoadName.END, RoadName.STRAIGHT, RoadName.BEND, RoadName.JUNCTION];
     modelNames.vehicles = [VehicleName.SEDAN];
 
     this.modelLoader.loadModels(modelNames, () => this.buildScene());
@@ -52,9 +52,8 @@ export class SceneState {
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     this.scene.add(ambientLight);
 
-    //this.bendRoadScene();
-    //this.lanesTestScene();
-    this.refPointsScene();
+    //this.straightBendScene();
+    this.junctionScene();
 
     // Now ready to start
     this.onReady?.();
@@ -76,7 +75,7 @@ export class SceneState {
     this.controls.enableDamping = true;
   }
 
-  private refPointsScene() {
+  private straightBendScene() {
     const s1 = RoadFactory.createRoad(
       RoadName.STRAIGHT,
       this.modelLoader.getModel(RoadName.STRAIGHT)
@@ -136,6 +135,55 @@ export class SceneState {
       this.scene.add(r.model);
       this.scene.add(r.edgePoints);
       r.lanes.forEach((l) => this.scene.add(l.line));
+    });
+  }
+
+  private junctionScene() {
+    const s1 = RoadFactory.createRoad(
+      RoadName.STRAIGHT,
+      this.modelLoader.getModel(RoadName.STRAIGHT)
+    );
+    const j1 = RoadFactory.createRoad(
+      RoadName.JUNCTION,
+      this.modelLoader.getModel(RoadName.JUNCTION)
+    );
+    const s2 = RoadFactory.createRoad(
+      RoadName.STRAIGHT,
+      this.modelLoader.getModel(RoadName.STRAIGHT)
+    );
+    const s3 = RoadFactory.createRoad(
+      RoadName.STRAIGHT,
+      this.modelLoader.getModel(RoadName.STRAIGHT)
+    );
+    const roads = [s1, s2, s3];
+
+    // Position
+    // j1.position.z = -2;
+    s2.position.z = -2;
+    s2.position.x = 2;
+    s2.rotation.y = Math.PI / 2;
+    s3.position.z = -4;
+
+    // Post transform
+    roads.forEach((r) => r.postTransform());
+
+    // Connect
+
+    // Route
+
+    // Add to scene
+    this.scene.add(j1.model);
+    this.scene.add(j1.edgePoints);
+
+    const face = new THREE.Vector3();
+    j1.model.getWorldDirection(face);
+    const arrow = new THREE.ArrowHelper(face, j1.position, 1.5);
+    this.scene.add(arrow);
+
+    roads.forEach((r) => {
+      // this.scene.add(r.model);
+      //this.scene.add(r.edgePoints);
+      // r.lanes.forEach((l) => this.scene.add(l.line));
     });
   }
 }
