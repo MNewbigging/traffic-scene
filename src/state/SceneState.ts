@@ -89,11 +89,14 @@ export class SceneState {
       RoadName.STRAIGHT,
       this.modelLoader.getModel(RoadName.STRAIGHT)
     );
-    const roads = [s1, s2, s3];
+    const b1 = RoadFactory.createRoad(RoadName.BEND, this.modelLoader.getModel(RoadName.BEND));
+    const roads = [s1, s2, s3, b1];
 
     // Position roads
     s2.position.z = -2;
     s3.position.z = -4;
+    b1.position.z = -6;
+    b1.rotation.y = -Math.PI / 2;
 
     // Generate lane data ater moving roads
     roads.forEach((r) => r.postTransform());
@@ -101,10 +104,11 @@ export class SceneState {
     // Connect all roads
     s1.connectRoads([s2]);
     s2.connectRoads([s1, s3]);
-    s3.connectRoads([s2]);
+    s3.connectRoads([s2, b1]);
+    b1.connectRoads([s3]);
 
     // Route
-    const route = Pathfinder.findRoute(s1, s3);
+    const route = Pathfinder.findRoute(s1, b1);
     const waypoints = Pathfinder.getRouteWaypoints(route);
     console.log('waypoints', waypoints);
 
@@ -115,7 +119,7 @@ export class SceneState {
     this.vehicles.push(car);
 
     // Another route
-    const route2 = Pathfinder.findRoute(s3, s1);
+    const route2 = Pathfinder.findRoute(b1, s1);
     const waypoints2 = Pathfinder.getRouteWaypoints(route2);
     const car2 = new Vehicle(VehicleName.SEDAN, this.modelLoader.getModel(VehicleName.SEDAN));
     car2.setRouteWaypoints(waypoints2);
