@@ -110,7 +110,6 @@ export class RoadFactory {
     const laneOneGeom = new THREE.BufferGeometry().setFromPoints(laneOnePoints);
     const laneOneMat = new THREE.LineBasicMaterial({ color: 'red' });
     const laneOne = new THREE.Line(laneOneGeom, laneOneMat);
-    road.leftLane = laneOne;
 
     // Lane 2
     const laneTwoStart = new THREE.Vector3(pos.x + halfWidth, pos.y, pos.z + laneCenter);
@@ -129,6 +128,5 @@ export class RoadFactory {
     const laneTwoGeom = new THREE.BufferGeometry().setFromPoints(laneTwoPoints);
     const laneTwoMat = new THREE.LineBasicMaterial({ color: 'blue' });
     const laneTwo = new THREE.Line(laneTwoGeom, laneTwoMat);
-    road.rightLane = laneTwo;
   }
 }

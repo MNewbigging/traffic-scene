@@ -61,10 +61,3 @@ export class Lane {
     this.toRoadIdx = RoadUtils.getClosestIndexFromArray(to, edgePoints);
   }
 }
-
-/**
- * 1 - position/rotate the road
- * 2 - update the edge points
- * 3 - update the lane line
- * 4 - find from/to for lane line -> edge points
- */

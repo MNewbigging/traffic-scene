@@ -114,43 +114,7 @@ export class Pathfinder {
     return route.reverse().map((rs) => rs.road);
   }
 
-  // TODO - could roll this into above function if I don't need
-  // to return the road array of a route
   public static getRouteWaypoints(route: Road[]) {
-    const waypoints: THREE.Vector3[] = [];
-
-    /**
-     * Loop through roads, looking to next road to determine which lane to use
-     * Each road knows what joins it in a given direction, so can tell which lane
-     *
-     * Note: taking direction by road position might not yield exact results when
-     * road sizes/positions aren't the same
-     */
-    let dir = route[1].position.clone().sub(route[0].position).normalize();
-    for (let i = 0; i < route.length; i++) {
-      let curIdx = i;
-      let nextIdx = i + 1;
-      const curRoad = route[curIdx];
-      const nextRoad = route[nextIdx];
-
-      const points = curRoad.getLaneWaypoints(dir);
-      points.forEach((p) => {
-        const exists = waypoints.find((wp) => wp.equals(p));
-        if (!exists) {
-          waypoints.push(p);
-        }
-      });
-      console.log('dir', dir);
-      // If we've not yet reached last road
-      if (nextIdx < route.length) {
-        dir = nextRoad.position.clone().sub(curRoad.position).normalize();
-      }
-    }
-
-    return waypoints;
-  }
-
-  public static getWaypointsOfRoute(route: Road[]) {
     // Ask the road to pick a lane and return its waypoints
     // It needs to know the from and to roads to do so
     const waypoints: THREE.Vector3[] = [];

@@ -10,10 +10,6 @@ export class Road {
   public neighbours: (Road | undefined)[] = [];
   public speedLimit = 1;
   // 'left' is according to the default forward direction (0, 0, 1)
-  public leftLanePoints: THREE.Vector3[] = [];
-  public rightLanePoints: THREE.Vector3[] = [];
-  public leftLane: THREE.Line;
-  public rightLane: THREE.Line;
   public forward = new THREE.Vector3(0, 0, 1);
   public edgePoints: THREE.Points;
   public edgePointPositions: THREE.Vector3[] = [];
@@ -82,64 +78,5 @@ export class Road {
     return (
       lanes.find((lane) => this.neighbours[lane.fromRoadIdx]?.id === fromRoad.id).waypoints ?? []
     );
-  }
-
-  /**
-   * Given the vehicle's travel direction, determine which lane to use and return its waypoints.
-   * @param travelDir normalised direction of travel of vehicle
-   */
-  public getLaneWaypoints(travelDir: THREE.Vector3) {
-    return RoadUtils.getCorrectLane(
-      this.name,
-      travelDir,
-      this.forward,
-      this.leftLanePoints,
-      this.rightLanePoints
-    );
-  }
-
-  public generateLanes() {
-    // Update facing direction
-    this.model.updateMatrixWorld();
-    this.model.getWorldDirection(this.forward);
-
-    // Update the ref points and lane lines as per model
-    [this.leftLane, this.rightLane, this.edgePoints].forEach((item) => {
-      // Transforms
-      const axes: ('x' | 'y' | 'z')[] = ['x', 'y', 'z'];
-      axes.forEach((axis) => {
-        item.position[axis] = this.model.position[axis];
-        item.rotation[axis] = this.model.rotation[axis];
-      });
-      // Matrices
-      item.updateMatrixWorld();
-    });
-
-    // Update lane waypoints following above transforms
-    RoadUtils.copyTransforms(this.model, this.edgePoints);
-
-    // Link lanes to edge points
-  }
-
-  private updateLaneWaypoints() {
-    // Left lane
-    const leftPositions = this.leftLane.geometry.getAttribute('position');
-    this.leftLanePoints = [];
-
-    for (let i = 0; i < leftPositions.count; i++) {
-      const point = new THREE.Vector3().fromBufferAttribute(leftPositions, i);
-      const worldPoint = this.leftLane.localToWorld(point);
-      this.leftLanePoints.push(worldPoint);
-    }
-
-    // Right lane
-    const rightPositions = this.rightLane.geometry.getAttribute('position');
-    this.rightLanePoints = [];
-
-    for (let i = 0; i < leftPositions.count; i++) {
-      const point = new THREE.Vector3().fromBufferAttribute(rightPositions, i);
-      const worldPoint = this.leftLane.localToWorld(point);
-      this.rightLanePoints.push(worldPoint);
-    }
   }
 }
