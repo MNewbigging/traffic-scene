@@ -1,12 +1,13 @@
 import * as THREE from 'three';
 
+import { Lane } from './Lane';
 import { NumberUtils } from '../utils/NumberUtils';
 import { RoadName } from '../utils/ModelLoader';
 import { RoadUtils } from '../utils/RoadUtils';
 
 export class Road {
   public id = NumberUtils.createId();
-  public neighbours: Road[] = [];
+  public neighbours: (Road | undefined)[] = [];
   public speedLimit = 1;
   // 'left' is according to the default forward direction (0, 0, 1)
   public leftLanePoints: THREE.Vector3[] = [];
@@ -14,6 +15,9 @@ export class Road {
   public leftLane: THREE.Line;
   public rightLane: THREE.Line;
   public forward = new THREE.Vector3(0, 0, 1);
+  public edgePoints: THREE.Points;
+  public edgePointPositions: THREE.Vector3[] = [];
+  public lanes: Lane[] = [];
 
   constructor(public name: RoadName, public model: THREE.Group) {
     model.getWorldDirection(this.forward);
@@ -27,26 +31,64 @@ export class Road {
     return this.model.rotation;
   }
 
+  // Call this once finished moving the road
+  public postTransform() {
+    // Update facing direction
+    this.model.updateMatrixWorld();
+    this.model.getWorldDirection(this.forward);
+
+    // Update the edge points according to model transform
+    RoadUtils.copyTransforms(this.model, this.edgePoints);
+    this.edgePointPositions = RoadUtils.getEdgePointPositions(this.edgePoints);
+
+    // Setup lanes using model and edge point positions
+    this.lanes.forEach((lane) => lane.setup(this.model, this.edgePointPositions));
+  }
+
+  // Connects neighbouring roads
+  public connectRoads(roads: Road[]) {
+    roads.forEach((road) => {
+      // Find the nearest edge point's index into the edge points array
+      const nearestIdx = RoadUtils.getClosestIndexFromArray(road.position, this.edgePointPositions);
+
+      // Insert into neighbours array at that position
+      this.neighbours.splice(nearestIdx, 0, road);
+    });
+  }
+
+  // TODO - return halfway along line if starting/ending on this road
+  public getWaypoints(fromRoad: Road, toRoad: Road): THREE.Vector3[] {
+    // Can only start and end routes on straight roads which only have 2 lanes
+
+    // If we're going to this road
+    if (toRoad.id === this.id) {
+      // Find a match on fromRoad within lanes
+      return (
+        this.lanes.find((lane) => this.neighbours[lane.fromRoadIdx]?.id === fromRoad.id)
+          .waypoints ?? []
+      );
+    }
+
+    // If we're going from this road
+    if (fromRoad.id === this.id) {
+      // Find a match on toRoad within lanes
+      return (
+        this.lanes.find((lane) => this.neighbours[lane.toRoadIdx]?.id === toRoad.id).waypoints ?? []
+      );
+    }
+
+    // Otherwise, going through this road - match on both from and to
+    let lanes = this.lanes.filter((lane) => this.neighbours[lane.toRoadIdx].id === toRoad.id);
+    return (
+      lanes.find((lane) => this.neighbours[lane.fromRoadIdx]?.id === fromRoad.id).waypoints ?? []
+    );
+  }
+
   /**
    * Given the vehicle's travel direction, determine which lane to use and return its waypoints.
    * @param travelDir normalised direction of travel of vehicle
    */
   public getLaneWaypoints(travelDir: THREE.Vector3) {
-    // TODO - this will likely be different for various road types (like bends)
-    // const dot = this.forward.dot(travelDir);
-    // // If dot is 1, same direction as forward; use left lane
-    // if (dot === 1) {
-    //   return this.leftLanePoints;
-    // }
-
-    // // If dot is -1, opposite directions; use right lane
-    // if (dot === -1) {
-    //   return this.rightLanePoints;
-    // }
-
-    // // Otherwise, better choose something!
-    // return this.leftLanePoints;
-
     return RoadUtils.getCorrectLane(
       this.name,
       travelDir,
@@ -56,25 +98,27 @@ export class Road {
     );
   }
 
-  public generateLaneWaypoints() {
-    // Update the lane lines as per model
-    [this.leftLane, this.rightLane].forEach((lane) => {
-      const axes: ('x' | 'y' | 'z')[] = ['x', 'y', 'z'];
-      axes.forEach((axis) => {
-        lane.position[axis] = this.model.position[axis];
-        lane.rotation[axis] = this.model.rotation[axis];
-      });
-    });
-    // Update lane matrices after transforms
-    this.leftLane.updateMatrixWorld();
-    this.rightLane.updateMatrixWorld();
-
+  public generateLanes() {
     // Update facing direction
     this.model.updateMatrixWorld();
     this.model.getWorldDirection(this.forward);
 
-    // Update lane points
-    this.updateLaneWaypoints();
+    // Update the ref points and lane lines as per model
+    [this.leftLane, this.rightLane, this.edgePoints].forEach((item) => {
+      // Transforms
+      const axes: ('x' | 'y' | 'z')[] = ['x', 'y', 'z'];
+      axes.forEach((axis) => {
+        item.position[axis] = this.model.position[axis];
+        item.rotation[axis] = this.model.rotation[axis];
+      });
+      // Matrices
+      item.updateMatrixWorld();
+    });
+
+    // Update lane waypoints following above transforms
+    RoadUtils.copyTransforms(this.model, this.edgePoints);
+
+    // Link lanes to edge points
   }
 
   private updateLaneWaypoints() {

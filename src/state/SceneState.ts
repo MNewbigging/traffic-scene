@@ -41,7 +41,7 @@ export class SceneState {
     this.controls.update();
 
     // Move vehicles along their route
-    this.vehicles.forEach((v) => v.update(deltaTime));
+    //this.vehicles.forEach((v) => v.update(deltaTime));
   }
 
   // Once models are loaded, can then piece them together as per scene
@@ -52,8 +52,9 @@ export class SceneState {
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     this.scene.add(ambientLight);
 
-    this.bendRoadScene();
+    //this.bendRoadScene();
     //this.lanesTestScene();
+    this.refPointsScene();
 
     // Now ready to start
     this.onReady?.();
@@ -73,6 +74,46 @@ export class SceneState {
     this.camera = camera;
     this.controls = new OrbitControls(this.camera, this.canvasListener.canvas);
     this.controls.enableDamping = true;
+  }
+
+  private refPointsScene() {
+    const s1 = RoadFactory.createRoad(
+      RoadName.STRAIGHT,
+      this.modelLoader.getModel(RoadName.STRAIGHT)
+    );
+    const s2 = RoadFactory.createRoad(
+      RoadName.STRAIGHT,
+      this.modelLoader.getModel(RoadName.STRAIGHT)
+    );
+    const s3 = RoadFactory.createRoad(
+      RoadName.STRAIGHT,
+      this.modelLoader.getModel(RoadName.STRAIGHT)
+    );
+    const roads = [s1, s2, s3];
+
+    // Position roads
+    s2.position.z = -2;
+    s3.position.z = -4;
+
+    // Generate lane data ater moving roads
+    roads.forEach((r) => r.postTransform());
+
+    // Connect all roads
+    s1.connectRoads([s2]);
+    s2.connectRoads([s1, s3]);
+    s3.connectRoads([s2]);
+
+    // Route
+    const route = Pathfinder.findRoute(s1, s3);
+    const waypoints = Pathfinder.getWaypointsOfRoute(route);
+    console.log('waypoints', waypoints);
+
+    // Add to scene
+    roads.forEach((r) => {
+      this.scene.add(r.model);
+      this.scene.add(r.edgePoints);
+      r.lanes.forEach((l) => this.scene.add(l.line));
+    });
   }
 
   private bendRoadScene() {
@@ -117,7 +158,7 @@ export class SceneState {
     b4.rotation.y = Math.PI / 2;
 
     // Update lane lines after positioning
-    roads.forEach((r) => r.generateLaneWaypoints());
+    roads.forEach((r) => r.generateLanes());
 
     // Connect
     s1.neighbours.push(b1);
@@ -191,7 +232,7 @@ export class SceneState {
     s3.position.x = 4;
 
     // Create lane lines
-    [s1, s2, s3].forEach((s) => s.generateLaneWaypoints());
+    [s1, s2, s3].forEach((s) => s.generateLanes());
 
     // Connect them
     s1.neighbours.push(s2);

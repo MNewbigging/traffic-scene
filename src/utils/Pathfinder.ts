@@ -82,7 +82,12 @@ export class Pathfinder {
       }
 
       // Find neighbouring nodes
-      currentNode.road.neighbours.forEach((node) => {
+      currentNode.road.neighbours.forEach((node: Road | undefined) => {
+        // If there is no road at this neighbour position, continue
+        if (!node) {
+          return;
+        }
+
         // Continue to next iteration if this node is in closed list
         const inClosed = closed.find((n) => n.road.id === node.id);
         if (inClosed) {
@@ -144,4 +149,42 @@ export class Pathfinder {
 
     return waypoints;
   }
+
+  public static getWaypointsOfRoute(route: Road[]) {
+    // Ask the road to pick a lane and return its waypoints
+    // It needs to know the from and to roads to do so
+    const waypoints: THREE.Vector3[] = [];
+
+    let fromRoad, toRoad;
+
+    const routeLength = route.length;
+    for (let i = 0; i < routeLength; i++) {
+      // Set the from and to roads
+      fromRoad = i - 1 < 0 ? route[i] : route[i - 1];
+      toRoad = i + 1 === routeLength ? route[i] : route[i + 1];
+
+      // Get waypoints of current road using from/to roads
+      route[i].getWaypoints(fromRoad, toRoad).forEach((point) => {
+        // Ignore any duplicate points
+        const exists = waypoints.find((wp) => wp.equals(point));
+        if (!exists) {
+          waypoints.push(point);
+        }
+      });
+    }
+
+    return waypoints;
+  }
 }
+
+/**
+ * On lanes and waypoints:
+ *
+ * Junctions and roundabouts have more than one entry and exit way,
+ * therefore in order to determine the lane line it needs to know the
+ * entry and exit being used.
+ *
+ * Should restructure the model so that, for each road:
+ * - given an entry and exit direction,
+ * - can return the proper line (following lane) from entry to exit
+ */
