@@ -21,6 +21,8 @@ export enum RoadName {
   END = 'road_end',
   BEND = 'road_bend',
   JUNCTION = 'road_intersection',
+  ROUNDABOUT = 'road_roundabout',
+  CROSSROAD = 'road_crossroad',
 }
 
 /**

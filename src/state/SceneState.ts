@@ -174,7 +174,7 @@ export class SceneState {
     s3.connectRoads([j1]);
 
     // Route
-    const route = Pathfinder.findRoute(s2, s1);
+    const route = Pathfinder.findRoute(s1, s3);
     const waypoints = Pathfinder.getRouteWaypoints(route);
 
     const car = new Vehicle(VehicleName.SEDAN, this.modelLoader.getModel(VehicleName.SEDAN));

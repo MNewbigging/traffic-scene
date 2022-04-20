@@ -4,7 +4,7 @@ import { NumberUtils } from '../utils/NumberUtils';
 import { VehicleName } from '../utils/ModelLoader';
 
 export class Vehicle {
-  public speed = 1.5;
+  public speed = 1;
 
   public routeWaypoints: THREE.Vector3[] = [];
   public nextWaypoint?: THREE.Vector3;
