@@ -124,7 +124,7 @@ export class RoadFactory {
     );
 
     const laneOneCurve = new THREE.QuadraticBezierCurve3(laneOneStart, laneOneControl, laneOneEnd);
-    const laneOnePoints = laneOneCurve.getPoints(10);
+    const laneOnePoints = laneOneCurve.getPoints(16);
 
     const laneOneGeom = new THREE.BufferGeometry().setFromPoints(laneOnePoints);
     const laneOneMat = new THREE.LineBasicMaterial({ color: 'red' });
@@ -146,7 +146,7 @@ export class RoadFactory {
     );
 
     const laneTwoCurve = new THREE.QuadraticBezierCurve3(laneTwoStart, laneTwoControl, laneTwoEnd);
-    const laneTwoPoints = laneTwoCurve.getPoints(10);
+    const laneTwoPoints = laneTwoCurve.getPoints(16);
 
     const laneTwoGeom = new THREE.BufferGeometry().setFromPoints(laneTwoPoints);
     const laneTwoMat = new THREE.LineBasicMaterial({ color: 'blue' });
@@ -177,16 +177,18 @@ export class RoadFactory {
 
   private static createJunctionLanes(road: Road, size: THREE.Vector3) {
     const leftLaneMat = new THREE.LineBasicMaterial({ color: 'blue' });
-    const rightLaneMAt = new THREE.LineBasicMaterial({ color: 'red' });
+    const rightLaneMat = new THREE.LineBasicMaterial({ color: 'red' });
+    const thirdLaneMat = new THREE.LineBasicMaterial({ color: 'yellow' });
 
     // Relative to model size
     const pos = road.model.position.clone();
+    pos.y += 0.01;
     const halfWidth = size.x * 0.5;
     const halfDepth = size.z * 0.5;
     const laneCenter = halfWidth * 0.4;
     // 6 lanes; two for each direction
 
-    // Lane 1 - straight across the junction in default facing direction
+    // Lane 1 - straight across the junction in line with default normal
     const laneOnePoints = [
       new THREE.Vector3(pos.x + laneCenter, pos.y, pos.z - halfDepth),
       new THREE.Vector3(pos.x + laneCenter, pos.y, pos.z),
@@ -197,5 +199,95 @@ export class RoadFactory {
     const laneOne = new Lane();
     laneOne.line = laneOneLine;
     road.lanes.push(laneOne);
+
+    // Lane 2 - left turn facing default normal
+    const smallCurveMod = halfWidth * 0.35;
+    const laneTwoCurvePoints = [
+      new THREE.Vector3(pos.x + laneCenter, pos.y, pos.z - halfDepth),
+      new THREE.Vector3(pos.x + smallCurveMod, pos.y, pos.z - smallCurveMod),
+      new THREE.Vector3(pos.x + halfWidth, pos.y, pos.z - laneCenter),
+    ];
+    const laneTwoCurve = new THREE.QuadraticBezierCurve3(
+      laneTwoCurvePoints[0],
+      laneTwoCurvePoints[1],
+      laneTwoCurvePoints[2]
+    );
+    const laneTwoPoints = laneTwoCurve.getPoints(12);
+    const laneTwoGeom = new THREE.BufferGeometry().setFromPoints(laneTwoPoints);
+    const laneTwoLine = new THREE.Line(laneTwoGeom, leftLaneMat);
+    const laneTwo = new Lane();
+    laneTwo.line = laneTwoLine;
+    road.lanes.push(laneTwo);
+
+    // Lane 3 - straight across junction opposite default normal
+    const laneThreePoints = [
+      new THREE.Vector3(pos.x - laneCenter, pos.y, pos.z + halfDepth),
+      new THREE.Vector3(pos.x - laneCenter, pos.y, pos.z),
+      new THREE.Vector3(pos.x - laneCenter, pos.y, pos.z - halfDepth),
+    ];
+    const laneThreeGeom = new THREE.BufferGeometry().setFromPoints(laneThreePoints);
+    const laneThreeLine = new THREE.Line(laneThreeGeom, rightLaneMat);
+    const laneThree = new Lane();
+    laneThree.line = laneThreeLine;
+    road.lanes.push(laneThree);
+
+    // Lane 4 - turning right opposite default normal
+    const bigCurveMod = halfWidth * 0.45;
+    const laneFourCurvePoints = [
+      new THREE.Vector3(pos.x - laneCenter, pos.y, pos.z + halfDepth),
+      new THREE.Vector3(pos.x - bigCurveMod, pos.y, pos.z + smallCurveMod),
+      new THREE.Vector3(pos.x + smallCurveMod, pos.y, pos.z - bigCurveMod),
+      new THREE.Vector3(pos.x + halfWidth, pos.y, pos.z - laneCenter),
+    ];
+    const laneFourCurve = new THREE.CubicBezierCurve3(
+      laneFourCurvePoints[0],
+      laneFourCurvePoints[1],
+      laneFourCurvePoints[2],
+      laneFourCurvePoints[3]
+    );
+    const laneFourPoints = laneFourCurve.getPoints(16);
+    const laneFourGeom = new THREE.BufferGeometry().setFromPoints(laneFourPoints);
+    const laneFourLine = new THREE.Line(laneFourGeom, rightLaneMat);
+    const laneFour = new Lane();
+    laneFour.line = laneFourLine;
+    road.lanes.push(laneFour);
+
+    // Lane 5 - adjoining lane going left, towards default normal
+    const laneFiveCurvePoints = [
+      new THREE.Vector3(pos.x + halfWidth, pos.y, pos.z + laneCenter),
+      new THREE.Vector3(pos.x + smallCurveMod, pos.y, pos.z + smallCurveMod),
+      new THREE.Vector3(pos.x + laneCenter, pos.y, pos.z + halfDepth),
+    ];
+    const laneFiveCurve = new THREE.QuadraticBezierCurve3(
+      laneFiveCurvePoints[0],
+      laneFiveCurvePoints[1],
+      laneFiveCurvePoints[2]
+    );
+    const laneFivePoints = laneFiveCurve.getPoints(12);
+    const laneFiveGeom = new THREE.BufferGeometry().setFromPoints(laneFivePoints);
+    const laneFiveLine = new THREE.Line(laneFiveGeom, thirdLaneMat);
+    const laneFive = new Lane();
+    laneFive.line = laneFiveLine;
+    road.lanes.push(laneFive);
+
+    // Lane 6 - adjoining lane going right, away from default normal
+    const laneSixCurvePoints = [
+      new THREE.Vector3(pos.x + halfWidth, pos.y, pos.z + laneCenter),
+      new THREE.Vector3(pos.x + smallCurveMod, pos.y, pos.z + bigCurveMod),
+      new THREE.Vector3(pos.x - bigCurveMod, pos.y, pos.z - smallCurveMod),
+      new THREE.Vector3(pos.x - laneCenter, pos.y, pos.z - halfDepth),
+    ];
+    const laneSixCurve = new THREE.CubicBezierCurve3(
+      laneSixCurvePoints[0],
+      laneSixCurvePoints[1],
+      laneSixCurvePoints[2],
+      laneSixCurvePoints[3]
+    );
+    const laneSixPoints = laneSixCurve.getPoints(16);
+    const laneSixGeom = new THREE.BufferGeometry().setFromPoints(laneSixPoints);
+    const laneSixLine = new THREE.Line(laneSixGeom, thirdLaneMat);
+    const laneSix = new Lane();
+    laneSix.line = laneSixLine;
+    road.lanes.push(laneSix);
   }
 }

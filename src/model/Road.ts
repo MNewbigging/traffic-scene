@@ -48,7 +48,7 @@ export class Road {
       const nearestIdx = RoadUtils.getClosestIndexFromArray(road.position, this.edgePointPositions);
 
       // Insert into neighbours array at that position
-      this.neighbours.splice(nearestIdx, 0, road);
+      this.neighbours.splice(nearestIdx, 1, road);
     });
   }
 
@@ -74,7 +74,7 @@ export class Road {
     }
 
     // Otherwise, going through this road - match on both from and to
-    let lanes = this.lanes.filter((lane) => this.neighbours[lane.toRoadIdx].id === toRoad.id);
+    let lanes = this.lanes.filter((lane) => this.neighbours[lane.toRoadIdx]?.id === toRoad.id);
     return (
       lanes.find((lane) => this.neighbours[lane.fromRoadIdx]?.id === fromRoad.id).waypoints ?? []
     );
