@@ -171,9 +171,11 @@ export class SceneState {
 
     // Route
 
-    // Add to scene
+    // TEsting junction
+    j1.postTransform();
     this.scene.add(j1.model);
     this.scene.add(j1.edgePoints);
+    j1.lanes.forEach((l) => this.scene.add(l.line));
 
     const face = new THREE.Vector3();
     j1.model.getWorldDirection(face);

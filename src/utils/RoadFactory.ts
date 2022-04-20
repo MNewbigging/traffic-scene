@@ -21,12 +21,12 @@ export class RoadFactory {
       case RoadName.BEND:
         road.neighbours = [undefined, undefined];
         this.createBendRoadEdgePoints(road, size);
-        this.createBendRoadLanes(road);
+        this.createBendRoadLanes(road, size);
         break;
       case RoadName.JUNCTION:
         road.neighbours = [undefined, undefined, undefined];
         this.createJunctionEdgePoints(road, size);
-        this.createJunctionLanes(road);
+        this.createJunctionLanes(road, size);
         break;
     }
 
@@ -106,12 +106,8 @@ export class RoadFactory {
     road.edgePoints = edgePoints;
   }
 
-  private static createBendRoadLanes(road: Road) {
+  private static createBendRoadLanes(road: Road, size: THREE.Vector3) {
     // Relative to model size
-    const box = new THREE.Box3().setFromObject(road.model);
-    const size = new THREE.Vector3();
-    box.getSize(size);
-
     const pos = road.model.position.clone();
     const halfWidth = size.x * 0.5;
     const laneCenter = halfWidth * 0.4;
@@ -179,5 +175,27 @@ export class RoadFactory {
     road.edgePoints = edgePoints;
   }
 
-  private static createJunctionLanes(road: Road) {}
+  private static createJunctionLanes(road: Road, size: THREE.Vector3) {
+    const leftLaneMat = new THREE.LineBasicMaterial({ color: 'blue' });
+    const rightLaneMAt = new THREE.LineBasicMaterial({ color: 'red' });
+
+    // Relative to model size
+    const pos = road.model.position.clone();
+    const halfWidth = size.x * 0.5;
+    const halfDepth = size.z * 0.5;
+    const laneCenter = halfWidth * 0.4;
+    // 6 lanes; two for each direction
+
+    // Lane 1 - straight across the junction in default facing direction
+    const laneOnePoints = [
+      new THREE.Vector3(pos.x + laneCenter, pos.y, pos.z - halfDepth),
+      new THREE.Vector3(pos.x + laneCenter, pos.y, pos.z),
+      new THREE.Vector3(pos.x + laneCenter, pos.y, pos.z + halfDepth),
+    ];
+    const laneOneGeom = new THREE.BufferGeometry().setFromPoints(laneOnePoints);
+    const laneOneLine = new THREE.Line(laneOneGeom, leftLaneMat);
+    const laneOne = new Lane();
+    laneOne.line = laneOneLine;
+    road.lanes.push(laneOne);
+  }
 }
