@@ -85,26 +85,27 @@ export class RoadFactory {
     const laneCenter = halfWidth * 0.4;
 
     // Lane 1
-    const laneOneStart = new THREE.Vector3(pos.x - laneCenter, pos.y, pos.z + halfWidth);
-    const laneOneEnd = new THREE.Vector3(pos.x + halfWidth, pos.y, pos.z - laneCenter);
+    // const laneOneStart = new THREE.Vector3(pos.x - laneCenter, pos.y, pos.z + halfWidth);
+    // const laneOneEnd = new THREE.Vector3(pos.x + halfWidth, pos.y, pos.z - laneCenter);
 
-    const laneOneControlMod = halfWidth * 0.28;
-    const laneOneControl = new THREE.Vector3(
-      pos.x - laneOneControlMod,
-      pos.y,
-      pos.z - laneOneControlMod
-    );
+    // const laneOneControlMod = halfWidth * 0.28;
+    // const laneOneControl = new THREE.Vector3(
+    //   pos.x - laneOneControlMod,
+    //   pos.y,
+    //   pos.z - laneOneControlMod
+    // );
 
-    const laneOneCurve = new THREE.QuadraticBezierCurve3(laneOneStart, laneOneControl, laneOneEnd);
-    const laneOnePoints = laneOneCurve.getPoints(16);
+    // const laneOneCurve = new THREE.QuadraticBezierCurve3(laneOneStart, laneOneControl, laneOneEnd);
+    // const laneOnePoints = laneOneCurve.getPoints(16);
 
-    const laneOneGeom = new THREE.BufferGeometry().setFromPoints(laneOnePoints);
-    const laneOneMat = new THREE.LineBasicMaterial({ color: 'red' });
-    const laneOneLine = new THREE.Line(laneOneGeom, laneOneMat);
+    // const laneOneGeom = new THREE.BufferGeometry().setFromPoints(laneOnePoints);
+    // const laneOneMat = new THREE.LineBasicMaterial({ color: 'red' });
+    // const laneOneLine = new THREE.Line(laneOneGeom, laneOneMat);
 
-    const laneOne = new Lane();
-    laneOne.line = laneOneLine;
-    road.lanes.push(laneOne);
+    // const laneOne = new Lane();
+    // laneOne.line = laneOneLine;
+    // road.lanes.push(laneOne);
+    this.createWideCurveLine(road, size, this.secondLaneMat);
 
     // Lane 2
     const laneTwoStart = new THREE.Vector3(pos.x + halfWidth, pos.y, pos.z + laneCenter);
@@ -255,7 +256,7 @@ export class RoadFactory {
   ) {
     // Relative to model size
     const pos = road.model.position.clone();
-    pos.y += 0.01;
+    pos.y += 0.001;
     const halfWidth = size.x * 0.5;
     const halfDepth = size.z * 0.5;
     const laneCenter = halfWidth * 0.4;
@@ -287,7 +288,7 @@ export class RoadFactory {
   ) {
     // Relative to model size
     const pos = road.model.position.clone();
-    pos.y += 0.01;
+    pos.y += 0.001;
     const halfWidth = size.x * 0.5;
     const halfDepth = size.z * 0.5;
     const laneCenter = halfWidth * 0.4;
@@ -317,7 +318,6 @@ export class RoadFactory {
     // Shouldn't copy transforms, should add them for lines
     laneFourLine.rotation.y = rotation;
     laneFourLine.updateMatrixWorld();
-    console.log('lane rot', laneFourLine.rotation.y);
 
     const laneFour = new Lane();
     laneFour.line = laneFourLine;

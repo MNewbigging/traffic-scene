@@ -40,9 +40,11 @@ export class Lane {
     const posCount = positions.count;
     for (let i = 0; i < posCount; i++) {
       const point = new THREE.Vector3().fromBufferAttribute(positions, i);
-      const worldPoint = this.line.localToWorld(point);
+      const worldPoint = RoadUtils.toPrecision(this.line.localToWorld(point), 5);
       this.waypoints.push(worldPoint);
     }
+
+    console.log('setup waypoints', this.waypoints);
   }
 
   // Will determine which edge points mark the from and to for this lane

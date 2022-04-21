@@ -85,22 +85,30 @@ export class SceneState {
       RoadName.STRAIGHT,
       this.modelLoader.getModel(RoadName.STRAIGHT)
     );
+    const b1 = RoadFactory.createRoad(RoadName.BEND, this.modelLoader.getModel(RoadName.BEND));
 
-    const roads = [s1, s2];
+    const roads = [s1, s2, b1];
 
     // Position
-    s2.position.z = -2;
+    b1.rotation.y = Math.PI / 2;
+    s1.position.z = -2;
+    s2.position.z = -4;
+
+    const arrow = new THREE.ArrowHelper(b1.forward, b1.position, 1.5);
+    this.scene.add(arrow);
 
     // Update
     roads.forEach((r) => r.postTransform());
 
     // Connect
-    s1.connectRoads([s2]);
+    b1.connectRoads([s1]);
+    s1.connectRoads([b1, s2]);
     s2.connectRoads([s1]);
 
     // Route
-    const route = Pathfinder.findRoute(s2, s1);
+    const route = Pathfinder.findRoute(b1, s2);
     const waypoints = Pathfinder.getRouteWaypoints(route);
+    console.log('waypoints', waypoints);
 
     const car = new Vehicle(VehicleName.SEDAN, this.modelLoader.getModel(VehicleName.SEDAN));
     car.setRouteWaypoints(waypoints);
