@@ -96,15 +96,11 @@ export class SceneState {
     b2.rotation.y = -Math.PI / 2;
     b1.rotation.y = Math.PI / 2;
     j1.position.z = -2;
-    //j1.rotation.y = Math.PI / 2;
 
     s1.position.z = -4;
     s2.position.z = -2;
     s2.rotation.y = Math.PI / 2;
     s2.position.x = 2;
-
-    const arrow = new THREE.ArrowHelper(b1.forward, b1.position, 1.5);
-    this.scene.add(arrow);
 
     // Update
     roads.forEach((r) => r.postTransform());
@@ -138,14 +134,28 @@ export class SceneState {
     car2.updateRouteLine();
     this.vehicles.push(car2);
 
+    // Route
+    const route3 = Pathfinder.findRoute(s1, b2);
+    const waypoints3 = Pathfinder.getRouteWaypoints(route3);
+
+    const car3 = new Vehicle(VehicleName.SEDAN, this.modelLoader.getModel(VehicleName.SEDAN));
+    car3.setRouteWaypoints(waypoints3);
+    car3.model.position.x = waypoints3[0].x;
+    car3.model.position.z = waypoints3[0].z;
+    car3.updateRouteLine();
+    this.vehicles.push(car3);
+
     // Add to scene
     this.scene.add(car.model);
     this.scene.add(car.routeLine);
     this.scene.add(car2.model);
     this.scene.add(car2.routeLine);
+    this.scene.add(car3.model);
+    this.scene.add(car3.routeLine);
     roads.forEach((r) => {
       this.scene.add(r.model);
       r.lanes.forEach((l) => this.scene.add(l.line));
     });
+    this.controls.target.z = -2;
   }
 }
