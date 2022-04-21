@@ -86,12 +86,19 @@ export class SceneState {
       this.modelLoader.getModel(RoadName.STRAIGHT)
     );
     const b1 = RoadFactory.createRoad(RoadName.BEND, this.modelLoader.getModel(RoadName.BEND));
+    const j1 = RoadFactory.createRoad(
+      RoadName.JUNCTION,
+      this.modelLoader.getModel(RoadName.JUNCTION)
+    );
 
-    const roads = [s1, s2, b1];
+    const roads = [j1];
 
     // Position
-    b1.rotation.y = Math.PI / 2;
+    //b1.rotation.y = Math.PI / 2;
+    //j1.rotation.y = Math.PI / 2;
+
     s1.position.z = -2;
+    s1.rotation.y = Math.PI / 2;
     s2.position.z = -4;
 
     const arrow = new THREE.ArrowHelper(b1.forward, b1.position, 1.5);
@@ -106,20 +113,20 @@ export class SceneState {
     s2.connectRoads([s1]);
 
     // Route
-    const route = Pathfinder.findRoute(b1, s2);
-    const waypoints = Pathfinder.getRouteWaypoints(route);
-    console.log('waypoints', waypoints);
+    // const route = Pathfinder.findRoute(b1, s2);
+    // const waypoints = Pathfinder.getRouteWaypoints(route);
+    // console.log('waypoints', waypoints);
 
-    const car = new Vehicle(VehicleName.SEDAN, this.modelLoader.getModel(VehicleName.SEDAN));
-    car.setRouteWaypoints(waypoints);
-    car.model.position.x = waypoints[0].x;
-    car.model.position.z = waypoints[0].z;
-    car.updateRouteLine();
-    this.vehicles.push(car);
+    // const car = new Vehicle(VehicleName.SEDAN, this.modelLoader.getModel(VehicleName.SEDAN));
+    // car.setRouteWaypoints(waypoints);
+    // car.model.position.x = waypoints[0].x;
+    // car.model.position.z = waypoints[0].z;
+    // car.updateRouteLine();
+    // this.vehicles.push(car);
 
     // Add to scene
-    this.scene.add(car.model);
-    this.scene.add(car.routeLine);
+    // this.scene.add(car.model);
+    //this.scene.add(car.routeLine);
     roads.forEach((r) => {
       this.scene.add(r.model);
       r.lanes.forEach((l) => this.scene.add(l.line));
