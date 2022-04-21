@@ -11,12 +11,15 @@ export class Road {
   public speedLimit = 1;
   // 'left' is according to the default forward direction (0, 0, 1)
   public forward = new THREE.Vector3(0, 0, 1);
+  public size = new THREE.Vector3();
   public edgePoints: THREE.Points;
   public edgePointPositions: THREE.Vector3[] = [];
   public lanes: Lane[] = [];
 
   constructor(public name: RoadName, public model: THREE.Group) {
     model.getWorldDirection(this.forward);
+    const box = new THREE.Box3().setFromObject(model);
+    box.getSize(this.size);
   }
 
   public get position(): THREE.Vector3 {

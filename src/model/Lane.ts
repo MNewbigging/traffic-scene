@@ -43,8 +43,6 @@ export class Lane {
       const worldPoint = RoadUtils.toPrecision(this.line.localToWorld(point), 5);
       this.waypoints.push(worldPoint);
     }
-
-    console.log('setup waypoints', this.waypoints);
   }
 
   // Will determine which edge points mark the from and to for this lane
