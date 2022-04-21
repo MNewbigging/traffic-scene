@@ -4,7 +4,7 @@ import { NumberUtils } from '../utils/NumberUtils';
 import { VehicleName } from '../utils/ModelLoader';
 
 export class Vehicle {
-  public speed = 1;
+  public speed = 0.5;
 
   public routeWaypoints: THREE.Vector3[] = [];
   public nextWaypoint?: THREE.Vector3;
@@ -41,7 +41,7 @@ export class Vehicle {
     this.routeLine.geometry.setFromPoints(points);
   }
 
-  private updateRouteLine() {
+  public updateRouteLine() {
     const positions = this.routeLine.geometry.getAttribute('position');
     positions.setXYZ(0, this.position.x, this.position.y + 0.3, this.position.z);
     positions.needsUpdate = true;

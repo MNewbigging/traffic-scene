@@ -20,7 +20,7 @@ export class Lane {
 
   public setup(roadModel: THREE.Object3D, edgePoints: THREE.Vector3[]) {
     // Move with the road
-    RoadUtils.copyTransforms(roadModel, this.line);
+    RoadUtils.addTransforms(roadModel, this.line);
 
     // Update waypoints with new transform
     this.updateWaypoints();

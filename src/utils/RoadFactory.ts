@@ -55,18 +55,11 @@ export class RoadFactory {
   }
 
   private static createStraightRoadLanes(road: Road, size: THREE.Vector3) {
-    const halfDepth = size.z * 0.5;
-    const halfWidth = size.x * 0.5;
-    const laneCenter = halfWidth * 0.4; // Pavement 10% of a half
-
-    // Straight roads face (0, 0, 1) by default
-    const modelPos = road.model.position.clone();
-
     // Lane 1
     this.createStraightLane(road, size, this.firstLaneMat);
 
     // Lane 2
-    this.createStraightLane(road, size, this.secondLaneMat, true);
+    this.createStraightLane(road, size, this.secondLaneMat, Math.PI);
   }
 
   private static createBendRoadEdgePoints(road: Road, size: THREE.Vector3) {
@@ -190,7 +183,7 @@ export class RoadFactory {
     road.lanes.push(laneTwo);
 
     // Lane 3 - straight across junction opposite default normal
-    this.createStraightLane(road, size, this.secondLaneMat, true);
+    this.createStraightLane(road, size, this.secondLaneMat, Math.PI);
 
     // Lane 4 - turning right opposite default normal
     const bigCurveMod = halfWidth * 0.45;
@@ -258,7 +251,7 @@ export class RoadFactory {
     road: Road,
     size: THREE.Vector3,
     material: THREE.LineBasicMaterial,
-    reversed = false
+    rotation = 0
   ) {
     // Relative to model size
     const pos = road.model.position.clone();
@@ -267,26 +260,20 @@ export class RoadFactory {
     const halfDepth = size.z * 0.5;
     const laneCenter = halfWidth * 0.4;
 
-    let laneOnePoints: THREE.Vector3[] = [];
-    if (reversed) {
-      laneOnePoints = [
-        new THREE.Vector3(pos.x - laneCenter, pos.y, pos.z + halfDepth),
-        new THREE.Vector3(pos.x - laneCenter, pos.y, pos.z),
-        new THREE.Vector3(pos.x - laneCenter, pos.y, pos.z - halfDepth),
-      ];
-    } else {
-      laneOnePoints = [
-        new THREE.Vector3(pos.x + laneCenter, pos.y, pos.z - halfDepth),
-        new THREE.Vector3(pos.x + laneCenter, pos.y, pos.z),
-        new THREE.Vector3(pos.x + laneCenter, pos.y, pos.z + halfDepth),
-      ];
-    }
+    const lanePoints = [
+      new THREE.Vector3(pos.x + laneCenter, pos.y, pos.z - halfDepth),
+      new THREE.Vector3(pos.x + laneCenter, pos.y, pos.z),
+      new THREE.Vector3(pos.x + laneCenter, pos.y, pos.z + halfDepth),
+    ];
 
-    const laneOneGeom = new THREE.BufferGeometry().setFromPoints(laneOnePoints);
-    const laneOneLine = new THREE.Line(laneOneGeom, material);
-    const laneOne = new Lane();
-    laneOne.line = laneOneLine;
-    road.lanes.push(laneOne);
+    const laneGeom = new THREE.BufferGeometry().setFromPoints(lanePoints);
+    const laneLine = new THREE.Line(laneGeom, material);
+
+    laneLine.rotation.y = rotation;
+
+    const lane = new Lane();
+    lane.line = laneLine;
+    road.lanes.push(lane);
   }
 
   private static createTightCurveLine() {}

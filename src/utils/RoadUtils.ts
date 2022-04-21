@@ -11,6 +11,16 @@ export class RoadUtils {
     to.updateMatrixWorld();
   }
 
+  public static addTransforms(from: THREE.Object3D, to: THREE.Object3D) {
+    const axes: ('x' | 'y' | 'z')[] = ['x', 'y', 'z'];
+    axes.forEach((axis) => {
+      to.position[axis] += from.position[axis];
+      to.rotation[axis] += from.rotation[axis];
+    });
+
+    to.updateMatrixWorld();
+  }
+
   public static getEdgePointPositions(edgePoints: THREE.Points) {
     const points: THREE.Vector3[] = [];
 

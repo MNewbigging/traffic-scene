@@ -53,7 +53,8 @@ export class SceneState {
     this.scene.add(ambientLight);
 
     //this.straightBendScene();
-    this.junctionScene();
+    //this.junctionScene();
+    this.laneTestScene();
 
     // Now ready to start
     this.onReady?.();
@@ -73,6 +74,48 @@ export class SceneState {
     this.camera = camera;
     this.controls = new OrbitControls(this.camera, this.canvasListener.canvas);
     this.controls.enableDamping = true;
+  }
+
+  private laneTestScene() {
+    const s1 = RoadFactory.createRoad(
+      RoadName.STRAIGHT,
+      this.modelLoader.getModel(RoadName.STRAIGHT)
+    );
+    const s2 = RoadFactory.createRoad(
+      RoadName.STRAIGHT,
+      this.modelLoader.getModel(RoadName.STRAIGHT)
+    );
+
+    const roads = [s1, s2];
+
+    // Position
+    s2.position.z = -2;
+
+    // Update
+    roads.forEach((r) => r.postTransform());
+
+    // Connect
+    s1.connectRoads([s2]);
+    s2.connectRoads([s1]);
+
+    // Route
+    const route = Pathfinder.findRoute(s2, s1);
+    const waypoints = Pathfinder.getRouteWaypoints(route);
+
+    const car = new Vehicle(VehicleName.SEDAN, this.modelLoader.getModel(VehicleName.SEDAN));
+    car.setRouteWaypoints(waypoints);
+    car.model.position.x = waypoints[0].x;
+    car.model.position.z = waypoints[0].z;
+    car.updateRouteLine();
+    this.vehicles.push(car);
+
+    // Add to scene
+    this.scene.add(car.model);
+    this.scene.add(car.routeLine);
+    roads.forEach((r) => {
+      this.scene.add(r.model);
+      r.lanes.forEach((l) => this.scene.add(l.line));
+    });
   }
 
   private straightBendScene() {
