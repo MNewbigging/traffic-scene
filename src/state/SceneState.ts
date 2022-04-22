@@ -89,6 +89,9 @@ export class SceneState {
     );
     [r1].forEach((r) => this.roads.push(r));
 
+    // r1.position.x = 2;
+    // r1.rotation.y = Math.PI / 2;
+
     this.roads.forEach((r) => r.postTransform());
 
     this.roads.forEach((r) => {

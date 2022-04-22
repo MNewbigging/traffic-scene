@@ -238,29 +238,95 @@ export class RoadFactory {
       innerCirclePoints
     );
 
-    // FOR TESTING:
+    // Lane 4 - enter -x, exit z
+    this.createRoundaboutLeftLane(
+      road,
+      this.secondLaneMat,
+      entryLine,
+      exitLine,
+      outerCirclePoints,
+      -Math.PI / 2
+    );
 
-    // Draw the outer circle
-    const outerCircleGeom = new THREE.BufferGeometry().setFromPoints(innerCirclePoints);
-    const outerCircleLine = new THREE.Line(outerCircleGeom, this.firstLaneMat);
-    const outerCircleLane = new Lane();
-    outerCircleLane.line = outerCircleLine;
-    //road.lanes.push(outerCircleLane);
+    // Lane 5 - enter -x, exit -x
+    this.createRoundaboutStraightLane(
+      road,
+      this.secondLaneMat,
+      entryLine,
+      exitLine,
+      outerCirclePoints,
+      -Math.PI / 2
+    );
 
-    // Draw the entry line
-    const entryLane = new Lane();
-    entryLane.line = entryLine;
-    //road.lanes.push(entryLane);
+    // Lane 6 - enter -x, exit -z
+    this.createRoundaboutRightLane(
+      road,
+      this.secondLaneMat,
+      longEntryLine,
+      longExitLine,
+      innerCirclePoints,
+      -Math.PI / 2
+    );
 
-    // Draw the exit line
-    const exitLane = new Lane();
-    exitLane.line = exitLine;
-    //road.lanes.push(exitLane);
+    // Lane 7 - enter -z, exit -x
+    this.createRoundaboutLeftLane(
+      road,
+      this.thirdLaneMat,
+      entryLine,
+      exitLine,
+      outerCirclePoints,
+      Math.PI
+    );
 
-    // For a lane:
-    // Draw the entry line
-    // Draw the exit line
-    // Find points on circle between these
+    // Lane 8 - enter -z, exit -z
+    this.createRoundaboutStraightLane(
+      road,
+      this.thirdLaneMat,
+      entryLine,
+      exitLine,
+      outerCirclePoints,
+      Math.PI
+    );
+
+    // Lane 9 - enter -z, exit x
+    this.createRoundaboutRightLane(
+      road,
+      this.thirdLaneMat,
+      longEntryLine,
+      longExitLine,
+      innerCirclePoints,
+      Math.PI
+    );
+
+    // Lane 10 - enter -x, exit -z
+    this.createRoundaboutLeftLane(
+      road,
+      this.fourthLaneMat,
+      entryLine,
+      exitLine,
+      outerCirclePoints,
+      Math.PI / 2
+    );
+
+    // Lane 8 - enter -x, exit x
+    this.createRoundaboutStraightLane(
+      road,
+      this.fourthLaneMat,
+      entryLine,
+      exitLine,
+      outerCirclePoints,
+      Math.PI / 2
+    );
+
+    // Lane 9 - enter -x, exit z
+    this.createRoundaboutRightLane(
+      road,
+      this.fourthLaneMat,
+      longEntryLine,
+      longExitLine,
+      innerCirclePoints,
+      Math.PI / 2
+    );
   }
 
   private static createRoundaboutExitLine(road: Road, long = false) {
