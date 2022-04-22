@@ -44,6 +44,7 @@ export class SceneState {
 
   public updateScene(deltaTime: number) {
     this.controls.update();
+    this.controls.target = this.vehicles[0].position;
 
     // Move vehicles along their route
     this.vehicles.forEach((v) => v.update(deltaTime));

@@ -41,7 +41,7 @@ export class Lane {
     const posCount = positions.count;
     for (let i = 0; i < posCount; i++) {
       const point = new THREE.Vector3().fromBufferAttribute(positions, i);
-      const worldPoint = NumberUtils.toVectorPrecision(this.line.localToWorld(point), 5);
+      const worldPoint = NumberUtils.toVectorPrecision(this.line.localToWorld(point), 3);
       this.waypoints.push(worldPoint);
     }
   }

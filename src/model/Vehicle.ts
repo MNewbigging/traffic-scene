@@ -4,15 +4,13 @@ import { NumberUtils } from '../utils/NumberUtils';
 import { VehicleName } from '../utils/ModelLoader';
 
 export class Vehicle {
-  public speed = 0.5;
+  public speed = 3;
   public routeWaypoints: THREE.Vector3[] = [];
   public nextWaypoint?: THREE.Vector3;
   public routeLine?: THREE.Line;
   public lastRoadId = ''; // slight hack to get final road when route is done, to change later
   private onRouteComplete?: (car: Vehicle) => void;
   private nextLookAt = new THREE.Quaternion();
-  private nextWaypointDistance = 0;
-  private lookAtIncrement = 0;
 
   constructor(public name: VehicleName, public model: THREE.Group, color?: THREE.Color) {
     this.setColor(color);
@@ -121,35 +119,6 @@ export class Vehicle {
     if (NumberUtils.vectorsEqual(this.position, this.nextWaypoint)) {
       // Target the next waypoint
       this.targetNextWaypoint();
-
-      // Target next waypoint in list
-      // this.nextWaypoint = this.routeWaypoints[0];
-
-      // // Look ahead of this target
-      // const nextLookTarget =
-      //   // this.routeWaypoints[4] ??
-      //   // this.routeWaypoints[3] ??
-      //   //this.routeWaypoints[2] ??
-      //   //this.routeWaypoints[1] ??
-      //   this.routeWaypoints[0];
-
-      // // Save current facing direction
-      // const facing = this.model.rotation.clone();
-
-      // // Turn to look at next waypoint
-      // this.model.lookAt(nextLookTarget);
-
-      // // Save next waypoint facing direction
-      // this.nextLookAt = new THREE.Quaternion().copy(this.model.quaternion);
-
-      // // Rotate back to original facing direction
-      // this.model.rotation.x = facing.x;
-      // this.model.rotation.y = facing.y;
-      // this.model.rotation.z = facing.z;
-
-      // const lookDir = this.nextWaypoint.clone();
-      // lookDir.y = this.position.y;
-      // this.model.lookAt(lookDir);
     }
 
     // Otherwise, keep moving towards next target
@@ -158,7 +127,7 @@ export class Vehicle {
     this.position.x += direction.x * speed;
     this.position.z += direction.z * speed;
 
-    // Use difference as a measure of slerpiness
+    // Rotate towards next target
     const rotateSpeed = speed * 1.5;
     this.model.quaternion.rotateTowards(this.nextLookAt, rotateSpeed);
   }

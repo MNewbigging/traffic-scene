@@ -15,7 +15,7 @@ export class NumberUtils {
 
   // Returns if vectors are equal within a certain small allowance
   public static vectorsEqual(v1: THREE.Vector3, v2: THREE.Vector3) {
-    const epsilon = 0.01;
+    const epsilon = 0.1;
 
     const xEquals = Math.abs(v1.x - v2.x) <= epsilon;
     const yEquals = Math.abs(v1.y - v2.y) <= epsilon;
