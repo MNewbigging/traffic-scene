@@ -5,19 +5,16 @@ import { VehicleName } from '../utils/ModelLoader';
 
 export class Vehicle {
   public speed = 0.5;
-
   public routeWaypoints: THREE.Vector3[] = [];
   public nextWaypoint?: THREE.Vector3;
-
   public routeLine?: THREE.Line;
-  public forward = new THREE.Vector3();
-
   public lastRoadId = ''; // slight hack to get final road when route is done, to change later
   private onRouteComplete?: (car: Vehicle) => void;
+  private nextLookAt = new THREE.Quaternion();
+  private nextWaypointDistance = 0;
+  private lookAtIncrement = 0;
 
   constructor(public name: VehicleName, public model: THREE.Group, color?: THREE.Color) {
-    model.getWorldDirection(this.forward);
-
     this.setColor(color);
 
     const mat = new THREE.LineBasicMaterial({ color });
@@ -34,13 +31,25 @@ export class Vehicle {
     lastRoadId: string,
     onComplete?: (car: Vehicle) => void
   ) {
+    // Save callback and info for when route is finished
     this.lastRoadId = lastRoadId;
     this.onRouteComplete = onComplete;
 
+    // Save route
     this.routeWaypoints = waypoints;
-    this.nextWaypoint = this.routeWaypoints[0];
+
+    // Always start the route at first waypoint
+    this.position.x = waypoints[0].x;
+    this.position.z = waypoints[0].z;
+
+    // Can now target the next waypoint since we're at the first already
+    this.targetNextWaypoint();
+
+    // Face next waypoint immediately
+    this.model.lookAt(this.nextWaypoint);
 
     this.setRouteLine();
+    this.updateRouteLine();
   }
 
   private setColor(color: THREE.Color) {
@@ -74,6 +83,34 @@ export class Vehicle {
     this.updateRouteLine();
   }
 
+  private targetNextWaypoint() {
+    this.routeWaypoints.shift();
+
+    // Have we reached the end now?
+    if (!this.routeWaypoints.length) {
+      this.onRouteComplete?.(this);
+      return;
+    }
+
+    this.nextWaypoint = this.routeWaypoints[0];
+    // Save current facing direction
+    const facing = this.model.rotation.clone();
+
+    // Turn to look at next waypoint
+    this.model.lookAt(this.nextWaypoint);
+
+    // Save next waypoint facing direction
+    this.nextLookAt = new THREE.Quaternion().copy(this.model.quaternion);
+
+    // Rotate back to original facing direction
+    this.model.rotation.x = facing.x;
+    this.model.rotation.y = facing.y;
+    this.model.rotation.z = facing.z;
+
+    // Update route line
+    this.setRouteLine();
+  }
+
   private driveRoute(deltaTime: number) {
     // Has the route ended?
     if (!this.routeWaypoints.length || !this.nextWaypoint) {
@@ -82,19 +119,37 @@ export class Vehicle {
 
     // Have we reached the next waypoint?
     if (NumberUtils.vectorsEqual(this.position, this.nextWaypoint)) {
-      // Remove this waypoint
-      this.routeWaypoints.shift();
-      this.setRouteLine();
-
-      // Was that the last waypoint on this route?
-      if (!this.routeWaypoints.length) {
-        // Have now finished this route; can stop driving
-        this.onRouteComplete?.(this);
-        return;
-      }
+      // Target the next waypoint
+      this.targetNextWaypoint();
 
       // Target next waypoint in list
-      this.nextWaypoint = this.routeWaypoints[0];
+      // this.nextWaypoint = this.routeWaypoints[0];
+
+      // // Look ahead of this target
+      // const nextLookTarget =
+      //   // this.routeWaypoints[4] ??
+      //   // this.routeWaypoints[3] ??
+      //   //this.routeWaypoints[2] ??
+      //   //this.routeWaypoints[1] ??
+      //   this.routeWaypoints[0];
+
+      // // Save current facing direction
+      // const facing = this.model.rotation.clone();
+
+      // // Turn to look at next waypoint
+      // this.model.lookAt(nextLookTarget);
+
+      // // Save next waypoint facing direction
+      // this.nextLookAt = new THREE.Quaternion().copy(this.model.quaternion);
+
+      // // Rotate back to original facing direction
+      // this.model.rotation.x = facing.x;
+      // this.model.rotation.y = facing.y;
+      // this.model.rotation.z = facing.z;
+
+      // const lookDir = this.nextWaypoint.clone();
+      // lookDir.y = this.position.y;
+      // this.model.lookAt(lookDir);
     }
 
     // Otherwise, keep moving towards next target
@@ -103,11 +158,8 @@ export class Vehicle {
     this.position.x += direction.x * speed;
     this.position.z += direction.z * speed;
 
-    const lookDir = this.nextWaypoint.clone();
-    lookDir.y = this.position.y;
-    this.model.lookAt(lookDir);
-
-    this.model.getWorldDirection(this.forward);
-    //console.log('car forward', this.forward);
+    // Use difference as a measure of slerpiness
+    const rotateSpeed = speed * 1.5;
+    this.model.quaternion.rotateTowards(this.nextLookAt, rotateSpeed);
   }
 }

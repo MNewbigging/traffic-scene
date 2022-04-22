@@ -167,10 +167,10 @@ export class SceneState {
     s13.connectRoads([b7, j1]);
 
     // Route
-    this.addCarWithRoute(j1, s13, new THREE.Color('#2354a1'));
-    this.addCarWithRoute(s5, s7, new THREE.Color('green'));
-    this.addCarWithRoute(b5, s4, new THREE.Color('red'));
-    this.addCarWithRoute(b2, s9, new THREE.Color('yellow'));
+    this.addCarWithRoute(s1, b2, new THREE.Color('#2354a1'));
+    // this.addCarWithRoute(s5, s7, new THREE.Color('green'));
+    // this.addCarWithRoute(b5, s4, new THREE.Color('red'));
+    // this.addCarWithRoute(b2, s9, new THREE.Color('yellow'));
 
     this.vehicles.forEach((v) => {
       this.scene.add(v.model);
@@ -226,6 +226,5 @@ export class SceneState {
     car.setRoute(waypoints, lastRoadId, this.onCompleteRoute);
     car.model.position.x = waypoints[0].x;
     car.model.position.z = waypoints[0].z;
-    car.updateRouteLine();
   }
 }

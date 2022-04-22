@@ -23,4 +23,22 @@ export class NumberUtils {
 
     return xEquals && yEquals && zEquals;
   }
+
+  public static toVectorPrecision(vector: THREE.Vector3, digits: number) {
+    const e = Math.pow(10, digits || 0);
+
+    vector.x = Math.round(vector.x * e) / e;
+    vector.y = Math.round(vector.y * e) / e;
+    vector.z = Math.round(vector.z * e) / e;
+
+    return vector;
+  }
+
+  public static toNumberPrecision(number: number, digits: number) {
+    const e = Math.pow(10, digits);
+
+    const n = Math.round(number * e) / e;
+
+    return n;
+  }
 }

@@ -415,7 +415,7 @@ export class RoadFactory {
     ];
 
     const curve = new THREE.CatmullRomCurve3(p, true);
-    const cp = curve.getPoints(60);
+    const cp = curve.getPoints(128);
 
     return cp;
   }
@@ -577,7 +577,7 @@ export class RoadFactory {
     );
 
     // Get n points along line for object
-    const linePoints = laneCurve.getPoints(12);
+    const linePoints = laneCurve.getPoints(24);
     const geom = new THREE.BufferGeometry().setFromPoints(linePoints);
     const line = new THREE.Line(geom, material);
 
@@ -615,7 +615,7 @@ export class RoadFactory {
       laneFourCurvePoints[3]
     );
 
-    const laneFourPoints = laneFourCurve.getPoints(16);
+    const laneFourPoints = laneFourCurve.getPoints(32);
     const laneFourGeom = new THREE.BufferGeometry().setFromPoints(laneFourPoints);
     const laneFourLine = new THREE.Line(laneFourGeom, material);
 
