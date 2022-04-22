@@ -12,10 +12,12 @@ export class Vehicle {
   public routeLine?: THREE.Line;
   public forward = new THREE.Vector3();
 
-  constructor(public name: VehicleName, public model: THREE.Group) {
+  constructor(public name: VehicleName, public model: THREE.Group, color?: THREE.Color) {
     model.getWorldDirection(this.forward);
 
-    const mat = new THREE.LineBasicMaterial({ color: 'yellow' });
+    this.setColor(color);
+
+    const mat = new THREE.LineBasicMaterial({ color });
     const geom = new THREE.BufferGeometry();
     this.routeLine = new THREE.Line(geom, mat);
   }
@@ -29,6 +31,13 @@ export class Vehicle {
     this.nextWaypoint = this.routeWaypoints[0];
 
     this.setRouteLine();
+  }
+
+  private setColor(color: THREE.Color) {
+    const body = this.model.getObjectByName('Mesh_body_1');
+    if (body && body instanceof THREE.Mesh) {
+      body.material.color = color;
+    }
   }
 
   private setRouteLine() {

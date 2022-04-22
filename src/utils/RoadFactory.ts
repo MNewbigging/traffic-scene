@@ -241,7 +241,7 @@ export class RoadFactory {
     // Lane 4 - enter -x, exit z
     this.createRoundaboutLeftLane(
       road,
-      this.secondLaneMat,
+      this.thirdLaneMat,
       entryLine,
       exitLine,
       outerCirclePoints,
@@ -251,7 +251,7 @@ export class RoadFactory {
     // Lane 5 - enter -x, exit -x
     this.createRoundaboutStraightLane(
       road,
-      this.secondLaneMat,
+      this.thirdLaneMat,
       entryLine,
       exitLine,
       outerCirclePoints,
@@ -261,7 +261,7 @@ export class RoadFactory {
     // Lane 6 - enter -x, exit -z
     this.createRoundaboutRightLane(
       road,
-      this.secondLaneMat,
+      this.thirdLaneMat,
       longEntryLine,
       longExitLine,
       innerCirclePoints,
@@ -271,7 +271,7 @@ export class RoadFactory {
     // Lane 7 - enter -z, exit -x
     this.createRoundaboutLeftLane(
       road,
-      this.thirdLaneMat,
+      this.secondLaneMat,
       entryLine,
       exitLine,
       outerCirclePoints,
@@ -281,7 +281,7 @@ export class RoadFactory {
     // Lane 8 - enter -z, exit -z
     this.createRoundaboutStraightLane(
       road,
-      this.thirdLaneMat,
+      this.secondLaneMat,
       entryLine,
       exitLine,
       outerCirclePoints,
@@ -291,7 +291,7 @@ export class RoadFactory {
     // Lane 9 - enter -z, exit x
     this.createRoundaboutRightLane(
       road,
-      this.thirdLaneMat,
+      this.secondLaneMat,
       longEntryLine,
       longExitLine,
       innerCirclePoints,

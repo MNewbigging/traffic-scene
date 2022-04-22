@@ -87,22 +87,51 @@ export class SceneState {
       RoadName.ROUNDABOUT,
       this.modelLoader.getModel(RoadName.ROUNDABOUT)
     );
-    [r1].forEach((r) => this.roads.push(r));
+    const s1 = RoadFactory.createRoad(
+      RoadName.STRAIGHT,
+      this.modelLoader.getModel(RoadName.STRAIGHT)
+    );
+    const s2 = RoadFactory.createRoad(
+      RoadName.STRAIGHT,
+      this.modelLoader.getModel(RoadName.STRAIGHT)
+    );
+    const s3 = RoadFactory.createRoad(
+      RoadName.STRAIGHT,
+      this.modelLoader.getModel(RoadName.STRAIGHT)
+    );
+    const s4 = RoadFactory.createRoad(
+      RoadName.STRAIGHT,
+      this.modelLoader.getModel(RoadName.STRAIGHT)
+    );
 
-    // r1.position.x = 2;
-    // r1.rotation.y = Math.PI / 2;
+    [r1, s1, s2, s3, s4].forEach((r) => this.roads.push(r));
 
+    // Position
+    s1.position.z = 4;
+    s2.position.z = -4;
+    s3.position.x = -4;
+    s3.rotation.y = -Math.PI / 2;
+    s4.position.x = 4;
+    s4.rotation.y = Math.PI / 2;
+
+    // Update
     this.roads.forEach((r) => r.postTransform());
+
+    // Connect
+    [s1, s2, s3, s4].forEach((r) => r.connectRoads([r1]));
+    r1.connectRoads([s1, s2, s3, s4]);
+
+    // Route
+    this.addCarWithRoute(s1, s2, new THREE.Color('blue'));
+
+    this.vehicles.forEach((v) => {
+      this.scene.add(v.model);
+      this.scene.add(v.routeLine);
+    });
 
     this.roads.forEach((r) => {
       this.scene.add(r.model);
-      this.scene.add(r.edgePoints);
-      r.lanes.forEach((l) => this.scene.add(l.line));
-      this.scene.add(new THREE.ArrowHelper(r.forward, r.position, 2));
     });
-
-    this.controls.target.z = -2;
-    this.controls.target.x = 0.5;
   }
 
   private crossroadScene() {
@@ -248,5 +277,18 @@ export class SceneState {
       r.lanes.forEach((l) => this.scene.add(l.line));
     });
     this.controls.target.z = -2;
+  }
+
+  private addCarWithRoute(fromRoad: Road, toRoad: Road, color?: THREE.Color) {
+    const route = Pathfinder.findRoute(fromRoad, toRoad);
+    const waypoints = Pathfinder.getRouteWaypoints(route);
+
+    const car = new Vehicle(VehicleName.SEDAN, this.modelLoader.getModel(VehicleName.SEDAN), color);
+    car.setRouteWaypoints(waypoints);
+    car.model.position.x = waypoints[0].x;
+    car.model.position.z = waypoints[0].z;
+    car.updateRouteLine();
+
+    this.vehicles.push(car);
   }
 }
