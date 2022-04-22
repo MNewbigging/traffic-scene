@@ -83,46 +83,62 @@ export class SceneState {
   }
 
   private roundaboutScene() {
-    const r1 = RoadFactory.createRoad(
-      RoadName.ROUNDABOUT,
-      this.modelLoader.getModel(RoadName.ROUNDABOUT)
-    );
-    const s1 = RoadFactory.createRoad(
-      RoadName.STRAIGHT,
-      this.modelLoader.getModel(RoadName.STRAIGHT)
-    );
-    const s2 = RoadFactory.createRoad(
-      RoadName.STRAIGHT,
-      this.modelLoader.getModel(RoadName.STRAIGHT)
-    );
-    const s3 = RoadFactory.createRoad(
-      RoadName.STRAIGHT,
-      this.modelLoader.getModel(RoadName.STRAIGHT)
-    );
-    const s4 = RoadFactory.createRoad(
-      RoadName.STRAIGHT,
-      this.modelLoader.getModel(RoadName.STRAIGHT)
+    // Roundabout, route towards z
+    const r1 = this.addRoad(RoadName.ROUNDABOUT, new THREE.Vector3());
+    const s1 = this.addRoad(RoadName.STRAIGHT, new THREE.Vector3(0, 0, 4));
+    const j1 = this.addRoad(RoadName.JUNCTION, new THREE.Vector3(0, 0, 6), Math.PI / 2);
+    const s5 = this.addRoad(RoadName.STRAIGHT, new THREE.Vector3(-2, 0, 6), Math.PI / 2);
+    const s6 = this.addRoad(RoadName.STRAIGHT, new THREE.Vector3(-4, 0, 6), Math.PI / 2);
+    const b1 = this.addRoad(RoadName.BEND, new THREE.Vector3(-6, 0, 6), Math.PI / 2); // turns bend, goes towards -z now
+    const s7 = this.addRoad(RoadName.STRAIGHT, new THREE.Vector3(-6, 0, 4));
+    const s8 = this.addRoad(RoadName.STRAIGHT, new THREE.Vector3(-6, 0, 2)); // this meets j2 to left of roundabout
+
+    // Route going above roundabout, towards -z
+    const b2 = this.addRoad(RoadName.BEND, new THREE.Vector3(0, 0, -4), -Math.PI / 2);
+
+    // Route going left of roundabout, then up
+    const s3 = this.addRoad(RoadName.STRAIGHT, new THREE.Vector3(-4, 0, 0), -Math.PI / 2);
+    const j2 = this.addRoad(RoadName.JUNCTION, new THREE.Vector3(-6, 0, 0));
+    const s9 = this.addRoad(RoadName.STRAIGHT, new THREE.Vector3(-6, 0, -2));
+    const b3 = this.addRoad(RoadName.BEND, new THREE.Vector3(-6, 0, -4));
+    const s10 = this.addRoad(RoadName.STRAIGHT, new THREE.Vector3(-4, 0, -4), Math.PI / 2);
+    const s11 = this.addRoad(RoadName.STRAIGHT, new THREE.Vector3(-2, 0, -4), Math.PI / 2);
+
+    // Route going right of roundabout, towards x
+    const s4 = this.addRoad(RoadName.STRAIGHT, new THREE.Vector3(4, 0, 0), -Math.PI / 2);
+
+    [r1, s1, b2, s3, s4, j1, s5, s6, b1, s7, j2, s8, s9, b3, s10, s11].forEach((r) =>
+      this.roads.push(r)
     );
 
-    [r1, s1, s2, s3, s4].forEach((r) => this.roads.push(r));
+    // Connect all roads
+    // Roundabout
+    r1.connectRoads([s1, b2, s3, s4]);
+    // route towards z, bends back up towards -z
+    s1.connectRoads([r1, j1]);
+    j1.connectRoads([s1, s5]);
+    s5.connectRoads([j1, s6]);
+    s6.connectRoads([s5, b1]);
+    b1.connectRoads([s6, s7]);
+    s7.connectRoads([b1, s8]);
+    s8.connectRoads([s7, j2]);
+    // Above connects with side route towards -x:
+    s3.connectRoads([r1, j2]);
+    j2.connectRoads([s3, s8, s9]);
+    s9.connectRoads([j2, b3]);
+    b3.connectRoads([s9, s10]);
+    s10.connectRoads([b3, s11]);
+    s11.connectRoads([s10, b2]);
 
-    // Position
-    s1.position.z = 4;
-    s2.position.z = -4;
-    s3.position.x = -4;
-    s3.rotation.y = -Math.PI / 2;
-    s4.position.x = 4;
-    s4.rotation.y = Math.PI / 2;
+    // Above roundabove, heading towards -z
+    b2.connectRoads([r1, s11]);
 
-    // Update
-    this.roads.forEach((r) => r.postTransform());
-
-    // Connect
-    [s1, s2, s3, s4].forEach((r) => r.connectRoads([r1]));
-    r1.connectRoads([s1, s2, s3, s4]);
+    // Right of roundabout, heading towards x
+    s4.connectRoads([r1]);
 
     // Route
-    this.addCarWithRoute(s1, s2, new THREE.Color('blue'));
+    this.addCarWithRoute(s1, s5, new THREE.Color('#2354a1'));
+    this.addCarWithRoute(s8, b2, new THREE.Color('green'));
 
     this.vehicles.forEach((v) => {
       this.scene.add(v.model);
@@ -290,5 +306,19 @@ export class SceneState {
     car.updateRouteLine();
 
     this.vehicles.push(car);
+  }
+
+  private addRoad(name: RoadName, pos: THREE.Vector3, rot = 0) {
+    const road = RoadFactory.createRoad(name, this.modelLoader.getModel(name));
+
+    road.position.x = pos.x;
+    road.position.y = pos.y;
+    road.position.z = pos.z;
+
+    road.rotation.y = rot;
+
+    road.postTransform();
+
+    return road;
   }
 }

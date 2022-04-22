@@ -86,10 +86,6 @@ export class ModelLoader {
           if (node instanceof THREE.Mesh) {
             // Adjust metalness so it shows via ambient light
             node.material.metalness = 0;
-            console.log('name', node.name);
-            if (node.name === 'Mesh_body_1') {
-              node.material.color = new THREE.Color('green');
-            }
           }
         });
 

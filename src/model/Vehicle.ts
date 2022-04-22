@@ -36,7 +36,7 @@ export class Vehicle {
   private setColor(color: THREE.Color) {
     const body = this.model.getObjectByName('Mesh_body_1');
     if (body && body instanceof THREE.Mesh) {
-      body.material.color = color;
+      body.material = new THREE.MeshBasicMaterial({ color });
     }
   }
 
