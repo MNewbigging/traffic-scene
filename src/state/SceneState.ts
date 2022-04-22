@@ -31,11 +31,11 @@ export class SceneState {
     // This is where proc gen comes in - hardcoded for now
     const modelNames = new ModelNames();
     modelNames.roads = [
-      RoadName.END,
       RoadName.STRAIGHT,
       RoadName.BEND,
       RoadName.JUNCTION,
       RoadName.CROSSROAD,
+      RoadName.ROUNDABOUT,
     ];
     modelNames.vehicles = [VehicleName.SEDAN];
 
@@ -58,8 +58,9 @@ export class SceneState {
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     this.scene.add(ambientLight);
 
-    //this.laneTestScene();
-    this.crossroadScene();
+    //this.junctionScene();
+    //this.crossroadScene();
+    this.roundaboutScene();
 
     // Now ready to start
     this.onReady?.();
@@ -79,6 +80,26 @@ export class SceneState {
     this.camera = camera;
     this.controls = new OrbitControls(this.camera, this.canvasListener.canvas);
     this.controls.enableDamping = true;
+  }
+
+  private roundaboutScene() {
+    const r1 = RoadFactory.createRoad(
+      RoadName.ROUNDABOUT,
+      this.modelLoader.getModel(RoadName.ROUNDABOUT)
+    );
+    [r1].forEach((r) => this.roads.push(r));
+
+    console.log('r size', r1.size);
+
+    this.roads.forEach((r) => {
+      this.scene.add(r.model);
+      this.scene.add(r.edgePoints);
+      r.lanes.forEach((l) => this.scene.add(l.line));
+      this.scene.add(new THREE.ArrowHelper(r.forward, r.position, 2));
+    });
+
+    this.controls.target.z = -2;
+    this.controls.target.x = 0.5;
   }
 
   private crossroadScene() {
@@ -141,7 +162,7 @@ export class SceneState {
     });
   }
 
-  private laneTestScene() {
+  private junctionScene() {
     const s1 = RoadFactory.createRoad(
       RoadName.STRAIGHT,
       this.modelLoader.getModel(RoadName.STRAIGHT)

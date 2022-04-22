@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { BufferGeometry } from 'three';
 
 export class RoadUtils {
   public static copyTransforms(from: THREE.Object3D, to: THREE.Object3D) {
@@ -40,6 +41,19 @@ export class RoadUtils {
       const point = new THREE.Vector3().fromBufferAttribute(positions, i);
       const worldPoint = edgePoints.localToWorld(point);
       points.push(worldPoint);
+    }
+
+    return points;
+  }
+
+  public static getPositions(geom: BufferGeometry) {
+    const points: THREE.Vector3[] = [];
+
+    const positions = geom.getAttribute('position');
+    const posCount = positions.count;
+    for (let i = 0; i < posCount; i++) {
+      const point = new THREE.Vector3().fromBufferAttribute(positions, i);
+      points.push(point);
     }
 
     return points;

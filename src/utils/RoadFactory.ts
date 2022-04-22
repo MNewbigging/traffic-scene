@@ -3,8 +3,10 @@ import * as THREE from 'three';
 import { Lane } from '../model/Lane';
 import { Road } from '../model/Road';
 import { RoadName } from './ModelLoader';
+import { RoadUtils } from './RoadUtils';
 
 export class RoadFactory {
+  private static pointsMat = new THREE.PointsMaterial({ color: 'white', size: 0.1 });
   private static firstLaneMat = new THREE.LineBasicMaterial({ color: 'blue' });
   private static secondLaneMat = new THREE.LineBasicMaterial({ color: 'red' });
   private static thirdLaneMat = new THREE.LineBasicMaterial({ color: 'yellow' });
@@ -35,6 +37,11 @@ export class RoadFactory {
         this.createCrossroadEdgePoints(road);
         this.createCrossroadLanes(road);
         break;
+      case RoadName.ROUNDABOUT:
+        road.neighbours = [undefined, undefined, undefined, undefined];
+        this.createRoundaboutEdgePoints(road);
+        this.createRoundaboutLanes(road);
+        break;
     }
 
     return road;
@@ -51,8 +58,7 @@ export class RoadFactory {
     ];
 
     const edgeGeom = new THREE.BufferGeometry().setFromPoints(points);
-    const edgeMat = new THREE.PointsMaterial({ color: 'white', size: 0.1 });
-    const edgePoints = new THREE.Points(edgeGeom, edgeMat);
+    const edgePoints = new THREE.Points(edgeGeom, this.pointsMat);
 
     road.edgePoints = edgePoints;
   }
@@ -67,7 +73,7 @@ export class RoadFactory {
 
   private static createBendRoadEdgePoints(road: Road) {
     // Ref points face forward and to its left by 90 deg
-    const pos = road.model.position.clone();
+    const pos = road.position.clone();
 
     const points = [
       new THREE.Vector3(pos.x, pos.y, pos.z + road.size.z * 0.5),
@@ -75,8 +81,7 @@ export class RoadFactory {
     ];
 
     const edgeGeom = new THREE.BufferGeometry().setFromPoints(points);
-    const edgeMat = new THREE.PointsMaterial({ color: 'white', size: 0.1 });
-    const edgePoints = new THREE.Points(edgeGeom, edgeMat);
+    const edgePoints = new THREE.Points(edgeGeom, this.pointsMat);
 
     road.edgePoints = edgePoints;
   }
@@ -102,8 +107,7 @@ export class RoadFactory {
     ];
 
     const edgeGeom = new THREE.BufferGeometry().setFromPoints(points);
-    const edgeMat = new THREE.PointsMaterial({ color: 'white', size: 0.1 });
-    const edgePoints = new THREE.Points(edgeGeom, edgeMat);
+    const edgePoints = new THREE.Points(edgeGeom, this.pointsMat);
 
     road.edgePoints = edgePoints;
   }
@@ -141,8 +145,7 @@ export class RoadFactory {
     ];
 
     const geom = new THREE.BufferGeometry().setFromPoints(points);
-    const mat = new THREE.PointsMaterial({ color: 'white', size: 0.1 });
-    const edgePoints = new THREE.Points(geom, mat);
+    const edgePoints = new THREE.Points(geom, this.pointsMat);
 
     road.edgePoints = edgePoints;
   }
@@ -185,9 +188,144 @@ export class RoadFactory {
     this.createWideCurveLine(road, this.fourthLaneMat, -Math.PI / 2);
   }
 
+  private static createRoundaboutEdgePoints(road: Road) {
+    const pos = road.position.clone();
+    const halfDepth = road.size.z * 0.5;
+    const halfWidth = road.size.x * 0.5;
+
+    const points = [
+      new THREE.Vector3(pos.x, pos.y, pos.z + halfDepth),
+      new THREE.Vector3(pos.x - halfWidth, pos.y, pos.z),
+      new THREE.Vector3(pos.x, pos.y, pos.z - halfDepth),
+      new THREE.Vector3(pos.x + halfWidth, pos.y, pos.z),
+    ];
+
+    const geom = new THREE.BufferGeometry().setFromPoints(points);
+    const edgePoints = new THREE.Points(geom, this.pointsMat);
+
+    road.edgePoints = edgePoints;
+  }
+
+  private static createRoundaboutLanes(road: Road) {
+    // Get the roundabout circles points
+    const outerCirclePoints = this.createRoundaboutOuterCircle(road);
+
+    // Get the entry and exit lines
+    const entryLine = this.createRoundaboutEntryLine(road);
+    const exitLine = this.createRoundaboutExitLine(road);
+
+    // this.createRoundaboutOuterCircle(road, this.firstLaneMat);
+    // this.createRoundaboutLeftLane(road, this.firstLaneMat);
+
+    // Draw the outer circle
+    const outerCircleGeom = new THREE.BufferGeometry().setFromPoints(outerCirclePoints);
+    const outerCircleLine = new THREE.Line(outerCircleGeom, this.firstLaneMat);
+    const outerCircleLane = new Lane();
+    outerCircleLane.line = outerCircleLine;
+    road.lanes.push(outerCircleLane);
+
+    // Draw the entry line
+    const entryLane = new Lane();
+    entryLane.line = entryLine;
+    road.lanes.push(entryLane);
+
+    // Draw the exit line
+    const exitLane = new Lane();
+    exitLane.line = exitLine;
+    road.lanes.push(exitLane);
+
+    // For a lane:
+    // Draw the entry line
+    // Draw the exit line
+    // Find points on circle between these
+  }
+
+  private static createRoundaboutExitLine(road: Road) {
+    const pos = road.position.clone();
+    pos.y += 0.001;
+    const halfDepth = road.size.z * 0.5;
+    const laneOffset = 0.4 * (halfDepth / 3); // Roundabout is 3x bigger than a road
+
+    const turnStart = new THREE.Vector3(pos.x - laneOffset, pos.y, pos.z - halfDepth + 0.8);
+
+    const turnPoints = [
+      turnStart,
+      new THREE.Vector3(turnStart.x, pos.y, turnStart.z + 0.3),
+      new THREE.Vector3(turnStart.x - 0.3, pos.y, turnStart.z + 0.45),
+    ];
+
+    const turnCurve = new THREE.QuadraticBezierCurve3(turnPoints[0], turnPoints[1], turnPoints[2]);
+    const curvePoints = turnCurve.getPoints(12);
+
+    const edgePos = new THREE.Vector3(pos.x - laneOffset, pos.y, pos.z - halfDepth);
+    curvePoints.unshift(edgePos);
+
+    const geom = new THREE.BufferGeometry().setFromPoints(curvePoints);
+    const line = new THREE.Line(geom, this.firstLaneMat);
+
+    return line;
+  }
+
+  private static createRoundaboutEntryLine(road: Road) {
+    const pos = road.position.clone();
+    pos.y += 0.001;
+    const halfDepth = road.size.z * 0.5;
+    const laneOffset = 0.4 * (halfDepth / 3); // Roundabout is 3x bigger than a road
+
+    // Start the turn at edge of circle
+    const turnStart = new THREE.Vector3(pos.x + laneOffset, pos.y, pos.z - halfDepth + 0.8);
+
+    const turnPoints = [
+      turnStart,
+      new THREE.Vector3(turnStart.x, pos.y, turnStart.z + 0.3),
+      new THREE.Vector3(turnStart.x + 0.3, pos.y, turnStart.z + 0.45),
+    ];
+
+    const turnCurve = new THREE.QuadraticBezierCurve3(turnPoints[0], turnPoints[1], turnPoints[2]);
+    const curvePoints = turnCurve.getPoints(12);
+
+    // The actual edge of roundabout (has a short straight bit)
+    const edgePos = new THREE.Vector3(pos.x + laneOffset, pos.y, pos.z - halfDepth);
+    curvePoints.unshift(edgePos);
+
+    // Otherwise we have to make a line object, rotate it, get its new points and return those
+    const geom = new THREE.BufferGeometry().setFromPoints(curvePoints);
+    const line = new THREE.Line(geom, this.firstLaneMat);
+
+    return line;
+  }
+
+  private static createRoundaboutOuterCircle(road: Road) {
+    // Relative to model size
+    const pos = road.position.clone();
+    pos.y += 0.001;
+    const halfWidth = road.size.x * 0.5;
+    const halfDepth = road.size.z * 0.5;
+    const laneOffset = 0.4 * (halfDepth / 3); // Roundabout is 3x bigger than a road
+
+    // Add laneOffset to move into left lane, remove for inner lane
+    const quarter = laneOffset + halfWidth * 0.5;
+    const inner = quarter * 0.71;
+    const p = [
+      new THREE.Vector3(pos.x, pos.y, pos.z - quarter),
+      new THREE.Vector3(pos.x + inner, pos.y, pos.z - inner),
+      new THREE.Vector3(pos.x + quarter, pos.y, pos.z),
+      new THREE.Vector3(pos.x + inner, pos.y, pos.z + inner),
+      new THREE.Vector3(pos.x, pos.y, pos.z + quarter),
+      new THREE.Vector3(pos.x - inner, pos.y, pos.z + inner),
+      new THREE.Vector3(pos.x - quarter, pos.y, pos.z),
+      new THREE.Vector3(pos.x - inner, pos.y, pos.z - inner),
+    ];
+
+    const curve = new THREE.CatmullRomCurve3(p, true);
+    const cp = curve.getPoints(60);
+
+    return cp;
+  }
+
   private static createStraightLane(road: Road, material: THREE.LineBasicMaterial, rotation = 0) {
     // Relative to model size
-    const pos = road.model.position.clone();
+    const pos = road.position.clone();
     pos.y += 0.001;
     const halfWidth = road.size.x * 0.5;
     const halfDepth = road.size.z * 0.5;
