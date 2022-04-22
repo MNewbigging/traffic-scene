@@ -12,6 +12,9 @@ export class Vehicle {
   public routeLine?: THREE.Line;
   public forward = new THREE.Vector3();
 
+  public lastRoadId = ''; // slight hack to get final road when route is done, to change later
+  private onRouteComplete?: (car: Vehicle) => void;
+
   constructor(public name: VehicleName, public model: THREE.Group, color?: THREE.Color) {
     model.getWorldDirection(this.forward);
 
@@ -26,7 +29,14 @@ export class Vehicle {
     return this.model.position;
   }
 
-  public setRouteWaypoints(waypoints: THREE.Vector3[]) {
+  public setRoute(
+    waypoints: THREE.Vector3[],
+    lastRoadId: string,
+    onComplete?: (car: Vehicle) => void
+  ) {
+    this.lastRoadId = lastRoadId;
+    this.onRouteComplete = onComplete;
+
     this.routeWaypoints = waypoints;
     this.nextWaypoint = this.routeWaypoints[0];
 
@@ -62,8 +72,6 @@ export class Vehicle {
 
     // Update route line
     this.updateRouteLine();
-
-    // Update direction line
   }
 
   private driveRoute(deltaTime: number) {
@@ -75,12 +83,13 @@ export class Vehicle {
     // Have we reached the next waypoint?
     if (NumberUtils.vectorsEqual(this.position, this.nextWaypoint)) {
       // Remove this waypoint
-      // Note - this has last visited road id
       this.routeWaypoints.shift();
       this.setRouteLine();
 
       // Was that the last waypoint on this route?
       if (!this.routeWaypoints.length) {
+        // Have now finished this route; can stop driving
+        this.onRouteComplete?.(this);
         return;
       }
 
