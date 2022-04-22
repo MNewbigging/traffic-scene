@@ -106,17 +106,44 @@ export class SceneState {
 
     // Route going right of roundabout, towards x
     const s4 = this.addRoad(RoadName.STRAIGHT, new THREE.Vector3(4, 0, 0), -Math.PI / 2);
+    const b4 = this.addRoad(RoadName.BEND, new THREE.Vector3(6, 0, 0), -Math.PI / 2);
+    const s12 = this.addRoad(RoadName.STRAIGHT, new THREE.Vector3(6, 0, 2));
+    const b5 = this.addRoad(RoadName.BEND, new THREE.Vector3(6, 0, 4), Math.PI);
+    const b6 = this.addRoad(RoadName.BEND, new THREE.Vector3(4, 0, 4));
+    const b7 = this.addRoad(RoadName.BEND, new THREE.Vector3(4, 0, 6), Math.PI);
+    const s13 = this.addRoad(RoadName.STRAIGHT, new THREE.Vector3(2, 0, 6), Math.PI / 2);
 
-    [r1, s1, b2, s3, s4, j1, s5, s6, b1, s7, j2, s8, s9, b3, s10, s11].forEach((r) =>
-      this.roads.push(r)
-    );
+    [
+      r1,
+      s1,
+      b2,
+      s3,
+      s4,
+      j1,
+      s5,
+      s6,
+      b1,
+      s7,
+      j2,
+      s8,
+      s9,
+      b3,
+      s10,
+      s11,
+      b4,
+      s12,
+      b5,
+      b6,
+      b7,
+      s13,
+    ].forEach((r) => this.roads.push(r));
 
     // Connect all roads
     // Roundabout
     r1.connectRoads([s1, b2, s3, s4]);
     // route towards z, bends back up towards -z
     s1.connectRoads([r1, j1]);
-    j1.connectRoads([s1, s5]);
+    j1.connectRoads([s1, s5, s13]);
     s5.connectRoads([j1, s6]);
     s6.connectRoads([s5, b1]);
     b1.connectRoads([s6, s7]);
@@ -134,10 +161,16 @@ export class SceneState {
     b2.connectRoads([r1, s11]);
 
     // Right of roundabout, heading towards x
-    s4.connectRoads([r1]);
+    s4.connectRoads([r1, b4]);
+    b4.connectRoads([s4, s12]);
+    s12.connectRoads([b4, b5]);
+    b5.connectRoads([s12, b6]);
+    b6.connectRoads([b5, b7]);
+    b7.connectRoads([b6, s13]);
+    s13.connectRoads([b7, j1]);
 
     // Route
-    this.addCarWithRoute(s1, s5, new THREE.Color('#2354a1'));
+    this.addCarWithRoute(s4, b4, new THREE.Color('#2354a1'));
     this.addCarWithRoute(s8, b2, new THREE.Color('green'));
 
     this.vehicles.forEach((v) => {
