@@ -86,14 +86,57 @@ export class SceneState {
       RoadName.CROSSROAD,
       this.modelLoader.getModel(RoadName.CROSSROAD)
     );
-    this.roads.push(c1);
+    const s1 = RoadFactory.createRoad(
+      RoadName.STRAIGHT,
+      this.modelLoader.getModel(RoadName.STRAIGHT)
+    );
+    const s2 = RoadFactory.createRoad(
+      RoadName.STRAIGHT,
+      this.modelLoader.getModel(RoadName.STRAIGHT)
+    );
+    const s3 = RoadFactory.createRoad(
+      RoadName.STRAIGHT,
+      this.modelLoader.getModel(RoadName.STRAIGHT)
+    );
+    const s4 = RoadFactory.createRoad(
+      RoadName.STRAIGHT,
+      this.modelLoader.getModel(RoadName.STRAIGHT)
+    );
+    [c1, s1, s2, s3, s4].forEach((r) => this.roads.push(r));
 
+    // Position
+    s1.position.z = 2;
+    s2.position.z = -2;
+    s3.position.x = -2;
+    s3.rotation.y = Math.PI / 2;
+    s4.position.x = 2;
+    s4.rotation.y = Math.PI / 2;
+
+    // Update
     this.roads.forEach((r) => r.postTransform());
 
+    // Connect
+    [s1, s2, s3, s4].forEach((r) => r.connectRoads([c1]));
+    c1.connectRoads([s1, s2, s3, s4]);
+
+    // Route
+    const route = Pathfinder.findRoute(s2, s3);
+    const waypoints = Pathfinder.getRouteWaypoints(route);
+
+    const car = new Vehicle(VehicleName.SEDAN, this.modelLoader.getModel(VehicleName.SEDAN));
+    car.setRouteWaypoints(waypoints);
+    car.model.position.x = waypoints[0].x;
+    car.model.position.z = waypoints[0].z;
+    car.updateRouteLine();
+    this.vehicles.push(car);
+
+    this.vehicles.forEach((v) => {
+      this.scene.add(v.model);
+      this.scene.add(v.routeLine);
+    });
     this.roads.forEach((r) => {
       this.scene.add(r.model);
       this.scene.add(r.edgePoints);
-      this.scene.add(new THREE.ArrowHelper(r.forward, r.position, 1.5));
       r.lanes.forEach((l) => this.scene.add(l.line));
     });
   }
