@@ -140,15 +140,3 @@ export class Pathfinder {
     return waypoints;
   }
 }
-
-/**
- * On lanes and waypoints:
- *
- * Junctions and roundabouts have more than one entry and exit way,
- * therefore in order to determine the lane line it needs to know the
- * entry and exit being used.
- *
- * Should restructure the model so that, for each road:
- * - given an entry and exit direction,
- * - can return the proper line (following lane) from entry to exit
- */

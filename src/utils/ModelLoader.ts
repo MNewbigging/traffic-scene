@@ -19,7 +19,6 @@ export enum VehicleName {
 
 export enum RoadName {
   STRAIGHT = 'road_straight',
-  END = 'road_end',
   BEND = 'road_bend',
   JUNCTION = 'road_intersection',
   ROUNDABOUT = 'road_roundabout',

@@ -43,7 +43,6 @@ export class SceneState {
   }
 
   public updateScene(deltaTime: number) {
-    //this.controls.target = this.vehicles[0].position;
     this.controls.update();
 
     // Move vehicles along their route
@@ -58,8 +57,6 @@ export class SceneState {
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     this.scene.add(ambientLight);
 
-    //this.junctionScene();
-    //this.crossroadScene();
     this.roundaboutScene();
 
     // Now ready to start
@@ -172,6 +169,8 @@ export class SceneState {
     // Route
     this.addCarWithRoute(j1, s13, new THREE.Color('#2354a1'));
     this.addCarWithRoute(s5, s7, new THREE.Color('green'));
+    this.addCarWithRoute(b5, s4, new THREE.Color('red'));
+    this.addCarWithRoute(b2, s9, new THREE.Color('yellow'));
 
     this.vehicles.forEach((v) => {
       this.scene.add(v.model);
@@ -184,16 +183,7 @@ export class SceneState {
   }
 
   private addCarWithRoute(fromRoad: Road, toRoad: Road, color?: THREE.Color) {
-    // const route = Pathfinder.findRoute(fromRoad, toRoad);
-    // const waypoints = Pathfinder.getRouteWaypoints(route);
-    // const lastRoadId = route[route.length - 1].id;
-
     const car = new Vehicle(VehicleName.SEDAN, this.modelLoader.getModel(VehicleName.SEDAN), color);
-    // car.setRoute(waypoints, lastRoadId, this.onCompleteRoute);
-    // car.model.position.x = waypoints[0].x;
-    // car.model.position.z = waypoints[0].z;
-    // car.updateRouteLine();
-
     this.vehicles.push(car);
 
     this.setCarRoute(car, fromRoad, toRoad);
@@ -214,7 +204,6 @@ export class SceneState {
   }
 
   private onCompleteRoute = (car: Vehicle) => {
-    console.log('finding new route');
     // Find a new route from the car's current road position
     const fromRoad = this.roads.find((r) => r.id === car.lastRoadId);
 
