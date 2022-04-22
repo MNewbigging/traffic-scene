@@ -8,6 +8,7 @@ export class RoadFactory {
   private static firstLaneMat = new THREE.LineBasicMaterial({ color: 'blue' });
   private static secondLaneMat = new THREE.LineBasicMaterial({ color: 'red' });
   private static thirdLaneMat = new THREE.LineBasicMaterial({ color: 'yellow' });
+  private static fourthLaneMat = new THREE.LineBasicMaterial({ color: 'green' });
 
   public static createRoad(name: RoadName, model: THREE.Group) {
     const road = new Road(name, model);
@@ -28,6 +29,11 @@ export class RoadFactory {
         road.neighbours = [undefined, undefined, undefined];
         this.createJunctionEdgePoints(road);
         this.createJunctionLanes(road);
+        break;
+      case RoadName.CROSSROAD:
+        road.neighbours = [undefined, undefined, undefined, undefined];
+        this.createCrossroadEdgePoints(road);
+        this.createCrossroadLanes(road);
         break;
     }
 
@@ -85,13 +91,14 @@ export class RoadFactory {
 
   private static createJunctionEdgePoints(road: Road) {
     // Two ref points at center on x and either edge, one on x edge center z
-    const pos = road.model.position.clone();
+    const pos = road.position.clone();
+    const halfWidth = road.size.x * 0.5;
     const halfDepth = road.size.z * 0.5;
 
     const points = [
       new THREE.Vector3(pos.x, pos.y, pos.z + halfDepth),
       new THREE.Vector3(pos.x, pos.y, pos.z - halfDepth),
-      new THREE.Vector3(pos.x + road.size.x * 0.5, pos.y, pos.z),
+      new THREE.Vector3(pos.x + halfWidth, pos.y, pos.z),
     ];
 
     const edgeGeom = new THREE.BufferGeometry().setFromPoints(points);
@@ -119,6 +126,63 @@ export class RoadFactory {
 
     // Lane 6 - adjoining lane going right, away from default normal
     this.createWideCurveLine(road, this.thirdLaneMat, Math.PI / 2);
+  }
+
+  private static createCrossroadEdgePoints(road: Road) {
+    const pos = road.position.clone();
+    const halfDepth = road.size.z * 0.5;
+    const halfWidth = road.size.x * 0.5;
+
+    const points = [
+      new THREE.Vector3(pos.x, pos.y, pos.z + halfDepth),
+      new THREE.Vector3(pos.x - halfWidth, pos.y, pos.z),
+      new THREE.Vector3(pos.x, pos.y, pos.z - halfDepth),
+      new THREE.Vector3(pos.x + halfWidth, pos.y, pos.z),
+    ];
+
+    const geom = new THREE.BufferGeometry().setFromPoints(points);
+    const mat = new THREE.PointsMaterial({ color: 'white', size: 0.1 });
+    const edgePoints = new THREE.Points(geom, mat);
+
+    road.edgePoints = edgePoints;
+  }
+
+  private static createCrossroadLanes(road: Road) {
+    // Lane 1 - straight over towards z
+    this.createStraightLane(road, this.firstLaneMat);
+
+    // Lane 2 - left turn facing z to facing x
+    this.createTightCurveLine(road, this.firstLaneMat, Math.PI / 2);
+
+    // Lane 3 - right turn from z to -x
+    this.createWideCurveLine(road, this.firstLaneMat, Math.PI);
+
+    // Lane 3 - straight over towards -z
+    this.createStraightLane(road, this.secondLaneMat, Math.PI);
+
+    // Lane 4 - left turn from -z to -x
+    this.createTightCurveLine(road, this.secondLaneMat, -Math.PI / 2);
+
+    // Lane 6 - right turn from -z to x
+    this.createWideCurveLine(road, this.secondLaneMat);
+
+    // Lane 7 - straight over towards -x
+    this.createStraightLane(road, this.thirdLaneMat, -Math.PI / 2);
+
+    // Lane 8 - left turn, -x to z
+    this.createTightCurveLine(road, this.thirdLaneMat);
+
+    // Lane 9 - right turn, -x to -z
+    this.createWideCurveLine(road, this.thirdLaneMat, Math.PI / 2);
+
+    // Lane 10 - straight over towards x
+    this.createStraightLane(road, this.fourthLaneMat, Math.PI / 2);
+
+    // Lane 11 - left turn, x to -z
+    this.createTightCurveLine(road, this.fourthLaneMat, Math.PI);
+
+    // Lane 12 - right turn, x to z
+    this.createWideCurveLine(road, this.fourthLaneMat, -Math.PI / 2);
   }
 
   private static createStraightLane(road: Road, material: THREE.LineBasicMaterial, rotation = 0) {

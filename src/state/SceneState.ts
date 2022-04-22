@@ -30,7 +30,13 @@ export class SceneState {
     // Work out which models we need to load for this scene
     // This is where proc gen comes in - hardcoded for now
     const modelNames = new ModelNames();
-    modelNames.roads = [RoadName.END, RoadName.STRAIGHT, RoadName.BEND, RoadName.JUNCTION];
+    modelNames.roads = [
+      RoadName.END,
+      RoadName.STRAIGHT,
+      RoadName.BEND,
+      RoadName.JUNCTION,
+      RoadName.CROSSROAD,
+    ];
     modelNames.vehicles = [VehicleName.SEDAN];
 
     this.modelLoader.loadModels(modelNames, () => this.buildScene());
@@ -52,7 +58,8 @@ export class SceneState {
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     this.scene.add(ambientLight);
 
-    this.laneTestScene();
+    //this.laneTestScene();
+    this.crossroadScene();
 
     // Now ready to start
     this.onReady?.();
@@ -72,6 +79,23 @@ export class SceneState {
     this.camera = camera;
     this.controls = new OrbitControls(this.camera, this.canvasListener.canvas);
     this.controls.enableDamping = true;
+  }
+
+  private crossroadScene() {
+    const c1 = RoadFactory.createRoad(
+      RoadName.CROSSROAD,
+      this.modelLoader.getModel(RoadName.CROSSROAD)
+    );
+    this.roads.push(c1);
+
+    this.roads.forEach((r) => r.postTransform());
+
+    this.roads.forEach((r) => {
+      this.scene.add(r.model);
+      this.scene.add(r.edgePoints);
+      this.scene.add(new THREE.ArrowHelper(r.forward, r.position, 1.5));
+      r.lanes.forEach((l) => this.scene.add(l.line));
+    });
   }
 
   private laneTestScene() {
