@@ -46,14 +46,15 @@ export class RoadUtils {
     return points;
   }
 
-  public static getPositions(geom: BufferGeometry) {
+  public static getLinePositions(line: THREE.Line) {
     const points: THREE.Vector3[] = [];
 
-    const positions = geom.getAttribute('position');
+    const positions = line.geometry.getAttribute('position');
     const posCount = positions.count;
     for (let i = 0; i < posCount; i++) {
       const point = new THREE.Vector3().fromBufferAttribute(positions, i);
-      points.push(point);
+      const worldPoint = line.localToWorld(point);
+      points.push(worldPoint);
     }
 
     return points;

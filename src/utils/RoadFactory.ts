@@ -208,31 +208,54 @@ export class RoadFactory {
 
   private static createRoundaboutLanes(road: Road) {
     // Get the roundabout circles points
-    const outerCirclePoints = this.createRoundaboutOuterCircle(road);
+    const outerCirclePoints = this.createRoundaboutCircle(road);
+    const innerCirclePoints = this.createRoundaboutCircle(road, true);
 
     // Get the entry and exit lines
     const entryLine = this.createRoundaboutEntryLine(road);
+    const longEntryLine = this.createRoundaboutEntryLine(road, true);
     const exitLine = this.createRoundaboutExitLine(road);
+    const longExitLine = this.createRoundaboutExitLine(road, true);
 
-    // this.createRoundaboutOuterCircle(road, this.firstLaneMat);
-    // this.createRoundaboutLeftLane(road, this.firstLaneMat);
+    // Lane 1 - enter z, exit x
+    this.createRoundaboutLeftLane(road, this.firstLaneMat, entryLine, exitLine, outerCirclePoints);
+
+    // Lane 2 - enter z, exit z
+    this.createRoundaboutStraightLane(
+      road,
+      this.firstLaneMat,
+      entryLine,
+      exitLine,
+      outerCirclePoints
+    );
+
+    // Lane 3 - enter z, exit -x
+    this.createRoundaboutRightLane(
+      road,
+      this.firstLaneMat,
+      longEntryLine,
+      longExitLine,
+      innerCirclePoints
+    );
+
+    // FOR TESTING:
 
     // Draw the outer circle
-    const outerCircleGeom = new THREE.BufferGeometry().setFromPoints(outerCirclePoints);
+    const outerCircleGeom = new THREE.BufferGeometry().setFromPoints(innerCirclePoints);
     const outerCircleLine = new THREE.Line(outerCircleGeom, this.firstLaneMat);
     const outerCircleLane = new Lane();
     outerCircleLane.line = outerCircleLine;
-    road.lanes.push(outerCircleLane);
+    //road.lanes.push(outerCircleLane);
 
     // Draw the entry line
     const entryLane = new Lane();
     entryLane.line = entryLine;
-    road.lanes.push(entryLane);
+    //road.lanes.push(entryLane);
 
     // Draw the exit line
     const exitLane = new Lane();
     exitLane.line = exitLine;
-    road.lanes.push(exitLane);
+    //road.lanes.push(exitLane);
 
     // For a lane:
     // Draw the entry line
@@ -240,13 +263,14 @@ export class RoadFactory {
     // Find points on circle between these
   }
 
-  private static createRoundaboutExitLine(road: Road) {
+  private static createRoundaboutExitLine(road: Road, long = false) {
     const pos = road.position.clone();
     pos.y += 0.001;
     const halfDepth = road.size.z * 0.5;
     const laneOffset = 0.4 * (halfDepth / 3); // Roundabout is 3x bigger than a road
 
-    const turnStart = new THREE.Vector3(pos.x - laneOffset, pos.y, pos.z - halfDepth + 0.8);
+    const inset = long ? 1.7 : 0.8;
+    const turnStart = new THREE.Vector3(pos.x - laneOffset, pos.y, pos.z - halfDepth + inset);
 
     const turnPoints = [
       turnStart,
@@ -266,14 +290,15 @@ export class RoadFactory {
     return line;
   }
 
-  private static createRoundaboutEntryLine(road: Road) {
+  private static createRoundaboutEntryLine(road: Road, long = false) {
     const pos = road.position.clone();
     pos.y += 0.001;
     const halfDepth = road.size.z * 0.5;
     const laneOffset = 0.4 * (halfDepth / 3); // Roundabout is 3x bigger than a road
 
     // Start the turn at edge of circle
-    const turnStart = new THREE.Vector3(pos.x + laneOffset, pos.y, pos.z - halfDepth + 0.8);
+    const inset = long ? 1.7 : 0.8;
+    const turnStart = new THREE.Vector3(pos.x + laneOffset, pos.y, pos.z - halfDepth + inset);
 
     const turnPoints = [
       turnStart,
@@ -295,7 +320,7 @@ export class RoadFactory {
     return line;
   }
 
-  private static createRoundaboutOuterCircle(road: Road) {
+  private static createRoundaboutCircle(road: Road, small = false) {
     // Relative to model size
     const pos = road.position.clone();
     pos.y += 0.001;
@@ -304,7 +329,13 @@ export class RoadFactory {
     const laneOffset = 0.4 * (halfDepth / 3); // Roundabout is 3x bigger than a road
 
     // Add laneOffset to move into left lane, remove for inner lane
-    const quarter = laneOffset + halfWidth * 0.5;
+    let quarter;
+    if (small) {
+      quarter = halfWidth * 0.5 - laneOffset;
+    } else {
+      quarter = laneOffset + halfWidth * 0.5;
+    }
+
     const inner = quarter * 0.71;
     const p = [
       new THREE.Vector3(pos.x, pos.y, pos.z - quarter),
@@ -321,6 +352,112 @@ export class RoadFactory {
     const cp = curve.getPoints(60);
 
     return cp;
+  }
+
+  private static getRoundaboutLinePoints(
+    entryPoints: THREE.Vector3[],
+    exitPoints: THREE.Vector3[],
+    circlePoints: THREE.Vector3[]
+  ) {
+    // Find the closest point index to entry on circle
+    const entryPoint = entryPoints[entryPoints.length - 1];
+    const entryClosest = RoadUtils.getClosestIndexFromArray(entryPoint, circlePoints);
+
+    // Find the closest point index to exit on circle
+    const exitPoint = exitPoints[exitPoints.length - 1];
+    const exitClosest = RoadUtils.getClosestIndexFromArray(exitPoint, circlePoints);
+
+    // Get that portion of the circle points
+    let start, end;
+    if (entryClosest < exitClosest) {
+      start = entryClosest;
+      end = exitClosest;
+    } else {
+      start = exitClosest;
+      end = entryClosest;
+    }
+
+    const circlePortion = circlePoints.slice(start, end);
+
+    return [...entryPoints, ...circlePortion, ...exitPoints.reverse()];
+  }
+
+  private static createRoundaboutLeftLane(
+    road: Road,
+    material: THREE.LineBasicMaterial,
+    entryLine: THREE.Line,
+    exitLine: THREE.Line,
+    outerCirclePoints: THREE.Vector3[],
+    rotation = 0
+  ) {
+    exitLine.rotation.y = -Math.PI / 2;
+    exitLine.updateMatrixWorld();
+
+    const linePoints = this.getRoundaboutLinePoints(
+      RoadUtils.getLinePositions(entryLine),
+      RoadUtils.getLinePositions(exitLine),
+      outerCirclePoints
+    );
+    const lineGeom = new THREE.BufferGeometry().setFromPoints(linePoints);
+    const line = new THREE.Line(lineGeom, material);
+
+    line.rotation.y = rotation;
+
+    const lane = new Lane();
+    lane.line = line;
+    road.lanes.push(lane);
+  }
+
+  private static createRoundaboutStraightLane(
+    road: Road,
+    material: THREE.LineBasicMaterial,
+    entryLine: THREE.Line,
+    exitLine: THREE.Line,
+    outerCirclePoints: THREE.Vector3[],
+    rotation = 0
+  ) {
+    exitLine.rotation.y = Math.PI;
+    exitLine.updateMatrixWorld();
+
+    const linePoints = this.getRoundaboutLinePoints(
+      RoadUtils.getLinePositions(entryLine),
+      RoadUtils.getLinePositions(exitLine),
+      outerCirclePoints
+    );
+    const lineGeom = new THREE.BufferGeometry().setFromPoints(linePoints);
+    const line = new THREE.Line(lineGeom, material);
+
+    line.rotation.y = rotation;
+
+    const lane = new Lane();
+    lane.line = line;
+    road.lanes.push(lane);
+  }
+
+  private static createRoundaboutRightLane(
+    road: Road,
+    material: THREE.LineBasicMaterial,
+    entryLine: THREE.Line,
+    exitLine: THREE.Line,
+    outerCirclePoints: THREE.Vector3[],
+    rotation = 0
+  ) {
+    exitLine.rotation.y = Math.PI / 2;
+    exitLine.updateMatrixWorld();
+
+    const linePoints = this.getRoundaboutLinePoints(
+      RoadUtils.getLinePositions(entryLine),
+      RoadUtils.getLinePositions(exitLine),
+      outerCirclePoints
+    );
+    const lineGeom = new THREE.BufferGeometry().setFromPoints(linePoints);
+    const line = new THREE.Line(lineGeom, material);
+
+    line.rotation.y = rotation;
+
+    const lane = new Lane();
+    lane.line = line;
+    road.lanes.push(lane);
   }
 
   private static createStraightLane(road: Road, material: THREE.LineBasicMaterial, rotation = 0) {

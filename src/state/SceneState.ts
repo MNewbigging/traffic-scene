@@ -89,7 +89,7 @@ export class SceneState {
     );
     [r1].forEach((r) => this.roads.push(r));
 
-    console.log('r size', r1.size);
+    this.roads.forEach((r) => r.postTransform());
 
     this.roads.forEach((r) => {
       this.scene.add(r.model);
