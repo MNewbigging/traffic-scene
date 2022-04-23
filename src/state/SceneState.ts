@@ -216,38 +216,8 @@ export class SceneState {
     const car = new Vehicle(VehicleName.SEDAN, this.modelLoader.getModel(VehicleName.SEDAN), color);
     this.vehicles.push(car);
 
-    // Get the route
+    // Get the route, position car at start of it
     const route = Pathfinder.findRoute(fromRoad, toRoad);
-    const waypoints = Pathfinder.getRouteWaypoints(route);
-    car.position.x = waypoints[0].x;
-    car.position.z = waypoints[0].z;
-    car.model.lookAt(waypoints[1]);
-
     car.setRoute(route);
-  }
-
-  private onCompleteRoute = (car: Vehicle) => {
-    // Find a new route from the car's current road position
-    const fromRoad = this.roads.find((r) => r.id === car.lastRoadId);
-
-    const disallowedNames = [RoadName.ROUNDABOUT, RoadName.JUNCTION, RoadName.CROSSROAD];
-    const targets = this.roads.filter(
-      (r) => r.id !== car.lastRoadId && !disallowedNames.includes(r.name)
-    );
-
-    const idx = Math.floor(Math.random() * targets.length);
-    const toRoad = targets[idx];
-
-    this.setCarRoute(car, fromRoad, toRoad);
-  };
-
-  private setCarRoute(car: Vehicle, fromRoad: Road, toRoad: Road) {
-    const route = Pathfinder.findRoute(fromRoad, toRoad);
-    let waypoints = Pathfinder.getRouteWaypoints(route);
-    const lastRoadId = route[route.length - 1].id;
-
-    //car.setRouteWaypoints(waypoints, lastRoadId, this.onCompleteRoute);
-    car.model.position.x = waypoints[0].x;
-    car.model.position.z = waypoints[0].z;
   }
 }

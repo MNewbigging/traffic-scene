@@ -13,8 +13,6 @@ export class Vehicle {
   public routeWaypoints: THREE.Vector3[] = [];
   public nextWaypoint?: THREE.Vector3;
   public routeLine?: THREE.Line;
-  public lastRoadId = ''; // slight hack to get final road when route is done, to change later
-  private onRouteComplete?: (car: Vehicle) => void;
   private nextLookAt = new THREE.Quaternion();
 
   constructor(public name: VehicleName, public model: THREE.Group, color?: THREE.Color) {
@@ -69,31 +67,13 @@ export class Vehicle {
     // Get waypoints for this lane
     this.routeWaypoints = [...this.currentLane.waypoints];
 
+    // Snap to position of first route point, face second
+    this.position.x = this.routeWaypoints[0].x;
+    this.position.z = this.routeWaypoints[0].z;
+    this.model.lookAt(this.routeWaypoints[1]);
+
     // Target the next
     this.targetNextWaypoint();
-  }
-
-  // Gives this vehicle a specific route of waypoints to follow
-  public setRouteWaypoints(waypoints: THREE.Vector3[]) {
-    // The last road will be current road when waypoints are finished
-    // (when this next looks at current road)
-    //this.currentRoad = lastRoad;
-
-    // Save route
-    this.routeWaypoints = waypoints;
-
-    // Always start the route at first waypoint
-    this.position.x = waypoints[0].x;
-    this.position.z = waypoints[0].z;
-
-    // Can now target the next waypoint since we're at the first already
-    this.targetNextWaypoint();
-
-    // Face next waypoint immediately
-    this.model.lookAt(this.nextWaypoint);
-
-    // Update route line due to moving car above
-    this.updateRouteLine();
   }
 
   public update(deltaTime: number) {
