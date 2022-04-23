@@ -46,7 +46,7 @@ export class SceneState {
 
   public updateScene(deltaTime: number) {
     this.controls.update();
-    this.controls.target = this.vehicles[0].position;
+    //this.controls.target = this.vehicles[0].position;
 
     // Move vehicles along their route
     this.vehicles.forEach((v) => v.update(deltaTime));
@@ -171,10 +171,10 @@ export class SceneState {
 
     // Route
     this.addCarWithRoute(s1, b2, new THREE.Color('#2354a1'));
-    //this.addCar(new THREE.Color('green'));
-    // this.addCarWithRoute(s5, s7, new THREE.Color('green'));
-    // this.addCarWithRoute(b5, s4, new THREE.Color('red'));
-    // this.addCarWithRoute(b2, s9, new THREE.Color('yellow'));
+    this.addCar(new THREE.Color('red'));
+    this.addCarWithRoute(s5, s7, new THREE.Color('green'));
+    this.addCarWithRoute(b5, s4, new THREE.Color('yellow'));
+    this.addCar(new THREE.Color('white'));
 
     this.vehicles.forEach((v) => {
       this.scene.add(v.model);
@@ -206,7 +206,14 @@ export class SceneState {
     this.vehicles.push(car);
 
     // Pick a random road to start on
-    const road = RoadUtils.getRandomStartingRoad(this.roads);
+    let road = RoadUtils.getRandomStartingRoad(this.roads);
+
+    // While a vehicle is on that starting road, pick another
+    let vehicleOnRoad = this.vehicles.some((v) => v.currentRoad?.id === road.id);
+    while (vehicleOnRoad) {
+      road = RoadUtils.getRandomStartingRoad(this.roads);
+      vehicleOnRoad = this.vehicles.some((v) => v.currentRoad?.id === road.id);
+    }
 
     // Assign to car to start roaming
     car.setRoam(road);

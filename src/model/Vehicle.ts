@@ -6,13 +6,13 @@ import { Road } from './Road';
 import { VehicleName } from '../utils/ModelLoader';
 
 export class Vehicle {
-  public speed = 3;
-  public route: Road[] = [];
-  public currentRoad?: Road;
-  public currentLane?: Lane;
-  public routeWaypoints: THREE.Vector3[] = [];
-  public nextWaypoint?: THREE.Vector3;
   public routeLine?: THREE.Line;
+  private speed = 3;
+  private route: Road[] = [];
+  public currentRoad?: Road;
+  private currentLane?: Lane;
+  private routeWaypoints: THREE.Vector3[] = [];
+  private nextWaypoint?: THREE.Vector3;
   private nextLookAt = new THREE.Quaternion();
 
   constructor(public name: VehicleName, public model: THREE.Group, color?: THREE.Color) {
