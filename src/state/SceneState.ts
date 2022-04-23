@@ -183,6 +183,9 @@ export class SceneState {
     this.addCar(new THREE.Color('red'));
     this.addCar(new THREE.Color('yellow'));
     this.addCar(new THREE.Color('white'));
+    this.addCar(new THREE.Color('red'));
+    this.addCar(new THREE.Color('yellow'));
+    this.addCar(new THREE.Color('white'));
 
     this.vehicles[0].maxSpeed = 1;
     this.vehicles[1].maxSpeed = 2;

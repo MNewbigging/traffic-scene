@@ -14,7 +14,7 @@ export class Vehicle {
   public currentRoad?: Road;
   public maxSpeed = 2;
   public actualSpeed = 2;
-  public acceleration = 0.08;
+  public acceleration = 0.01;
   private route: Road[] = [];
   private currentLane?: Lane;
   private routeWaypoints: THREE.Vector3[] = [];
@@ -37,7 +37,7 @@ export class Vehicle {
 
     // Setup raycaster
     this.raycaster.near = 0;
-    this.raycaster.far = 1.6;
+    this.raycaster.far = 1.2;
     this.raycastHelper.setLength(this.raycaster.far);
     this.raycastHelper.setColor(color);
     this.raycastHelper.position.y = 0.3;
@@ -116,6 +116,7 @@ export class Vehicle {
       otherVehicles
     );
     if (!closeVehicles.length) {
+      //this.accelerate();
       return;
     }
 
@@ -125,19 +126,15 @@ export class Vehicle {
     // Check for intersections with close vehicles
     const intersections = this.raycaster.intersectObjects(check, true);
     if (!intersections.length) {
-      console.log('no intersections');
+      //this.accelerate();
       return;
     }
 
     const firstHit = intersections[0];
-    //console.log('hit at dist', firstHit.distance);
 
     // Slow down based on the distance
-    let speedMod = firstHit.distance * 1.5 - 0.4;
-    if (firstHit.distance < 0) {
-      speedMod = 0;
-    }
-    //console.log('speedMod', speedMod);
+    let speedMod = firstHit.distance * 2 - 0.4;
+
     this.actualSpeed *= speedMod;
   }
 
@@ -313,5 +310,12 @@ export class Vehicle {
     this.raycastHelper.setDirection(forward);
     this.raycastHelper.position.x = this.position.x;
     this.raycastHelper.position.z = this.position.z;
+  }
+
+  private accelerate() {
+    this.actualSpeed += this.acceleration;
+    if (this.actualSpeed > this.maxSpeed) {
+      this.actualSpeed = this.maxSpeed;
+    }
   }
 }
