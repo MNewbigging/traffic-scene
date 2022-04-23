@@ -3,14 +3,16 @@ import * as THREE from 'three';
 import { Lane } from './Lane';
 import { NumberUtils } from '../utils/NumberUtils';
 import { Road } from './Road';
+import { RoadUtils } from '../utils/RoadUtils';
 import { VehicleName } from '../utils/ModelLoader';
 
 export class Vehicle {
+  public id = NumberUtils.createId();
   public raycaster = new THREE.Raycaster();
   public raycastHelper = new THREE.ArrowHelper();
   public routeLine?: THREE.Line;
   public currentRoad?: Road;
-  private speed = 1;
+  public speed = 2;
   private route: Road[] = [];
   private currentLane?: Lane;
   private routeWaypoints: THREE.Vector3[] = [];
@@ -84,6 +86,21 @@ export class Vehicle {
 
     // Target the next
     this.targetNextWaypoint();
+  }
+
+  public checkVehicleCollisions(allVehicles: Vehicle[]) {
+    // Only bother checking if close to another vehicle - ignore self
+    const otherVehicles = allVehicles.filter((v) => v.id !== this.id);
+    const closeVehicles = RoadUtils.getCloseVehicles(
+      this.position,
+      this.raycaster.far,
+      otherVehicles
+    );
+    if (!closeVehicles.length) {
+      return;
+    }
+
+    console.log('close to other');
   }
 
   public update(deltaTime: number) {

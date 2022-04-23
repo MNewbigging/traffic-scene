@@ -48,8 +48,11 @@ export class SceneState {
     this.controls.update();
     //this.controls.target = this.vehicles[0].position;
 
-    // Move vehicles along their route
+    // Update vehicles
     this.vehicles.forEach((v) => {
+      // Check for collisions first
+      v.checkVehicleCollisions(this.vehicles);
+      // Then update
       v.update(deltaTime);
     });
   }
@@ -75,9 +78,9 @@ export class SceneState {
       0.1,
       1000
     );
-    camera.position.x = 2;
-    camera.position.y = 2;
-    camera.position.z = 2;
+    camera.position.x = 0;
+    camera.position.y = 5;
+    camera.position.z = 10;
 
     this.camera = camera;
     this.controls = new OrbitControls(this.camera, this.canvasListener.canvas);
@@ -171,12 +174,12 @@ export class SceneState {
     b7.connectRoads([b6, s13]);
     s13.connectRoads([b7, j1]);
 
-    // Route
-    this.addCarWithRoute(s1, b2, new THREE.Color('#2354a1'));
-    this.addCar(new THREE.Color('red'));
-    this.addCarWithRoute(s5, s7, new THREE.Color('green'));
-    this.addCarWithRoute(b5, s4, new THREE.Color('yellow'));
-    this.addCar(new THREE.Color('white'));
+    // Two cars, same route - first slower than second
+    this.addCarWithRoute(s13, s7, new THREE.Color('#2354a1'));
+    this.addCarWithRoute(b7, s7, new THREE.Color('green'));
+
+    this.vehicles[0].speed = 1;
+    this.vehicles[1].speed = 2;
 
     this.vehicles.forEach((v) => {
       this.scene.add(v.model);

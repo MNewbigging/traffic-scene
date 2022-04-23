@@ -4,6 +4,7 @@ import { BufferGeometry } from 'three';
 import { NumberUtils } from './NumberUtils';
 import { Road } from '../model/Road';
 import { RoadName } from './ModelLoader';
+import { Vehicle } from '../model/Vehicle';
 
 export class RoadUtils {
   public static copyTransforms(from: THREE.Object3D, to: THREE.Object3D) {
@@ -65,5 +66,21 @@ export class RoadUtils {
     const rnd = NumberUtils.getRandomArrayIndex(validRoads.length);
 
     return validRoads[rnd];
+  }
+
+  public static getCloseVehicles(origin: THREE.Vector3, maxDistance: number, vehicles: Vehicle[]) {
+    // Returns points within maxDistance from origin
+    const within: Vehicle[] = [];
+
+    vehicles.forEach((v) => {
+      const distance = origin.distanceTo(v.position);
+
+      if (origin.distanceTo(v.position) < maxDistance) {
+        console.log(`dist ${distance} is less than ${maxDistance}`);
+        within.push(v);
+      }
+    });
+
+    return within;
   }
 }
