@@ -130,11 +130,9 @@ export class Vehicle {
       return;
     }
 
-    const firstHit = intersections[0];
-
     // Slow down based on the distance
+    const firstHit = intersections[0];
     let speedMod = firstHit.distance * 2 - 0.4;
-
     this.actualSpeed *= speedMod;
   }
 
@@ -310,12 +308,5 @@ export class Vehicle {
     this.raycastHelper.setDirection(forward);
     this.raycastHelper.position.x = this.position.x;
     this.raycastHelper.position.z = this.position.z;
-  }
-
-  private accelerate() {
-    this.actualSpeed += this.acceleration;
-    if (this.actualSpeed > this.maxSpeed) {
-      this.actualSpeed = this.maxSpeed;
-    }
   }
 }

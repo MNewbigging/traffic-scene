@@ -184,8 +184,10 @@ export class SceneState {
     this.addCar(new THREE.Color('yellow'));
     this.addCar(new THREE.Color('white'));
     this.addCar(new THREE.Color('red'));
-    this.addCar(new THREE.Color('yellow'));
-    this.addCar(new THREE.Color('white'));
+    // this.addCar(new THREE.Color('yellow'));
+    // this.addCar(new THREE.Color('white'));
+    // this.addCar(new THREE.Color('blue'));
+    // this.addCar(new THREE.Color('green'));
 
     this.vehicles[0].maxSpeed = 1;
     this.vehicles[1].maxSpeed = 2;
@@ -195,7 +197,7 @@ export class SceneState {
       this.scene.add(v.model);
       //this.scene.add(v.routeLine);
       //this.scene.add(v.bounds);
-      this.scene.add(v.raycastHelper);
+      //this.scene.add(v.raycastHelper);
     });
 
     this.roads.forEach((r) => {
