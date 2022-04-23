@@ -1,10 +1,14 @@
 import * as THREE from 'three';
 
+import { Lane } from './Lane';
 import { NumberUtils } from '../utils/NumberUtils';
+import { Road } from './Road';
 import { VehicleName } from '../utils/ModelLoader';
 
 export class Vehicle {
   public speed = 3;
+  public currentRoad?: Road;
+  public currentLane?: Lane;
   public routeWaypoints: THREE.Vector3[] = [];
   public nextWaypoint?: THREE.Vector3;
   public routeLine?: THREE.Line;
@@ -24,6 +28,30 @@ export class Vehicle {
     return this.model.position;
   }
 
+  // Gives this vehicle a starting road to roam from
+  public setRoad(road: Road) {
+    // Set the road
+    this.currentRoad = road;
+
+    // Pick a random lane on this road
+    const rnd = Math.floor(Math.random() * road.lanes.length);
+    this.currentLane = road.lanes[rnd];
+
+    // Get the waypoints for this lane
+    this.routeWaypoints = [...this.currentLane.waypoints];
+
+    // Position vehicle at first waypoint
+    this.position.x = this.routeWaypoints[0].x;
+    this.position.z = this.routeWaypoints[0].z;
+
+    // Face the second waypoint immediately
+    this.model.lookAt(this.routeWaypoints[1]);
+
+    // Since we're at the first waypoint, can target the next
+    this.targetNextWaypoint();
+  }
+
+  // Gives this vehicle a specific route of waypoints to follow
   public setRoute(
     waypoints: THREE.Vector3[],
     lastRoadId: string,
@@ -50,6 +78,14 @@ export class Vehicle {
     this.updateRouteLine();
   }
 
+  public update(deltaTime: number) {
+    // Drive along the route
+    this.driveRoute(deltaTime);
+
+    // Update route line
+    this.updateRouteLine();
+  }
+
   private setColor(color: THREE.Color) {
     const body = this.model.getObjectByName('Mesh_body_1');
     if (body && body instanceof THREE.Mesh) {
@@ -57,6 +93,7 @@ export class Vehicle {
     }
   }
 
+  // Creates a new route line from route waypoints
   private setRouteLine() {
     const points = this.routeWaypoints.map((wp) => wp.clone());
     points.forEach((p) => (p.y += 0.3));
@@ -67,30 +104,28 @@ export class Vehicle {
     this.routeLine.geometry.setFromPoints(points);
   }
 
-  public updateRouteLine() {
+  // Updates start of route line to follow current position
+  private updateRouteLine() {
     const positions = this.routeLine.geometry.getAttribute('position');
     positions.setXYZ(0, this.position.x, this.position.y + 0.3, this.position.z);
     positions.needsUpdate = true;
   }
 
-  public update(deltaTime: number) {
-    // Drive along the route
-    this.driveRoute(deltaTime);
-
-    // Update route line
-    this.updateRouteLine();
-  }
-
+  // Upon reaching a waypoint, calls this to move to next
   private targetNextWaypoint() {
-    this.routeWaypoints.shift();
-
     // Have we reached the end now?
-    if (!this.routeWaypoints.length) {
-      this.onRouteComplete?.(this);
+    if (this.routeWaypoints.length === 1) {
+      this.completeRoute();
+      //this.onRouteComplete?.(this);
       return;
     }
 
+    // Remove the first waypoint (just reached it)
+    this.routeWaypoints.shift();
+
+    // Target the next
     this.nextWaypoint = this.routeWaypoints[0];
+
     // Save current facing direction
     const facing = this.model.rotation.clone();
 
@@ -105,8 +140,36 @@ export class Vehicle {
     this.model.rotation.y = facing.y;
     this.model.rotation.z = facing.z;
 
-    // Update route line
+    // Update route line to remove point just reached
     this.setRouteLine();
+  }
+
+  private completeRoute() {
+    // The route is finished
+    this.routeWaypoints = [];
+
+    // Continue roaming - find the next road the current lane goes to
+    const toRoadIdx = this.currentLane?.toRoadIdx;
+    const nextRoad = this.currentRoad?.neighbours[toRoadIdx];
+
+    // Then find lanes that go from current road to the next
+    const lanes = nextRoad.lanes.filter(
+      (lane) => nextRoad.neighbours[lane.fromRoadIdx].id === this.currentRoad.id
+    );
+
+    // Pick a random lane
+    const rnd = Math.floor(Math.random() * lanes.length);
+    const nextLane = lanes[rnd];
+
+    // Assign the next road and lane as current
+    this.currentRoad = nextRoad;
+    this.currentLane = nextLane;
+
+    // Get the next lane's waypoints
+    this.routeWaypoints = [...this.currentLane.waypoints];
+
+    // Target the next (the first will be the last of current lane)
+    this.targetNextWaypoint();
   }
 
   private driveRoute(deltaTime: number) {

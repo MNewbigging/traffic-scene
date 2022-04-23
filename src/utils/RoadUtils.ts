@@ -1,6 +1,10 @@
 import * as THREE from 'three';
 import { BufferGeometry } from 'three';
 
+import { NumberUtils } from './NumberUtils';
+import { Road } from '../model/Road';
+import { RoadName } from './ModelLoader';
+
 export class RoadUtils {
   public static copyTransforms(from: THREE.Object3D, to: THREE.Object3D) {
     const axes: ('x' | 'y' | 'z')[] = ['x', 'y', 'z'];
@@ -65,5 +69,18 @@ export class RoadUtils {
     });
 
     return closest;
+  }
+
+  public static getRandomStartingRoad(roads: Road[]) {
+    // Cannot start on these roads
+    const disallowedNames = [RoadName.ROUNDABOUT, RoadName.JUNCTION, RoadName.CROSSROAD];
+
+    // Get all valid roads
+    const validRoads = roads.filter((road) => !disallowedNames.includes(road.name));
+
+    // Return a random one
+    const rnd = NumberUtils.getRandomArrayIndex(validRoads.length);
+
+    return validRoads[rnd];
   }
 }

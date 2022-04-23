@@ -3,9 +3,11 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 import { CanvasListener } from '../utils/CanvasListener';
 import { ModelLoader, ModelNames, RoadName, VehicleName } from '../utils/ModelLoader';
+import { NumberUtils } from '../utils/NumberUtils';
 import { Pathfinder } from '../utils/Pathfinder';
 import { Road } from '../model/Road';
 import { RoadFactory } from '../utils/RoadFactory';
+import { RoadUtils } from '../utils/RoadUtils';
 import { Vehicle } from '../model/Vehicle';
 
 /**
@@ -187,7 +189,8 @@ export class SceneState {
     const car = new Vehicle(VehicleName.SEDAN, this.modelLoader.getModel(VehicleName.SEDAN), color);
     this.vehicles.push(car);
 
-    this.setCarRoute(car, fromRoad, toRoad);
+    //this.setCarRoute(car, fromRoad, toRoad);
+    this.setCarRoam(car);
   }
 
   private addRoad(name: RoadName, pos: THREE.Vector3, rot = 0) {
@@ -219,9 +222,17 @@ export class SceneState {
     this.setCarRoute(car, fromRoad, toRoad);
   };
 
+  private setCarRoam(car: Vehicle) {
+    // Pick a random road to start on
+    const road = RoadUtils.getRandomStartingRoad(this.roads);
+
+    // Assign to car to start roaming
+    car.setRoad(road);
+  }
+
   private setCarRoute(car: Vehicle, fromRoad: Road, toRoad: Road) {
     const route = Pathfinder.findRoute(fromRoad, toRoad);
-    const waypoints = Pathfinder.getRouteWaypoints(route);
+    let waypoints = Pathfinder.getRouteWaypoints(route);
     const lastRoadId = route[route.length - 1].id;
 
     car.setRoute(waypoints, lastRoadId, this.onCompleteRoute);
