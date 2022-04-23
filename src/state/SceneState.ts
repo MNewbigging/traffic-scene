@@ -171,6 +171,7 @@ export class SceneState {
 
     // Route
     this.addCarWithRoute(s1, b2, new THREE.Color('#2354a1'));
+    //this.addCar(new THREE.Color('green'));
     // this.addCarWithRoute(s5, s7, new THREE.Color('green'));
     // this.addCarWithRoute(b5, s4, new THREE.Color('red'));
     // this.addCarWithRoute(b2, s9, new THREE.Color('yellow'));
@@ -185,14 +186,6 @@ export class SceneState {
     });
   }
 
-  private addCarWithRoute(fromRoad: Road, toRoad: Road, color?: THREE.Color) {
-    const car = new Vehicle(VehicleName.SEDAN, this.modelLoader.getModel(VehicleName.SEDAN), color);
-    this.vehicles.push(car);
-
-    //this.setCarRoute(car, fromRoad, toRoad);
-    this.setCarRoam(car);
-  }
-
   private addRoad(name: RoadName, pos: THREE.Vector3, rot = 0) {
     const road = RoadFactory.createRoad(name, this.modelLoader.getModel(name));
 
@@ -205,6 +198,32 @@ export class SceneState {
     road.postTransform();
 
     return road;
+  }
+
+  private addCar(color?: THREE.Color) {
+    // Create the car
+    const car = new Vehicle(VehicleName.SEDAN, this.modelLoader.getModel(VehicleName.SEDAN), color);
+    this.vehicles.push(car);
+
+    // Pick a random road to start on
+    const road = RoadUtils.getRandomStartingRoad(this.roads);
+
+    // Assign to car to start roaming
+    car.setRoam(road);
+  }
+
+  private addCarWithRoute(fromRoad: Road, toRoad: Road, color?: THREE.Color) {
+    const car = new Vehicle(VehicleName.SEDAN, this.modelLoader.getModel(VehicleName.SEDAN), color);
+    this.vehicles.push(car);
+
+    // Get the route
+    const route = Pathfinder.findRoute(fromRoad, toRoad);
+    const waypoints = Pathfinder.getRouteWaypoints(route);
+    car.position.x = waypoints[0].x;
+    car.position.z = waypoints[0].z;
+    car.model.lookAt(waypoints[1]);
+
+    car.setRoute(route);
   }
 
   private onCompleteRoute = (car: Vehicle) => {
@@ -222,20 +241,12 @@ export class SceneState {
     this.setCarRoute(car, fromRoad, toRoad);
   };
 
-  private setCarRoam(car: Vehicle) {
-    // Pick a random road to start on
-    const road = RoadUtils.getRandomStartingRoad(this.roads);
-
-    // Assign to car to start roaming
-    car.setRoad(road);
-  }
-
   private setCarRoute(car: Vehicle, fromRoad: Road, toRoad: Road) {
     const route = Pathfinder.findRoute(fromRoad, toRoad);
     let waypoints = Pathfinder.getRouteWaypoints(route);
     const lastRoadId = route[route.length - 1].id;
 
-    car.setRoute(waypoints, lastRoadId, this.onCompleteRoute);
+    //car.setRouteWaypoints(waypoints, lastRoadId, this.onCompleteRoute);
     car.model.position.x = waypoints[0].x;
     car.model.position.z = waypoints[0].z;
   }

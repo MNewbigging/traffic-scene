@@ -7,6 +7,7 @@ import { VehicleName } from '../utils/ModelLoader';
 
 export class Vehicle {
   public speed = 3;
+  public route: Road[] = [];
   public currentRoad?: Road;
   public currentLane?: Lane;
   public routeWaypoints: THREE.Vector3[] = [];
@@ -29,7 +30,7 @@ export class Vehicle {
   }
 
   // Gives this vehicle a starting road to roam from
-  public setRoad(road: Road) {
+  public setRoam(road: Road) {
     // Set the road
     this.currentRoad = road;
 
@@ -51,15 +52,32 @@ export class Vehicle {
     this.targetNextWaypoint();
   }
 
+  // Give the vehicle a route to follow
+  public setRoute(route: Road[]) {
+    this.route = route;
+
+    const first = route[0];
+    const second = route[1];
+
+    // Get the lane that goes from start to next
+    const lane = first.getConnectingLane(first, second);
+
+    // Assign road and lane
+    this.currentRoad = first;
+    this.currentLane = lane;
+
+    // Get waypoints for this lane
+    this.routeWaypoints = [...this.currentLane.waypoints];
+
+    // Target the next
+    this.targetNextWaypoint();
+  }
+
   // Gives this vehicle a specific route of waypoints to follow
-  public setRoute(
-    waypoints: THREE.Vector3[],
-    lastRoadId: string,
-    onComplete?: (car: Vehicle) => void
-  ) {
-    // Save callback and info for when route is finished
-    this.lastRoadId = lastRoadId;
-    this.onRouteComplete = onComplete;
+  public setRouteWaypoints(waypoints: THREE.Vector3[]) {
+    // The last road will be current road when waypoints are finished
+    // (when this next looks at current road)
+    //this.currentRoad = lastRoad;
 
     // Save route
     this.routeWaypoints = waypoints;
@@ -74,13 +92,13 @@ export class Vehicle {
     // Face next waypoint immediately
     this.model.lookAt(this.nextWaypoint);
 
-    this.setRouteLine();
+    // Update route line due to moving car above
     this.updateRouteLine();
   }
 
   public update(deltaTime: number) {
     // Drive along the route
-    this.driveRoute(deltaTime);
+    this.drive(deltaTime);
 
     // Update route line
     this.updateRouteLine();
@@ -115,7 +133,7 @@ export class Vehicle {
   private targetNextWaypoint() {
     // Have we reached the end now?
     if (this.routeWaypoints.length === 1) {
-      this.completeRoute();
+      this.onWaypointsEnd();
       //this.onRouteComplete?.(this);
       return;
     }
@@ -144,11 +162,50 @@ export class Vehicle {
     this.setRouteLine();
   }
 
-  private completeRoute() {
+  // When there are no more waypoints to follow
+  private onWaypointsEnd() {
     // The route is finished
     this.routeWaypoints = [];
 
-    // Continue roaming - find the next road the current lane goes to
+    // If the vehicle is following a set route, use the next road in the route
+    if (this.route.length) {
+      this.nextRouteRoad();
+    } else {
+      // Otherwise continue roaming - find the next road the current lane goes to
+      this.nextRoamRoad();
+    }
+  }
+
+  private nextRouteRoad() {
+    // Current road is the fromRoad
+    const fromRoad = this.currentRoad;
+
+    // Road after next is toRoad
+    const nextIdx = this.route.findIndex((r) => r.id === this.currentRoad.id) + 1;
+    const toRoad = this.route[nextIdx + 1] ?? this.route[nextIdx];
+    const nextRoad = this.route[nextIdx];
+
+    // Get the lane on next road that connects fromRoad and toRoad
+    const lane = nextRoad.getConnectingLane(fromRoad, toRoad);
+
+    // Assign, get waypoints
+    this.currentRoad = nextRoad;
+    this.currentLane = lane;
+    this.routeWaypoints = [...this.currentLane.waypoints];
+
+    // Lose the road we've just travelled
+    this.route.shift();
+
+    // If there is only one road left, can clear route as we have lane to it
+    if (this.route.length === 1) {
+      this.route = [];
+    }
+
+    // Target the next
+    this.targetNextWaypoint();
+  }
+
+  private nextRoamRoad() {
     const toRoadIdx = this.currentLane?.toRoadIdx;
     const nextRoad = this.currentRoad?.neighbours[toRoadIdx];
 
@@ -158,7 +215,7 @@ export class Vehicle {
     );
 
     // Pick a random lane
-    const rnd = Math.floor(Math.random() * lanes.length);
+    const rnd = NumberUtils.getRandomArrayIndex(lanes.length);
     const nextLane = lanes[rnd];
 
     // Assign the next road and lane as current
@@ -172,7 +229,7 @@ export class Vehicle {
     this.targetNextWaypoint();
   }
 
-  private driveRoute(deltaTime: number) {
+  private drive(deltaTime: number) {
     // Has the route ended?
     if (!this.routeWaypoints.length || !this.nextWaypoint) {
       return;

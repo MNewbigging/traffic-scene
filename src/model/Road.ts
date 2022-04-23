@@ -55,31 +55,52 @@ export class Road {
     });
   }
 
-  // TODO - return halfway along line if starting/ending on this road
   public getWaypoints(fromRoad: Road, toRoad: Road): THREE.Vector3[] {
-    // Can only start and end routes on straight roads which only have 2 lanes
+    // // Can only start and end routes on roads which only have 2 lanes
+
+    // // If we're going to this road
+    // if (toRoad.id === this.id) {
+    //   // Find a match on fromRoad within lanes
+    //   return (
+    //     this.lanes.find((lane) => this.neighbours[lane.fromRoadIdx]?.id === fromRoad.id)
+    //       .waypoints ?? []
+    //   );
+    // }
+
+    // // If we're going from this road
+    // if (fromRoad.id === this.id) {
+    //   // Find a match on toRoad within lanes
+    //   return (
+    //     this.lanes.find((lane) => this.neighbours[lane.toRoadIdx]?.id === toRoad.id).waypoints ?? []
+    //   );
+    // }
+
+    // // Otherwise, going through this road - match on both from and to
+    // let lanes = this.lanes.filter((lane) => this.neighbours[lane.toRoadIdx]?.id === toRoad.id);
+    // return (
+    //   lanes.find((lane) => this.neighbours[lane.fromRoadIdx]?.id === fromRoad.id).waypoints ?? []
+    // );
+
+    return this.getConnectingLane(fromRoad, toRoad)?.waypoints ?? [];
+  }
+
+  public getConnectingLane(fromRoad: Road, toRoad: Road): Lane {
+    // Can only start and end routes on roads which only have 2 lanes
 
     // If we're going to this road
     if (toRoad.id === this.id) {
       // Find a match on fromRoad within lanes
-      return (
-        this.lanes.find((lane) => this.neighbours[lane.fromRoadIdx]?.id === fromRoad.id)
-          .waypoints ?? []
-      );
+      return this.lanes.find((lane) => this.neighbours[lane.fromRoadIdx]?.id === fromRoad.id);
     }
 
     // If we're going from this road
     if (fromRoad.id === this.id) {
       // Find a match on toRoad within lanes
-      return (
-        this.lanes.find((lane) => this.neighbours[lane.toRoadIdx]?.id === toRoad.id).waypoints ?? []
-      );
+      return this.lanes.find((lane) => this.neighbours[lane.toRoadIdx]?.id === toRoad.id);
     }
 
     // Otherwise, going through this road - match on both from and to
     let lanes = this.lanes.filter((lane) => this.neighbours[lane.toRoadIdx]?.id === toRoad.id);
-    return (
-      lanes.find((lane) => this.neighbours[lane.fromRoadIdx]?.id === fromRoad.id).waypoints ?? []
-    );
+    return lanes.find((lane) => this.neighbours[lane.fromRoadIdx]?.id === fromRoad.id);
   }
 }

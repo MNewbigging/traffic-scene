@@ -29,7 +29,7 @@ export enum RoadName {
  * Responsible for loading models and storing them during runtime.
  */
 export class ModelLoader {
-  private readonly vehicleScaleModifer = 0.5;
+  private readonly vehicleScaleModifer = 0.4;
   private readonly roadScaleModifier = 2;
   private modelMap = new Map<ModelName, THREE.Group>();
   private loadedModels = 0;
