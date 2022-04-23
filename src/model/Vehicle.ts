@@ -12,19 +12,32 @@ export class Vehicle {
   public raycastHelper = new THREE.ArrowHelper();
   public routeLine?: THREE.Line;
   public currentRoad?: Road;
-  public speed = 2;
+  public maxSpeed = 2;
+  public actualSpeed = 2;
+  public acceleration = 0.08;
   private route: Road[] = [];
   private currentLane?: Lane;
   private routeWaypoints: THREE.Vector3[] = [];
   private nextWaypoint?: THREE.Vector3;
   private nextLookAt = new THREE.Quaternion();
+  public bounds: THREE.Mesh;
 
   constructor(public name: VehicleName, public model: THREE.Group, color: THREE.Color) {
     this.setColor(color);
 
+    // Setup bounds for raycaster
+    const box = new THREE.Box3().setFromObject(model);
+    const dimensions = new THREE.Vector3().subVectors(box.max, box.min);
+    const boxGeom = new THREE.BoxBufferGeometry(dimensions.x, dimensions.y, dimensions.z);
+    const matrix = new THREE.Matrix4().setPosition(
+      dimensions.addVectors(box.min, box.max).multiplyScalar(0.5)
+    );
+    boxGeom.applyMatrix4(matrix);
+    this.bounds = new THREE.Mesh(boxGeom, new THREE.MeshBasicMaterial({ color: 'white' }));
+
     // Setup raycaster
     this.raycaster.near = 0;
-    this.raycaster.far = 0.8;
+    this.raycaster.far = 1.6;
     this.raycastHelper.setLength(this.raycaster.far);
     this.raycastHelper.setColor(color);
     this.raycastHelper.position.y = 0.3;
@@ -89,6 +102,12 @@ export class Vehicle {
   }
 
   public checkVehicleCollisions(allVehicles: Vehicle[]) {
+    // By default, speed up towards maxSpeed
+    this.actualSpeed += this.acceleration;
+    if (this.actualSpeed > this.maxSpeed) {
+      this.actualSpeed = this.maxSpeed;
+    }
+
     // Only bother checking if close to another vehicle - ignore self
     const otherVehicles = allVehicles.filter((v) => v.id !== this.id);
     const closeVehicles = RoadUtils.getCloseVehicles(
@@ -100,7 +119,26 @@ export class Vehicle {
       return;
     }
 
-    console.log('close to other');
+    // Check against vehicle bounds
+    const check = closeVehicles.map((v) => v.bounds);
+
+    // Check for intersections with close vehicles
+    const intersections = this.raycaster.intersectObjects(check, true);
+    if (!intersections.length) {
+      console.log('no intersections');
+      return;
+    }
+
+    const firstHit = intersections[0];
+    //console.log('hit at dist', firstHit.distance);
+
+    // Slow down based on the distance
+    let speedMod = firstHit.distance * 1.5 - 0.4;
+    if (firstHit.distance < 0) {
+      speedMod = 0;
+    }
+    //console.log('speedMod', speedMod);
+    this.actualSpeed *= speedMod;
   }
 
   public update(deltaTime: number) {
@@ -112,6 +150,7 @@ export class Vehicle {
 
     // Update raycaster
     this.updateRaycaster();
+    RoadUtils.copyTransforms(this.model, this.bounds);
   }
 
   private setColor(color: THREE.Color) {
@@ -253,7 +292,7 @@ export class Vehicle {
 
     // Otherwise, keep moving towards next target
     const direction = this.nextWaypoint.clone().sub(this.position).normalize();
-    const speed = deltaTime * this.speed;
+    const speed = deltaTime * this.actualSpeed;
     this.position.x += direction.x * speed;
     this.position.z += direction.z * speed;
 

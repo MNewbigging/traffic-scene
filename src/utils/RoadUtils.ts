@@ -76,7 +76,6 @@ export class RoadUtils {
       const distance = origin.distanceTo(v.position);
 
       if (origin.distanceTo(v.position) < maxDistance) {
-        console.log(`dist ${distance} is less than ${maxDistance}`);
         within.push(v);
       }
     });

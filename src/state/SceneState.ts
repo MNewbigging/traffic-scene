@@ -177,13 +177,21 @@ export class SceneState {
     // Two cars, same route - first slower than second
     this.addCarWithRoute(s13, s7, new THREE.Color('#2354a1'));
     this.addCarWithRoute(b7, s7, new THREE.Color('green'));
+    this.addCar(new THREE.Color('red'));
+    this.addCar(new THREE.Color('yellow'));
+    this.addCar(new THREE.Color('white'));
+    this.addCar(new THREE.Color('red'));
+    this.addCar(new THREE.Color('yellow'));
+    this.addCar(new THREE.Color('white'));
 
-    this.vehicles[0].speed = 1;
-    this.vehicles[1].speed = 2;
+    this.vehicles[0].maxSpeed = 1;
+    this.vehicles[1].maxSpeed = 2;
+    this.vehicles[2].maxSpeed = 1;
 
     this.vehicles.forEach((v) => {
       this.scene.add(v.model);
       //this.scene.add(v.routeLine);
+      //this.scene.add(v.bounds);
       this.scene.add(v.raycastHelper);
     });
 
