@@ -54,23 +54,6 @@ export class RoadUtils {
     return points;
   }
 
-  public static getClosestIndexFromArray(point: THREE.Vector3, array: THREE.Vector3[]): number {
-    let closestDistance = Number.MAX_VALUE;
-    let closest: number = undefined;
-
-    array.forEach((item, index) => {
-      // Calculate distance
-      const distance = point.distanceTo(item);
-      // Remember if it's smallest yet
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        closest = index;
-      }
-    });
-
-    return closest;
-  }
-
   public static getRandomStartingRoad(roads: Road[]) {
     // Cannot start on these roads
     const disallowedNames = [RoadName.ROUNDABOUT, RoadName.JUNCTION, RoadName.CROSSROAD];

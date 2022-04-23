@@ -6,18 +6,28 @@ import { Road } from './Road';
 import { VehicleName } from '../utils/ModelLoader';
 
 export class Vehicle {
+  public raycaster = new THREE.Raycaster();
+  public raycastHelper = new THREE.ArrowHelper();
   public routeLine?: THREE.Line;
-  private speed = 3;
-  private route: Road[] = [];
   public currentRoad?: Road;
+  private speed = 1;
+  private route: Road[] = [];
   private currentLane?: Lane;
   private routeWaypoints: THREE.Vector3[] = [];
   private nextWaypoint?: THREE.Vector3;
   private nextLookAt = new THREE.Quaternion();
 
-  constructor(public name: VehicleName, public model: THREE.Group, color?: THREE.Color) {
+  constructor(public name: VehicleName, public model: THREE.Group, color: THREE.Color) {
     this.setColor(color);
 
+    // Setup raycaster
+    this.raycaster.near = 0;
+    this.raycaster.far = 0.8;
+    this.raycastHelper.setLength(this.raycaster.far);
+    this.raycastHelper.setColor(color);
+    this.raycastHelper.position.y = 0.3;
+
+    // Create the route line
     const mat = new THREE.LineBasicMaterial({ color });
     const geom = new THREE.BufferGeometry();
     this.routeLine = new THREE.Line(geom, mat);
@@ -82,6 +92,9 @@ export class Vehicle {
 
     // Update route line
     this.updateRouteLine();
+
+    // Update raycaster
+    this.updateRaycaster();
   }
 
   private setColor(color: THREE.Color) {
@@ -230,5 +243,19 @@ export class Vehicle {
     // Rotate towards next target
     const rotateSpeed = speed * 1.5;
     this.model.quaternion.rotateTowards(this.nextLookAt, rotateSpeed);
+  }
+
+  private updateRaycaster() {
+    // Get new forward facing direction
+    const forward = new THREE.Vector3();
+    this.model.getWorldDirection(forward);
+
+    // Set ray to new forward and position
+    this.raycaster.set(this.position, forward);
+
+    // Update helper to match
+    this.raycastHelper.setDirection(forward);
+    this.raycastHelper.position.x = this.position.x;
+    this.raycastHelper.position.z = this.position.z;
   }
 }

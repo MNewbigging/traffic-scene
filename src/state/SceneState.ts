@@ -49,7 +49,9 @@ export class SceneState {
     //this.controls.target = this.vehicles[0].position;
 
     // Move vehicles along their route
-    this.vehicles.forEach((v) => v.update(deltaTime));
+    this.vehicles.forEach((v) => {
+      v.update(deltaTime);
+    });
   }
 
   // Once models are loaded, can then piece them together as per scene
@@ -178,7 +180,8 @@ export class SceneState {
 
     this.vehicles.forEach((v) => {
       this.scene.add(v.model);
-      this.scene.add(v.routeLine);
+      //this.scene.add(v.routeLine);
+      this.scene.add(v.raycastHelper);
     });
 
     this.roads.forEach((r) => {

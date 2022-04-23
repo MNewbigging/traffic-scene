@@ -48,7 +48,10 @@ export class Road {
   public connectRoads(roads: Road[]) {
     roads.forEach((road) => {
       // Find the nearest edge point's index into the edge points array
-      const nearestIdx = RoadUtils.getClosestIndexFromArray(road.position, this.edgePointPositions);
+      const nearestIdx = NumberUtils.getClosestIndexFromArray(
+        road.position,
+        this.edgePointPositions
+      );
 
       // Insert into neighbours array at that position
       this.neighbours.splice(nearestIdx, 1, road);

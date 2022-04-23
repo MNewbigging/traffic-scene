@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 
 import { Lane } from '../model/Lane';
+import { NumberUtils } from './NumberUtils';
 import { Road } from '../model/Road';
 import { RoadName } from './ModelLoader';
 import { RoadUtils } from './RoadUtils';
@@ -427,11 +428,11 @@ export class RoadFactory {
   ) {
     // Find the closest point index to entry on circle
     const entryPoint = entryPoints[entryPoints.length - 1];
-    const entryClosest = RoadUtils.getClosestIndexFromArray(entryPoint, circlePoints);
+    const entryClosest = NumberUtils.getClosestIndexFromArray(entryPoint, circlePoints);
 
     // Find the closest point index to exit on circle
     const exitPoint = exitPoints[exitPoints.length - 1];
-    const exitClosest = RoadUtils.getClosestIndexFromArray(exitPoint, circlePoints);
+    const exitClosest = NumberUtils.getClosestIndexFromArray(exitPoint, circlePoints);
 
     // Get that portion of the circle points
     let start, end;

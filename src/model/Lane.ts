@@ -55,10 +55,10 @@ export class Lane {
 
     // From is first item in waypoints
     const from = this.waypoints[0];
-    this.fromRoadIdx = RoadUtils.getClosestIndexFromArray(from, edgePoints);
+    this.fromRoadIdx = NumberUtils.getClosestIndexFromArray(from, edgePoints);
 
     // To is last item in waypoints
     const to = this.waypoints[this.waypoints.length - 1];
-    this.toRoadIdx = RoadUtils.getClosestIndexFromArray(to, edgePoints);
+    this.toRoadIdx = NumberUtils.getClosestIndexFromArray(to, edgePoints);
   }
 }
