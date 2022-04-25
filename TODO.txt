@@ -1,5 +1,3 @@
-- add in more vehicles
-
 - add in house models
 
 - build scene
@@ -10,8 +8,12 @@
 
 - on resize, adjust camera/renderer
 
-- click to focus camera
+- click to focus camera (UI?)
 
 - WSAD camera controls
 
 - publish; assets load
+
+- tidy up code; profile?
+
+- street lights; day/night cycle

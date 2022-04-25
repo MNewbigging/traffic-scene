@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 import { CanvasListener } from '../utils/CanvasListener';
-import { ModelLoader, ModelNames, RoadName, VehicleName } from '../utils/ModelLoader';
+import { HouseName, ModelLoader, ModelNames, RoadName, VehicleName } from '../utils/ModelLoader';
 import { NumberUtils } from '../utils/NumberUtils';
 import { Pathfinder } from '../utils/Pathfinder';
 import { Road } from '../model/Road';
@@ -19,6 +19,7 @@ export class SceneState {
   public camera: THREE.PerspectiveCamera;
   public roads: Road[] = [];
   public vehicles: Vehicle[] = [];
+  public props: THREE.Group[] = [];
 
   private controls: OrbitControls;
   private modelLoader = new ModelLoader();
@@ -30,28 +31,10 @@ export class SceneState {
   public initScene(onReady: () => void) {
     this.onReady = onReady;
 
-    // Work out which models we need to load for this scene
-    // This is where proc gen comes in - hardcoded for now
     const modelNames = new ModelNames();
-    modelNames.roads = [
-      RoadName.STRAIGHT,
-      RoadName.BEND,
-      RoadName.JUNCTION,
-      RoadName.CROSSROAD,
-      RoadName.ROUNDABOUT,
-    ];
-    modelNames.vehicles = [
-      VehicleName.SEDAN,
-      VehicleName.HATCHBACK,
-      VehicleName.POLICE,
-      VehicleName.SEDAN_SPORTS,
-      VehicleName.SUV,
-      VehicleName.TAXI,
-      VehicleName.TRUCK,
-      VehicleName.VAN,
-      VehicleName.GARBAGE,
-      VehicleName.DELIVERY,
-    ];
+    modelNames.roads = Object.values(RoadName);
+    modelNames.vehicles = Object.values(VehicleName);
+    modelNames.houses = Object.values(HouseName);
 
     this.modelLoader.loadModels(modelNames, () => this.buildScene());
   }
@@ -76,7 +59,8 @@ export class SceneState {
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     this.scene.add(ambientLight);
 
-    this.roundaboutScene();
+    //this.roundaboutScene();
+    this.houseScene();
 
     // Now ready to start
     this.onReady?.();
@@ -90,12 +74,25 @@ export class SceneState {
       1000
     );
     camera.position.x = 0;
-    camera.position.y = 5;
-    camera.position.z = 10;
+    camera.position.y = 2;
+    camera.position.z = 2;
 
     this.camera = camera;
     this.controls = new OrbitControls(this.camera, this.canvasListener.canvas);
     this.controls.enableDamping = true;
+  }
+
+  private houseScene() {
+    const s1 = this.addRoad(RoadName.STRAIGHT, new THREE.Vector3(0, 0, 1));
+
+    const h1 = this.modelLoader.getModel(HouseName.TYPE_19);
+    const h2 = this.modelLoader.getModel(HouseName.TYPE_21);
+    const houses = [h1, h2];
+
+    h1.position.x = -3;
+
+    this.scene.add(s1.model);
+    houses.forEach((h) => this.scene.add(h));
   }
 
   private roundaboutScene() {
