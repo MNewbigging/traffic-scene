@@ -15,6 +15,13 @@ type ModelName = VehicleName | RoadName;
 
 export enum VehicleName {
   SEDAN = 'sedan',
+  HATCHBACK = 'hatchbackSports',
+  POLICE = 'police',
+  SEDAN_SPORTS = 'sedanSports',
+  SUV = 'suv',
+  TAXI = 'taxi',
+  TRUCK = 'truck',
+  VAN = 'van',
 }
 
 export enum RoadName {

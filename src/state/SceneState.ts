@@ -9,6 +9,7 @@ import { Road } from '../model/Road';
 import { RoadFactory } from '../utils/RoadFactory';
 import { RoadUtils } from '../utils/RoadUtils';
 import { Vehicle } from '../model/Vehicle';
+import { VehicleFactory } from '../utils/VehicleFactory';
 
 /**
  * Contains all the objects in the scene
@@ -39,14 +40,13 @@ export class SceneState {
       RoadName.CROSSROAD,
       RoadName.ROUNDABOUT,
     ];
-    modelNames.vehicles = [VehicleName.SEDAN];
+    modelNames.vehicles = [VehicleName.SEDAN, VehicleName.HATCHBACK];
 
     this.modelLoader.loadModels(modelNames, () => this.buildScene());
   }
 
   public updateScene(deltaTime: number) {
     this.controls.update();
-    //this.controls.target = this.vehicles[0].position;
 
     // Update vehicles
     this.vehicles.forEach((v) => {
@@ -175,28 +175,14 @@ export class SceneState {
     s13.connectRoads([b7, j1]);
 
     // Two cars, same route - first slower than second
-    this.addCarWithRoute(s13, s7, new THREE.Color('#2354a1'));
-    this.addCarWithRoute(b7, s7, new THREE.Color('green'));
-    this.addCar(new THREE.Color('red'));
-    this.addCar(new THREE.Color('yellow'));
-    this.addCar(new THREE.Color('white'));
-    this.addCar(new THREE.Color('red'));
-    this.addCar(new THREE.Color('yellow'));
-    this.addCar(new THREE.Color('white'));
-    this.addCar(new THREE.Color('red'));
-    // this.addCar(new THREE.Color('yellow'));
-    // this.addCar(new THREE.Color('white'));
-    // this.addCar(new THREE.Color('blue'));
-    // this.addCar(new THREE.Color('green'));
-
-    this.vehicles[0].maxSpeed = 1;
-    this.vehicles[1].maxSpeed = 2;
-    this.vehicles[2].maxSpeed = 1;
+    // this.addCarWithRoute(s13, s7, new THREE.Color('#2354a1'));
+    // this.addCarWithRoute(b7, s7, new THREE.Color('green'));
+    this.addCar(VehicleName.HATCHBACK);
 
     this.vehicles.forEach((v) => {
       this.scene.add(v.model);
       //this.scene.add(v.routeLine);
-      //this.scene.add(v.bounds);
+      this.scene.add(v.bounds);
       //this.scene.add(v.raycastHelper);
     });
 
@@ -219,9 +205,9 @@ export class SceneState {
     return road;
   }
 
-  private addCar(color?: THREE.Color) {
+  private addCar(name: VehicleName, color?: THREE.Color) {
     // Create the car
-    const car = new Vehicle(VehicleName.SEDAN, this.modelLoader.getModel(VehicleName.SEDAN), color);
+    const car = VehicleFactory.createVehicle(name, this.modelLoader.getModel(name), color); //new Vehicle(VehicleName.SEDAN, this.modelLoader.getModel(VehicleName.SEDAN), color);
     this.vehicles.push(car);
 
     // Pick a random road to start on
@@ -239,7 +225,7 @@ export class SceneState {
   }
 
   private addCarWithRoute(fromRoad: Road, toRoad: Road, color?: THREE.Color) {
-    const car = new Vehicle(VehicleName.SEDAN, this.modelLoader.getModel(VehicleName.SEDAN), color);
+    const car = new Vehicle(VehicleName.SEDAN, this.modelLoader.getModel(VehicleName.SEDAN));
     this.vehicles.push(car);
 
     // Get the route, position car at start of it

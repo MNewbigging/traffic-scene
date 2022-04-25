@@ -22,9 +22,7 @@ export class Vehicle {
   private nextLookAt = new THREE.Quaternion();
   public bounds: THREE.Mesh;
 
-  constructor(public name: VehicleName, public model: THREE.Group, color: THREE.Color) {
-    this.setColor(color);
-
+  constructor(public name: VehicleName, public model: THREE.Group) {
     // Setup bounds for raycaster
     const box = new THREE.Box3().setFromObject(model);
     const dimensions = new THREE.Vector3().subVectors(box.max, box.min);
@@ -33,23 +31,38 @@ export class Vehicle {
       dimensions.addVectors(box.min, box.max).multiplyScalar(0.5)
     );
     boxGeom.applyMatrix4(matrix);
-    this.bounds = new THREE.Mesh(boxGeom, new THREE.MeshBasicMaterial({ color: 'white' }));
+
+    this.bounds = new THREE.Mesh(
+      boxGeom,
+      new THREE.MeshBasicMaterial({ color: 'white', wireframe: true })
+    );
 
     // Setup raycaster
     this.raycaster.near = 0;
     this.raycaster.far = 1.2;
     this.raycastHelper.setLength(this.raycaster.far);
-    this.raycastHelper.setColor(color);
     this.raycastHelper.position.y = 0.3;
 
     // Create the route line
-    const mat = new THREE.LineBasicMaterial({ color });
+    const mat = new THREE.LineBasicMaterial({ color: 'blue' });
     const geom = new THREE.BufferGeometry();
     this.routeLine = new THREE.Line(geom, mat);
   }
 
   public get position() {
     return this.model.position;
+  }
+
+  public setSpeed(speed: number) {
+    this.maxSpeed = speed;
+    this.actualSpeed = speed;
+  }
+
+  public setColor(color: THREE.Color) {
+    const body = this.model.getObjectByName('Mesh_body_1');
+    if (body && body instanceof THREE.Mesh) {
+      body.material = new THREE.MeshBasicMaterial({ color });
+    }
   }
 
   // Gives this vehicle a starting road to roam from
@@ -146,13 +159,6 @@ export class Vehicle {
     // Update raycaster
     this.updateRaycaster();
     RoadUtils.copyTransforms(this.model, this.bounds);
-  }
-
-  private setColor(color: THREE.Color) {
-    const body = this.model.getObjectByName('Mesh_body_1');
-    if (body && body instanceof THREE.Mesh) {
-      body.material = new THREE.MeshBasicMaterial({ color });
-    }
   }
 
   // Creates a new route line from route waypoints
