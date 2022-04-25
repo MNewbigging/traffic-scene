@@ -40,7 +40,16 @@ export class SceneState {
       RoadName.CROSSROAD,
       RoadName.ROUNDABOUT,
     ];
-    modelNames.vehicles = [VehicleName.SEDAN, VehicleName.HATCHBACK];
+    modelNames.vehicles = [
+      VehicleName.SEDAN,
+      VehicleName.HATCHBACK,
+      VehicleName.POLICE,
+      VehicleName.SEDAN_SPORTS,
+      VehicleName.SUV,
+      VehicleName.TAXI,
+      VehicleName.TRUCK,
+      VehicleName.VAN,
+    ];
 
     this.modelLoader.loadModels(modelNames, () => this.buildScene());
   }
@@ -177,12 +186,11 @@ export class SceneState {
     // Two cars, same route - first slower than second
     // this.addCarWithRoute(s13, s7, new THREE.Color('#2354a1'));
     // this.addCarWithRoute(b7, s7, new THREE.Color('green'));
-    this.addCar(VehicleName.HATCHBACK);
+    this.addCar(VehicleName.VAN);
 
     this.vehicles.forEach((v) => {
       this.scene.add(v.model);
       //this.scene.add(v.routeLine);
-      this.scene.add(v.bounds);
       //this.scene.add(v.raycastHelper);
     });
 

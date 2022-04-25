@@ -10,6 +10,7 @@ export class Vehicle {
   public id = NumberUtils.createId();
   public raycaster = new THREE.Raycaster();
   public raycastHelper = new THREE.ArrowHelper();
+  public bounds: THREE.Mesh;
   public routeLine?: THREE.Line;
   public currentRoad?: Road;
   public maxSpeed = 2;
@@ -20,7 +21,6 @@ export class Vehicle {
   private routeWaypoints: THREE.Vector3[] = [];
   private nextWaypoint?: THREE.Vector3;
   private nextLookAt = new THREE.Quaternion();
-  public bounds: THREE.Mesh;
 
   constructor(public name: VehicleName, public model: THREE.Group) {
     // Setup bounds for raycaster
