@@ -14,6 +14,12 @@ export class VehicleFactory {
     // Set the speed
     let speed = 1;
     switch (name) {
+      case VehicleName.DELIVERY:
+        speed = 1.6;
+        break;
+      case VehicleName.GARBAGE:
+        speed = 1.4;
+        break;
       case VehicleName.HATCHBACK:
         speed = 1.8;
         break;

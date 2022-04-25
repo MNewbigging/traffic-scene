@@ -49,6 +49,8 @@ export class SceneState {
       VehicleName.TAXI,
       VehicleName.TRUCK,
       VehicleName.VAN,
+      VehicleName.GARBAGE,
+      VehicleName.DELIVERY,
     ];
 
     this.modelLoader.loadModels(modelNames, () => this.buildScene());
@@ -183,9 +185,13 @@ export class SceneState {
     b7.connectRoads([b6, s13]);
     s13.connectRoads([b7, j1]);
 
-    // Two cars, same route - first slower than second
-    // this.addCarWithRoute(s13, s7, new THREE.Color('#2354a1'));
-    // this.addCarWithRoute(b7, s7, new THREE.Color('green'));
+    this.addCar(VehicleName.DELIVERY);
+    this.addCar(VehicleName.GARBAGE);
+    this.addCar(VehicleName.SEDAN);
+    this.addCar(VehicleName.SEDAN_SPORTS);
+    this.addCar(VehicleName.SUV);
+    this.addCar(VehicleName.TAXI);
+    this.addCar(VehicleName.TRUCK);
     this.addCar(VehicleName.VAN);
 
     this.vehicles.forEach((v) => {
@@ -215,7 +221,7 @@ export class SceneState {
 
   private addCar(name: VehicleName, color?: THREE.Color) {
     // Create the car
-    const car = VehicleFactory.createVehicle(name, this.modelLoader.getModel(name), color); //new Vehicle(VehicleName.SEDAN, this.modelLoader.getModel(VehicleName.SEDAN), color);
+    const car = VehicleFactory.createVehicle(name, this.modelLoader.getModel(name), color);
     this.vehicles.push(car);
 
     // Pick a random road to start on
@@ -232,8 +238,8 @@ export class SceneState {
     car.setRoam(road);
   }
 
-  private addCarWithRoute(fromRoad: Road, toRoad: Road, color?: THREE.Color) {
-    const car = new Vehicle(VehicleName.SEDAN, this.modelLoader.getModel(VehicleName.SEDAN));
+  private addCarWithRoute(fromRoad: Road, toRoad: Road, name: VehicleName, color?: THREE.Color) {
+    const car = VehicleFactory.createVehicle(name, this.modelLoader.getModel(name), color);
     this.vehicles.push(car);
 
     // Get the route, position car at start of it
