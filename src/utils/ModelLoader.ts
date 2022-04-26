@@ -65,6 +65,17 @@ export class ModelLoader {
   private loadedModels = 0;
   private modelsToLoad = 0;
   private onLoad?: () => void;
+  private baseAssetPath = '';
+
+  constructor() {
+    // Hack to get assets from gh-pages when published
+    const location = window.location.href;
+    if (location.includes('localhost')) {
+      this.baseAssetPath = 'dist/assets/';
+    } else {
+      this.baseAssetPath = 'assets/';
+    }
+  }
 
   public loadModels(modelNames: ModelNames, onLoad: () => void) {
     this.onLoad = onLoad;
@@ -106,7 +117,7 @@ export class ModelLoader {
 
   private loadVehicle(vName: VehicleName, loader: GLTFLoader) {
     loader.load(
-      `/src/assets/vehicles/${vName}.glb`,
+      this.baseAssetPath + `vehicles/${vName}.glb`,
       (model: GLTF) => {
         // Traverse model nodes
         model.scene.traverse((node) => {
@@ -138,7 +149,7 @@ export class ModelLoader {
 
   private loadRoad(rName: RoadName, loader: GLTFLoader) {
     loader.load(
-      `/src/assets/roads/${rName}.glb`,
+      this.baseAssetPath + `roads/${rName}.glb`,
       (model: GLTF) => {
         // Traverse model nodes
         model.scene.traverse((node) => {
@@ -181,7 +192,7 @@ export class ModelLoader {
 
   private loadHouse(hName: HouseName, loader: GLTFLoader) {
     loader.load(
-      `/src/assets/houses/${hName}.glb`,
+      this.baseAssetPath + `houses/${hName}.glb`,
       (model: GLTF) => {
         // Traverse model nodes
         model.scene.traverse((node) => {

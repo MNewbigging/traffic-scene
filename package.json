@@ -1,13 +1,16 @@
 {
-  "name": "project-template",
+  "homepage": "https://mnewbigging.github.io/traffic-scene",
+  "name": "traffic-scene",
   "version": "1.0.0",
-  "description": "Project template with webpack, react, typescript, sass and mobx",
+  "description": "Threejs project with traffic pathfinding",
   "proxy": "http://localhost:8080",
   "main": "index.js",
   "scripts": {
     "dev": "webpack-dev-server --mode development --open",
     "build": "webpack --mode production",
-    "test": "jest"
+    "test": "jest",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "keywords": [
     "react",
@@ -38,6 +41,7 @@
     "@types/three": "^0.139.0",
     "awesome-typescript-loader": "^5.2.1",
     "css-loader": "^3.6.0",
+    "gh-pages": "^3.2.3",
     "html-webpack-plugin": "^3.2.0",
     "jest": "^24.9.0",
     "node-sass": "^4.14.1",

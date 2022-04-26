@@ -59,8 +59,8 @@ export class SceneState {
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     this.scene.add(ambientLight);
 
-    //this.roundaboutScene();
-    this.houseScene();
+    this.roundaboutScene();
+    //this.houseScene();
 
     // Now ready to start
     this.onReady?.();
