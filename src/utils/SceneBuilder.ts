@@ -132,6 +132,16 @@ export class SceneBuilder {
     const s47 = this.addRoad(RoadName.STRAIGHT, new THREE.Vector3(12, 0, -8));
     const s48 = this.addRoad(RoadName.STRAIGHT, new THREE.Vector3(12, 0, -6));
 
+    const s49 = this.addRoad(RoadName.STRAIGHT, new THREE.Vector3(16, 0, -12));
+    const b16 = this.addRoad(RoadName.BEND, new THREE.Vector3(16, 0, -14), -quarterRot);
+    const s50 = this.addRoad(RoadName.STRAIGHT, new THREE.Vector3(14, 0, -14), quarterRot);
+    const s51 = this.addRoad(RoadName.STRAIGHT, new THREE.Vector3(12, 0, -14), quarterRot);
+    const b17 = this.addRoad(RoadName.BEND, new THREE.Vector3(10, 0, -14));
+    const s52 = this.addRoad(RoadName.STRAIGHT, new THREE.Vector3(10, 0, -12));
+    const b18 = this.addRoad(RoadName.BEND, new THREE.Vector3(10, 0, -10), halfRot);
+
+    const s53 = this.addRoad(RoadName.STRAIGHT, new THREE.Vector3(14, 0, -4), quarterRot);
+
     // Connect
     c1.connectRoads([s1, s8, s9, s26]);
 
@@ -162,11 +172,11 @@ export class SceneBuilder {
     b2.connectRoads([j1, s11]);
     s11.connectRoads([b2, c2]);
 
-    r1.connectRoads([j1, s12, s30]);
+    r1.connectRoads([j1, s12, s30, c5]);
 
     s12.connectRoads([r1, j2]);
 
-    j2.connectRoads([s12, s13]);
+    j2.connectRoads([s12, s13, b18]);
 
     s13.connectRoads([j2, s14]);
     s14.connectRoads([s13, s15]);
@@ -217,7 +227,7 @@ export class SceneBuilder {
     s32.connectRoads([j6, s33]);
     s33.connectRoads([s32, c5]);
 
-    c5.connectRoads([r1, s33, s48]);
+    c5.connectRoads([r1, s33, s48, s53]);
 
     s34.connectRoads([j6, j7]);
 
@@ -226,7 +236,7 @@ export class SceneBuilder {
     s35.connectRoads([j7, s36]);
     s36.connectRoads([s35, c6]);
 
-    c6.connectRoads([s36, s40, s45]);
+    c6.connectRoads([s36, s40, s45, s53]);
 
     s37.connectRoads([j7, b13]);
     b13.connectRoads([s37, s38]);
@@ -242,7 +252,7 @@ export class SceneBuilder {
     b14.connectRoads([s42, s43]);
     s43.connectRoads([b14, c7]);
 
-    c7.connectRoads([s43, s44, s46]);
+    c7.connectRoads([s43, s44, s46, s49]);
 
     s44.connectRoads([c7, s45]);
     s45.connectRoads([s44, c6]);
@@ -251,6 +261,16 @@ export class SceneBuilder {
     b15.connectRoads([s46, s47]);
     s47.connectRoads([b15, s48]);
     s48.connectRoads([s47, c5]);
+
+    s49.connectRoads([c7, b16]);
+    b16.connectRoads([s49, s50]);
+    s50.connectRoads([b16, s51]);
+    s51.connectRoads([s50, b17]);
+    b17.connectRoads([s51, s52]);
+    s52.connectRoads([b17, b18]);
+    b18.connectRoads([s52, j2]);
+
+    s53.connectRoads([c5, c6]);
 
     return [
       c1,
@@ -332,6 +352,14 @@ export class SceneBuilder {
       b15,
       s47,
       s48,
+      s49,
+      b16,
+      s50,
+      s51,
+      b17,
+      s52,
+      b18,
+      s53,
     ];
   }
 
