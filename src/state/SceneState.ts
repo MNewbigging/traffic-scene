@@ -79,8 +79,8 @@ export class SceneState {
       1000
     );
     camera.position.x = 0;
-    camera.position.y = 5;
-    camera.position.z = 5;
+    camera.position.y = 10;
+    camera.position.z = 4;
 
     this.camera = camera;
     this.controls = new OrbitControls(this.camera, this.canvasListener.canvas);
