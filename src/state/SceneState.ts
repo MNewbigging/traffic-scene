@@ -8,6 +8,7 @@ import { Pathfinder } from '../utils/Pathfinder';
 import { Road } from '../model/Road';
 import { RoadFactory } from '../utils/RoadFactory';
 import { RoadUtils } from '../utils/RoadUtils';
+import { SceneBuilder } from '../utils/SceneBuilder';
 import { Vehicle } from '../model/Vehicle';
 import { VehicleFactory } from '../utils/VehicleFactory';
 
@@ -59,8 +60,12 @@ export class SceneState {
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     this.scene.add(ambientLight);
 
-    this.roundaboutScene();
-    //this.houseScene();
+    const sceneBuilder = new SceneBuilder(this.modelLoader);
+
+    this.roads = sceneBuilder.buildRoads();
+
+    // Add all the objects to the scene
+    this.roads.forEach((r) => this.scene.add(r.model));
 
     // Now ready to start
     this.onReady?.();
@@ -74,8 +79,8 @@ export class SceneState {
       1000
     );
     camera.position.x = 0;
-    camera.position.y = 2;
-    camera.position.z = 2;
+    camera.position.y = 5;
+    camera.position.z = 5;
 
     this.camera = camera;
     this.controls = new OrbitControls(this.camera, this.canvasListener.canvas);
