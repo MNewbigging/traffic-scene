@@ -376,13 +376,15 @@ export class SceneBuilder {
   public buildVehicles(): Vehicle[] {
     this.vehicles = [];
 
-    const vehicleNames = Object.values(VehicleName);
+    const vehicleNames = Object.values(VehicleName).filter((v) => v !== VehicleName.POLICE);
 
     vehicleNames.forEach((name) => {
       this.addCar(name);
       // this.addCar(name);
       this.addCar(name);
     });
+
+    this.addCar(VehicleName.POLICE);
 
     // const vehicleCount = 20;
     // for (let i = 0; i < this.vehicleCount; i++) {

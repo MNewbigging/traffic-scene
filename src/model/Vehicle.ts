@@ -3,8 +3,8 @@ import * as THREE from 'three';
 import { Lane } from './Lane';
 import { NumberUtils } from '../utils/NumberUtils';
 import { Road } from './Road';
+import { RoadName, VehicleName } from '../utils/ModelLoader';
 import { RoadUtils } from '../utils/RoadUtils';
-import { VehicleName } from '../utils/ModelLoader';
 
 export class Vehicle {
   public id = NumberUtils.createId();
@@ -14,8 +14,9 @@ export class Vehicle {
   public routeLine?: THREE.Line;
   public currentRoad?: Road;
   public maxSpeed = 2;
+  public targetSpeed = 2;
   public actualSpeed = 2;
-  public acceleration = 0.01;
+  public acceleration = 1;
   private route: Road[] = [];
   private currentLane?: Lane;
   private routeWaypoints: THREE.Vector3[] = [];
@@ -43,8 +44,9 @@ export class Vehicle {
     this.raycaster.near = 0;
     // Raycaster length needs to be enough to clear the car, plus standard length
     console.log('halfLength', this.halfLength);
-    this.raycaster.far = this.halfLength + 0.7;
+    this.raycaster.far = this.halfLength + 1.2;
     this.raycastHelper.setLength(this.raycaster.far);
+    console.log('raycast far', this.raycaster.far);
     this.raycastHelper.position.y = 0.3;
 
     // Create the route line
@@ -119,15 +121,10 @@ export class Vehicle {
   }
 
   public checkVehicleCollisions(allVehicles: Vehicle[]) {
-    // By default, speed up towards maxSpeed
-    this.actualSpeed += this.acceleration;
-    if (this.actualSpeed > this.maxSpeed) {
-      this.actualSpeed = this.maxSpeed;
-    }
-
+    this.targetSpeed = this.maxSpeed;
     // Only bother checking if close to another vehicle - ignore self
     const otherVehicles = allVehicles.filter((v) => v.id !== this.id);
-    const closeVehicles = RoadUtils.getCloseVehicles(
+    let closeVehicles = RoadUtils.getCloseVehicles(
       this.position,
       this.raycaster.far,
       otherVehicles
@@ -136,8 +133,21 @@ export class Vehicle {
       return;
     }
 
+    closeVehicles = closeVehicles.filter((v) => {
+      // That vehicle is on a lane that came from this vehicle's current road
+      if (v.currentRoad.neighbours[v.currentLane.fromRoadIdx].id === this.currentRoad.id) {
+        return true;
+      }
+      // That vehicle is on this road
+      if (v.currentLane.id === this.currentLane.id) {
+        return true;
+      }
+
+      // Don't care about it
+      return false;
+    });
+
     // Find intersections with close vehicles
-    let distance = Number.MAX_VALUE;
     for (const vehicle of closeVehicles) {
       const intersections = this.raycaster.intersectObject(vehicle.bounds);
       // If there was no intersection, check next vehicle
@@ -145,43 +155,34 @@ export class Vehicle {
         continue;
       }
 
-      // If this vehicle intersected is on this road but a different lane, ignore
-      if (
-        vehicle.currentRoad.id === this.currentRoad.id &&
-        vehicle.currentLane.id !== this.currentLane.id
-      ) {
-        continue;
-      }
+      const distance = intersections[0].distance - this.halfLength;
+      const realRaycastLength = this.raycaster.far - this.halfLength;
+      const relativeDistance = distance / realRaycastLength;
 
-      // If reached this point, we have intersected with a vehicle that is either:
-      // On this road and this lane (ahead of the car)
-      // On the next road ahead in any lane
-      distance = intersections[0].distance;
+      //this.targetSpeed = this.maxSpeed * relativeDistance;
+
+      const t1 = this.maxSpeed * relativeDistance; // adjust by own speed
+      const t2 = vehicle.actualSpeed * relativeDistance; // adjust by their target
+      // const t3 = vehicle.actualSpeed * relativeDistance; // adjust by their actual
+      this.acceleration = relativeDistance;
+      // Don't take on their values if this max is less than theirs?
+      this.targetSpeed = this.maxSpeed < vehicle.maxSpeed ? t1 : t2;
+
+      // // Only act on the first intersection - adopt that vehicle's speed if it's slower
+      // if (this.targetSpeed > vehicle.targetSpeed) {
+      //   this.targetSpeed = vehicle.targetSpeed * relativeDistance;
+      // }
 
       // Can now stop testing against other vehicles
-      break;
-    }
-
-    // Did we find intersections?
-    if (distance === Number.MAX_VALUE) {
       return;
     }
 
-    // Raycast begins within this car at its center
-    // Subtract half this car's length to get distance to intersection from front of car
-    const outsideDistance = distance - this.halfLength;
+    // If we reached this point, there was no intersection
+    this.targetSpeed = this.maxSpeed;
 
-    // Get the distance as a percentage of total raycast length
-    // This tells us how close it is relative to max raycast distance
-    const relativeDistance = outsideDistance / this.raycaster.far;
-
-    // Adjust speed by relative distance
-    this.actualSpeed *= relativeDistance;
-
-    // Slow down based on the distance
-    // const firstHit = intersections[0];
-    // let speedMod = firstHit.distance * 2 - 0.4;
-    // this.actualSpeed *= speedMod;
+    if (this.name === VehicleName.POLICE) {
+      console.log('set target to', this.targetSpeed);
+    }
   }
 
   public update(deltaTime: number) {
@@ -325,6 +326,15 @@ export class Vehicle {
       // Target the next waypoint
       this.targetNextWaypoint();
     }
+
+    // Lerp speed towards the target speed
+    const t = deltaTime / this.acceleration;
+    this.actualSpeed = THREE.MathUtils.lerp(this.actualSpeed, this.targetSpeed, deltaTime * 1.2);
+
+    // if (this.name === VehicleName.POLICE) {
+    //   console.log('actual speed', this.actualSpeed);
+    //   console.log('target speed', this.targetSpeed);
+    // }
 
     // Otherwise, keep moving towards next target
     const direction = this.nextWaypoint.clone().sub(this.position).normalize();

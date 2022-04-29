@@ -37,3 +37,97 @@ Could have:
 - A lane could have a ref to lanes it gives way to on that road 
 
 
+Default behaviour
+
+By default, all cars should raycast ahead to detect cars in front.
+
+This has mixed results based on the current road:
+- Straight: fine, will only hit cars ahead
+- Bend: bad, will hit cars ahead but also cars on other lane 
+- Junction: bad, two cars may turn into each other and both stop
+- Crossing: bad, as per junction
+- Roundabout: bad, two cars can still collide due to steep curves
+
+I can solve the bend issue by ignoring the opposite lane of that bend.
+I can solve the junction issue via the give way system.
+Roundabout can be solved with give way, but not nicely if its lane-based.
+
+Giving way 
+
+Lane method: best for junctions and crossroads, bad for roundabouts
+
+If cars know which lanes to give way to, they can avoid colliding by only 
+moving when clear. Each lane would reference others it gives way to.
+
+This isn't great for long lanes like on roundabouts, where another car might be at the
+start of a lane when it's actually clear for this car to go. 
+
+Box method: best for roundabouts, bad for junctions 
+
+Could do it via detection area, where each lane has a 3d box to give way to; if
+another car is in that box, must wait.
+
+This also isn't great for certain road types, where the other car in the box isn't 
+actually something you'd wait for to go.
+
+Suppose I could do a joint approach; things in box, omit certain lanes.
+
+Lane:
++ uses existing data
+- bad for roundabouts
+
+Box:
+- more data
++ better for roundabouts
+- bad for junctions
+
+Junctions:
+
+- No lights needed; each lane may give way to n other lanes
+- A car cannot move if there is another car currently on a lane it gives way to
+
+
+Goals
+
+The idea is to:
+
+- slim down number of cars to test intersections against
+- quick to run; does so each frame
+
+In doing:
+- slow down for car in front
+- prevent collisions by only moving when clear
+
+
+Slow down for car in front:
+
+- get all vehicles within close distance
+- remove any on lanes we don't care about
+- --- could add 'ignoreLanes' prop on a Lane
+- first hit will be car in front, if any (regardless of its road/lane)
+
+^ will test against all cars on next road, where we cannot ignore certain lanes
+i.e two bends meet, want to ignore other lane on other bend, but can't 
+
+Give way:
+
+- if lights && lights.green, can move
+- if lane.giveWayTo lanes are clear of cars
+--- would require each lane to record which cars are on it
+--- or I could get closeVehicles.lane for the info
+
+^ above not great for roundabouts, how to solve for them?
+
+
+Different strategy per road type?
+- probably quite expensive
+
+Straight:
+- any raycast ahead will be valid
+
+Bend:
+- ignore opposite lane on this road,
+- ignore any lanes going to the opposite? only if that road is not a junction/crossroad
+
+Junction:
+- 
