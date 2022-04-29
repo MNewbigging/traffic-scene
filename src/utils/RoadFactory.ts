@@ -89,10 +89,10 @@ export class RoadFactory {
 
   private static createBendRoadLanes(road: Road) {
     // Lane 1
-    this.createWideCurveLine(road, this.secondLaneMat);
+    this.createWideCurveLane(road, this.secondLaneMat);
 
     // Lane 2
-    this.createTightCurveLine(road, this.firstLaneMat);
+    this.createTightCurveLane(road, this.firstLaneMat);
   }
 
   private static createJunctionEdgePoints(road: Road) {
@@ -118,19 +118,19 @@ export class RoadFactory {
     this.createStraightLane(road, this.firstLaneMat);
 
     // Lane 2 - left turn facing default normal
-    this.createTightCurveLine(road, this.firstLaneMat, Math.PI / 2);
+    this.createTightCurveLane(road, this.firstLaneMat, Math.PI / 2);
 
     // Lane 3 - straight across junction opposite default normal
     this.createStraightLane(road, this.secondLaneMat, Math.PI);
 
     // Lane 4 - turning right opposite default normal
-    this.createWideCurveLine(road, this.secondLaneMat);
+    this.createWideCurveLane(road, this.secondLaneMat);
 
     // Lane 5 - adjoining lane going left, towards default normal
-    this.createTightCurveLine(road, this.thirdLaneMat);
+    this.createTightCurveLane(road, this.thirdLaneMat);
 
     // Lane 6 - adjoining lane going right, away from default normal
-    this.createWideCurveLine(road, this.thirdLaneMat, Math.PI / 2);
+    this.createWideCurveLane(road, this.thirdLaneMat, Math.PI / 2);
   }
 
   private static createCrossroadEdgePoints(road: Road) {
@@ -156,37 +156,37 @@ export class RoadFactory {
     this.createStraightLane(road, this.firstLaneMat);
 
     // Lane 2 - left turn facing z to facing x
-    this.createTightCurveLine(road, this.firstLaneMat, Math.PI / 2);
+    this.createTightCurveLane(road, this.firstLaneMat, Math.PI / 2);
 
     // Lane 3 - right turn from z to -x
-    this.createWideCurveLine(road, this.firstLaneMat, Math.PI);
+    this.createWideCurveLane(road, this.firstLaneMat, Math.PI);
 
     // Lane 3 - straight over towards -z
     this.createStraightLane(road, this.secondLaneMat, Math.PI);
 
     // Lane 4 - left turn from -z to -x
-    this.createTightCurveLine(road, this.secondLaneMat, -Math.PI / 2);
+    this.createTightCurveLane(road, this.secondLaneMat, -Math.PI / 2);
 
     // Lane 6 - right turn from -z to x
-    this.createWideCurveLine(road, this.secondLaneMat);
+    this.createWideCurveLane(road, this.secondLaneMat);
 
     // Lane 7 - straight over towards -x
     this.createStraightLane(road, this.thirdLaneMat, -Math.PI / 2);
 
     // Lane 8 - left turn, -x to z
-    this.createTightCurveLine(road, this.thirdLaneMat);
+    this.createTightCurveLane(road, this.thirdLaneMat);
 
     // Lane 9 - right turn, -x to -z
-    this.createWideCurveLine(road, this.thirdLaneMat, Math.PI / 2);
+    this.createWideCurveLane(road, this.thirdLaneMat, Math.PI / 2);
 
     // Lane 10 - straight over towards x
     this.createStraightLane(road, this.fourthLaneMat, Math.PI / 2);
 
     // Lane 11 - left turn, x to -z
-    this.createTightCurveLine(road, this.fourthLaneMat, Math.PI);
+    this.createTightCurveLane(road, this.fourthLaneMat, Math.PI);
 
     // Lane 12 - right turn, x to z
-    this.createWideCurveLine(road, this.fourthLaneMat, -Math.PI / 2);
+    this.createWideCurveLane(road, this.fourthLaneMat, -Math.PI / 2);
   }
 
   private static createRoundaboutEdgePoints(road: Road) {
@@ -472,6 +472,7 @@ export class RoadFactory {
 
     const lane = new Lane();
     lane.line = line;
+    lane.road = road;
     road.lanes.push(lane);
   }
 
@@ -498,6 +499,7 @@ export class RoadFactory {
 
     const lane = new Lane();
     lane.line = line;
+    lane.road = road;
     road.lanes.push(lane);
   }
 
@@ -524,6 +526,7 @@ export class RoadFactory {
 
     const lane = new Lane();
     lane.line = line;
+    lane.road = road;
     road.lanes.push(lane);
   }
 
@@ -552,10 +555,11 @@ export class RoadFactory {
     // Create the lane object, set line and add to road
     const lane = new Lane();
     lane.line = line;
+    lane.road = road;
     road.lanes.push(lane);
   }
 
-  private static createTightCurveLine(road: Road, material: THREE.LineBasicMaterial, rotation = 0) {
+  private static createTightCurveLane(road: Road, material: THREE.LineBasicMaterial, rotation = 0) {
     // Relative to model size
     const pos = road.model.position.clone();
     pos.y += 0.001;
@@ -588,10 +592,11 @@ export class RoadFactory {
     // Create lane, add line and add to road
     const lane = new Lane();
     lane.line = line;
+    lane.road = road;
     road.lanes.push(lane);
   }
 
-  private static createWideCurveLine(road: Road, material: THREE.LineBasicMaterial, rotation = 0) {
+  private static createWideCurveLane(road: Road, material: THREE.LineBasicMaterial, rotation = 0) {
     // Relative to model size
     const pos = road.model.position.clone();
     pos.y += 0.001;
@@ -602,28 +607,29 @@ export class RoadFactory {
     const smallCurveMod = halfWidth * 0.35;
     const bigCurveMod = halfWidth * 0.45;
 
-    const laneFourCurvePoints = [
+    const curvePoints = [
       new THREE.Vector3(pos.x - laneCenter, pos.y, pos.z + halfDepth),
       new THREE.Vector3(pos.x - bigCurveMod, pos.y, pos.z + smallCurveMod),
       new THREE.Vector3(pos.x + smallCurveMod, pos.y, pos.z - bigCurveMod),
       new THREE.Vector3(pos.x + halfWidth, pos.y, pos.z - laneCenter),
     ];
 
-    const laneFourCurve = new THREE.CubicBezierCurve3(
-      laneFourCurvePoints[0],
-      laneFourCurvePoints[1],
-      laneFourCurvePoints[2],
-      laneFourCurvePoints[3]
+    const curve = new THREE.CubicBezierCurve3(
+      curvePoints[0],
+      curvePoints[1],
+      curvePoints[2],
+      curvePoints[3]
     );
 
-    const laneFourPoints = laneFourCurve.getPoints(32);
-    const laneFourGeom = new THREE.BufferGeometry().setFromPoints(laneFourPoints);
-    const laneFourLine = new THREE.Line(laneFourGeom, material);
+    const linePoints = curve.getPoints(32);
+    const lineGeom = new THREE.BufferGeometry().setFromPoints(linePoints);
+    const line = new THREE.Line(lineGeom, material);
 
-    laneFourLine.rotation.y = rotation;
+    line.rotation.y = rotation;
 
-    const laneFour = new Lane();
-    laneFour.line = laneFourLine;
-    road.lanes.push(laneFour);
+    const lane = new Lane();
+    lane.line = line;
+    lane.road = road;
+    road.lanes.push(lane);
   }
 }

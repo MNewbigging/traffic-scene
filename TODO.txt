@@ -8,10 +8,32 @@
 
 - click to focus camera (UI?)
 
-- WSAD camera controls
-
-- publish; assets load
+- WSAD camera controls?
 
 - tidy up code; profile?
 
-- street lights; day/night cycle
+
+Driving Logic
+
+Cars should:
+
+- slow down for the car in front 
+- give way 
+- adhere to traffic lights 
+
+Cars should not:
+
+- slow down/give way to certain lanes (e.g opposite lanes on bends)
+- drive inside another
+
+Have now:
+
+- Each road has a number of lanes
+- Each car has a ref to current road and current lane
+
+Could have:
+
+- Lanes could have a ref to the road they're part of 
+- A lane could have a ref to lanes it gives way to on that road 
+
+

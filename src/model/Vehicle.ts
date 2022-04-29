@@ -21,11 +21,13 @@ export class Vehicle {
   private routeWaypoints: THREE.Vector3[] = [];
   private nextWaypoint?: THREE.Vector3;
   private nextLookAt = new THREE.Quaternion();
+  private halfLength = 0;
 
   constructor(public name: VehicleName, public model: THREE.Group) {
     // Setup bounds for raycaster
     const box = new THREE.Box3().setFromObject(model);
     const dimensions = new THREE.Vector3().subVectors(box.max, box.min);
+    this.halfLength = dimensions.z * 0.5;
     const boxGeom = new THREE.BoxBufferGeometry(dimensions.x, dimensions.y, dimensions.z);
     const matrix = new THREE.Matrix4().setPosition(
       dimensions.addVectors(box.min, box.max).multiplyScalar(0.5)
@@ -39,7 +41,9 @@ export class Vehicle {
 
     // Setup raycaster
     this.raycaster.near = 0;
-    this.raycaster.far = 1.2;
+    // Raycaster length needs to be enough to clear the car, plus standard length
+    console.log('halfLength', this.halfLength);
+    this.raycaster.far = this.halfLength + 0.7;
     this.raycastHelper.setLength(this.raycaster.far);
     this.raycastHelper.position.y = 0.3;
 
@@ -129,24 +133,55 @@ export class Vehicle {
       otherVehicles
     );
     if (!closeVehicles.length) {
-      //this.accelerate();
       return;
     }
 
-    // Check against vehicle bounds
-    const check = closeVehicles.map((v) => v.bounds);
+    // Find intersections with close vehicles
+    let distance = Number.MAX_VALUE;
+    for (const vehicle of closeVehicles) {
+      const intersections = this.raycaster.intersectObject(vehicle.bounds);
+      // If there was no intersection, check next vehicle
+      if (!intersections.length) {
+        continue;
+      }
 
-    // Check for intersections with close vehicles
-    const intersections = this.raycaster.intersectObjects(check, true);
-    if (!intersections.length) {
-      //this.accelerate();
+      // If this vehicle intersected is on this road but a different lane, ignore
+      if (
+        vehicle.currentRoad.id === this.currentRoad.id &&
+        vehicle.currentLane.id !== this.currentLane.id
+      ) {
+        continue;
+      }
+
+      // If reached this point, we have intersected with a vehicle that is either:
+      // On this road and this lane (ahead of the car)
+      // On the next road ahead in any lane
+      distance = intersections[0].distance;
+
+      // Can now stop testing against other vehicles
+      break;
+    }
+
+    // Did we find intersections?
+    if (distance === Number.MAX_VALUE) {
       return;
     }
+
+    // Raycast begins within this car at its center
+    // Subtract half this car's length to get distance to intersection from front of car
+    const outsideDistance = distance - this.halfLength;
+
+    // Get the distance as a percentage of total raycast length
+    // This tells us how close it is relative to max raycast distance
+    const relativeDistance = outsideDistance / this.raycaster.far;
+
+    // Adjust speed by relative distance
+    this.actualSpeed *= relativeDistance;
 
     // Slow down based on the distance
-    const firstHit = intersections[0];
-    let speedMod = firstHit.distance * 2 - 0.4;
-    this.actualSpeed *= speedMod;
+    // const firstHit = intersections[0];
+    // let speedMod = firstHit.distance * 2 - 0.4;
+    // this.actualSpeed *= speedMod;
   }
 
   public update(deltaTime: number) {

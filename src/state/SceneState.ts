@@ -3,7 +3,6 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 import { CanvasListener } from '../utils/CanvasListener';
 import { HouseName, ModelLoader, ModelNames, RoadName, VehicleName } from '../utils/ModelLoader';
-import { NumberUtils } from '../utils/NumberUtils';
 import { Pathfinder } from '../utils/Pathfinder';
 import { Road } from '../model/Road';
 import { RoadFactory } from '../utils/RoadFactory';
@@ -63,9 +62,11 @@ export class SceneState {
     const sceneBuilder = new SceneBuilder(this.modelLoader);
 
     this.roads = sceneBuilder.buildRoads();
+    this.vehicles = sceneBuilder.buildVehicles();
 
     // Add all the objects to the scene
     this.roads.forEach((r) => this.scene.add(r.model));
+    this.vehicles.forEach((v) => this.scene.add(v.model));
 
     // Now ready to start
     this.onReady?.();

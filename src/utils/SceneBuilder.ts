@@ -1,13 +1,21 @@
 import * as THREE from 'three';
 
-import { ModelLoader, RoadName } from './ModelLoader';
+import { ModelLoader, RoadName, VehicleName } from './ModelLoader';
 import { Road } from '../model/Road';
 import { RoadFactory } from './RoadFactory';
+import { RoadUtils } from './RoadUtils';
+import { Vehicle } from '../model/Vehicle';
+import { VehicleFactory } from './VehicleFactory';
 
 export class SceneBuilder {
+  private roads: Road[] = [];
+  private vehicles: Vehicle[] = [];
+
   constructor(private modelLoader: ModelLoader) {}
 
   public buildRoads(): Road[] {
+    this.roads = [];
+
     const quarterRot = Math.PI / 2;
     const halfRot = Math.PI;
 
@@ -272,7 +280,7 @@ export class SceneBuilder {
 
     s53.connectRoads([c5, c6]);
 
-    return [
+    this.roads = [
       c1,
       s1,
       s2,
@@ -361,6 +369,30 @@ export class SceneBuilder {
       b18,
       s53,
     ];
+
+    return this.roads;
+  }
+
+  public buildVehicles(): Vehicle[] {
+    this.vehicles = [];
+
+    const vehicleNames = Object.values(VehicleName);
+
+    vehicleNames.forEach((name) => {
+      this.addCar(name);
+      // this.addCar(name);
+      this.addCar(name);
+    });
+
+    // const vehicleCount = 20;
+    // for (let i = 0; i < this.vehicleCount; i++) {
+    //   const rnd = NumberUtils.getRandomArrayIndex(vehicleNames.length);
+    //   const name = vehicleNames[rnd];
+
+    //   this.addCar(name);
+    // }
+
+    return this.vehicles;
   }
 
   private addRoad(name: RoadName, pos: THREE.Vector3, rot = 0) {
@@ -375,5 +407,24 @@ export class SceneBuilder {
     road.postTransform();
 
     return road;
+  }
+
+  private addCar(name: VehicleName, color?: THREE.Color) {
+    // Create the car
+    const car = VehicleFactory.createVehicle(name, this.modelLoader.getModel(name), color);
+    this.vehicles.push(car);
+
+    // Pick a random road to start on
+    let road = RoadUtils.getRandomStartingRoad(this.roads);
+
+    // While a vehicle is on that starting road, pick another
+    let vehicleOnRoad = this.vehicles.some((v) => v.currentRoad?.id === road.id);
+    while (vehicleOnRoad) {
+      road = RoadUtils.getRandomStartingRoad(this.roads);
+      vehicleOnRoad = this.vehicles.some((v) => v.currentRoad?.id === road.id);
+    }
+
+    // Assign to car to start roaming
+    car.setRoam(road);
   }
 }
