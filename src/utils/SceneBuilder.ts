@@ -396,10 +396,10 @@ export class SceneBuilder {
 
   public buildHouses(): Prop[] {
     // First block inside the c1-c4 crossroads
-    const h1 = this.addHouse(HouseName.TYPE_03, new THREE.Vector3(-2, 0, -1.75));
-    const h2 = this.addHouse(HouseName.TYPE_05, new THREE.Vector3(-4, 0, -1.75));
-    const h3 = this.addHouse(HouseName.TYPE_08, new THREE.Vector3(-2, 0, -4.3), Math.PI);
-    const h4 = this.addHouse(HouseName.TYPE_10, new THREE.Vector3(-4, 0, -4), Math.PI);
+    const h1 = this.addHouse(HouseName.TYPE_03, new THREE.Vector3(-2.25, 0, -1.75));
+    const h2 = this.addHouse(HouseName.TYPE_15, new THREE.Vector3(-4.3, 0, -1.75));
+    const h3 = this.addHouse(HouseName.TYPE_16, new THREE.Vector3(-1.7, 0, -4.1), Math.PI);
+    const h4 = this.addHouse(HouseName.TYPE_10, new THREE.Vector3(-3.7, 0, -3.95), Math.PI);
     const g1 = this.addGround(
       GroundType.GRASS,
       new THREE.Vector2(4, 4),
@@ -408,9 +408,9 @@ export class SceneBuilder {
 
     // Second block above first
     const h5 = this.addHouse(HouseName.TYPE_19, new THREE.Vector3(-2, 0, -7.75));
-    const h6 = this.addHouse(HouseName.TYPE_08, new THREE.Vector3(-4, 0, -7.75));
-    const h7 = this.addHouse(HouseName.TYPE_03, new THREE.Vector3(-2, 0, -10.3), Math.PI);
-    const h8 = this.addHouse(HouseName.TYPE_20, new THREE.Vector3(-4, 0, -10.3), Math.PI);
+    const h6 = this.addHouse(HouseName.TYPE_01, new THREE.Vector3(-4, 0, -7.75));
+    const h7 = this.addHouse(HouseName.TYPE_03, new THREE.Vector3(-2.25, 0, -10.3), Math.PI);
+    const h8 = this.addHouse(HouseName.TYPE_21, new THREE.Vector3(-4.3, 0, -10.3), Math.PI);
     const g2 = this.addGround(
       GroundType.GRASS,
       new THREE.Vector2(4, 4),

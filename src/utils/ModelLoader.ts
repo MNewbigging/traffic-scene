@@ -59,8 +59,9 @@ export enum HouseName {
  * Responsible for loading models and storing them during runtime.
  */
 export class ModelLoader {
-  private readonly vehicleScaleModifer = 0.4;
+  private readonly vehicleScaleModifer = 0.35;
   private readonly roadScaleModifier = 2;
+  private readonly houseScaleModifier = 1.5;
   private modelMap = new Map<ModelName, THREE.Group>();
   private loadedModels = 0;
   private modelsToLoad = 0;
@@ -212,6 +213,9 @@ export class ModelLoader {
   }
 
   private setupHouse(house: THREE.Group) {
+    // Adjust scale of houses
+    house.scale.set(this.houseScaleModifier, this.houseScaleModifier, this.houseScaleModifier);
+
     // Set transform origin to center of the model
     const box = new THREE.Box3().setFromObject(house);
     box.getCenter(house.position).multiplyScalar(-1);
