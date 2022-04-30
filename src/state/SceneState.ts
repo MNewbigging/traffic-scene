@@ -4,6 +4,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { CanvasListener } from '../utils/CanvasListener';
 import { HouseName, ModelLoader, ModelNames, RoadName, VehicleName } from '../utils/ModelLoader';
 import { MouseListener } from '../utils/MouseListener';
+import { Prop } from '../model/Prop';
 import { Road } from '../model/Road';
 import { SceneBuilder } from '../utils/SceneBuilder';
 import { Vehicle } from '../model/Vehicle';
@@ -15,8 +16,9 @@ import { VehicleUtils } from '../utils/VehicleUtils';
 export class SceneState {
   public scene = new THREE.Scene();
   public camera: THREE.PerspectiveCamera;
-  public roads: Road[] = [];
-  public vehicles: Vehicle[] = [];
+  private roads: Road[] = [];
+  private vehicles: Vehicle[] = [];
+  private props: Prop[] = [];
   private targetVehicle?: Vehicle;
   private controls: OrbitControls;
   private modelLoader = new ModelLoader();
@@ -69,14 +71,18 @@ export class SceneState {
     this.setupSkybox();
     this.setupLights();
 
+    // Build the scene objects
     const sceneBuilder = new SceneBuilder(this.modelLoader);
 
     this.roads = sceneBuilder.buildRoads();
     this.vehicles = sceneBuilder.buildVehicles();
 
+    sceneBuilder.buildHouses().forEach((h) => this.props.push(h));
+
     // Add all the objects to the scene
     this.roads.forEach((r) => this.scene.add(r.model));
     this.vehicles.forEach((v) => this.scene.add(v.model));
+    this.props.forEach((p) => this.scene.add(p.model));
 
     // Now ready to start
     this.onReady?.();

@@ -1,11 +1,17 @@
 import * as THREE from 'three';
 
-import { ModelLoader, RoadName, VehicleName } from './ModelLoader';
+import { HouseName, ModelLoader, RoadName, VehicleName } from './ModelLoader';
+import { Prop } from '../model/Prop';
 import { Road } from '../model/Road';
 import { RoadFactory } from './RoadFactory';
 import { RoadUtils } from './RoadUtils';
 import { Vehicle } from '../model/Vehicle';
 import { VehicleFactory } from './VehicleFactory';
+
+enum GroundType {
+  GRASS = 'grass',
+  CONCRETE = 'concrete',
+}
 
 export class SceneBuilder {
   private roads: Road[] = [];
@@ -388,6 +394,32 @@ export class SceneBuilder {
     return this.vehicles;
   }
 
+  public buildHouses(): Prop[] {
+    // First block inside the c1-c4 crossroads
+    const h1 = this.addHouse(HouseName.TYPE_03, new THREE.Vector3(-2, 0, -1.75));
+    const h2 = this.addHouse(HouseName.TYPE_05, new THREE.Vector3(-4, 0, -1.75));
+    const h3 = this.addHouse(HouseName.TYPE_08, new THREE.Vector3(-2, 0, -4.3), Math.PI);
+    const h4 = this.addHouse(HouseName.TYPE_10, new THREE.Vector3(-4, 0, -4), Math.PI);
+    const g1 = this.addGround(
+      GroundType.GRASS,
+      new THREE.Vector2(4, 4),
+      new THREE.Vector3(-3, 0, -3)
+    );
+
+    // Second block above first
+    const h5 = this.addHouse(HouseName.TYPE_19, new THREE.Vector3(-2, 0, -7.75));
+    const h6 = this.addHouse(HouseName.TYPE_08, new THREE.Vector3(-4, 0, -7.75));
+    const h7 = this.addHouse(HouseName.TYPE_03, new THREE.Vector3(-2, 0, -10.3), Math.PI);
+    const h8 = this.addHouse(HouseName.TYPE_20, new THREE.Vector3(-4, 0, -10.3), Math.PI);
+    const g2 = this.addGround(
+      GroundType.GRASS,
+      new THREE.Vector2(4, 4),
+      new THREE.Vector3(-3, 0, -9)
+    );
+
+    return [h1, h2, h3, h4, g1, h5, h6, h7, h8, g2];
+  }
+
   private addRoad(name: RoadName, pos: THREE.Vector3, rot = 0) {
     const road = RoadFactory.createRoad(name, this.modelLoader.getModel(name));
 
@@ -419,5 +451,39 @@ export class SceneBuilder {
 
     // Assign to car to start roaming
     car.setRoam(road);
+  }
+
+  private addHouse(name: HouseName, pos: THREE.Vector3, rot = 0) {
+    const houseModel = this.modelLoader.getModel(name);
+    const house = new Prop(houseModel);
+
+    house.position.x = pos.x;
+    house.position.y = pos.y;
+    house.position.z = pos.z;
+
+    house.rotation.y = rot;
+
+    return house;
+  }
+
+  private addGround(type: GroundType, size: THREE.Vector2, pos: THREE.Vector3) {
+    const geom = new THREE.PlaneGeometry(size.x, size.y);
+
+    const color = type === GroundType.GRASS ? '#22f8ae' : '#eaeaf0';
+    const mat = new THREE.MeshLambertMaterial({ color });
+
+    const mesh = new THREE.Mesh(geom, mat);
+
+    mesh.position.x = pos.x;
+    mesh.position.y = pos.y;
+    mesh.position.z = pos.z;
+
+    mesh.rotation.x = -Math.PI / 2;
+
+    const group = new THREE.Group();
+    group.add(mesh);
+    const prop = new Prop(group);
+
+    return prop;
   }
 }
