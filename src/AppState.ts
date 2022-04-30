@@ -16,6 +16,7 @@ export class AppState {
     // Setup screen listener
     this.canvasListener = new CanvasListener(canvas);
     this.canvasListener.addCanvasListener(this.onCanvasResize);
+    document.addEventListener('visibilitychange', this.onVisibilityChange);
 
     // Setup renderer
     this.renderer = new THREE.WebGLRenderer({ canvas });
@@ -35,6 +36,14 @@ export class AppState {
   private onCanvasResize = () => {
     this.renderer.setSize(this.canvasListener.width, this.canvasListener.height, false);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  };
+
+  private onVisibilityChange = () => {
+    if (document.visibilityState === 'hidden') {
+      this.masterClock.stop();
+    } else {
+      this.masterClock.start();
+    }
   };
 
   private animate = () => {

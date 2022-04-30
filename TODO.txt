@@ -2,9 +2,6 @@
 
 - skybox
 
-- pause on lose focus
-
-- on resize, adjust camera/renderer
 
 - click to focus camera (UI?)
 

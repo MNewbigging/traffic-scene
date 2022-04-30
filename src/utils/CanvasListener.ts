@@ -3,7 +3,6 @@
  * render canvas as well. On a resize, it will call any subscribed listeners to get the updated canvas.
  */
 export type ListenerCallback = () => void;
-
 export class CanvasListener {
   private canvasListeners: ListenerCallback[] = [];
   private _canvasWidth: number;
