@@ -448,7 +448,35 @@ export class SceneBuilder {
     );
     const block5 = [h12, h13, g5];
 
-    return [...block1, ...block2, ...block3, ...block4, ...block5];
+    // Sixth block top left of roundabout
+    const h14 = this.addHouse(HouseName.TYPE_04, new THREE.Vector3(2.25, 0, -8), Math.PI);
+    const h15 = this.addHouse(HouseName.TYPE_16, new THREE.Vector3(4, 0, -8), Math.PI);
+    const h16 = this.addHouse(HouseName.TYPE_05, new THREE.Vector3(5.75, 0, -7.85), Math.PI);
+    const g6 = this.addGround(
+      GroundType.GRASS,
+      new THREE.Vector2(6, 4),
+      new THREE.Vector3(4, 0, -7)
+    );
+    const block6 = [h14, h15, h16, g6];
+
+    // Seventh block is bot left of roundabout
+    const h17 = this.addHouse(HouseName.TYPE_09, new THREE.Vector3(2, 0, 2));
+    const h18 = this.addHouse(HouseName.TYPE_11, new THREE.Vector3(4, 0, 2));
+    const h19 = this.addHouse(HouseName.TYPE_12, new THREE.Vector3(6, 0, 2));
+    const h20 = this.addHouse(HouseName.TYPE_01, new THREE.Vector3(6.25, 0, 0), Math.PI / 2);
+    const g7 = this.addGround(
+      GroundType.GRASS,
+      new THREE.Vector2(6, 2),
+      new THREE.Vector3(4, 0, 2)
+    );
+    const g8 = this.addGround(
+      GroundType.GRASS,
+      new THREE.Vector2(4, 4),
+      new THREE.Vector3(5, 0, -1)
+    );
+    const block7 = [h17, h18, h19, h20, g7, g8];
+
+    return [...block1, ...block2, ...block3, ...block4, ...block5, ...block6, ...block7];
   }
 
   private addRoad(name: RoadName, pos: THREE.Vector3, rot = 0) {
