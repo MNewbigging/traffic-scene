@@ -405,6 +405,7 @@ export class SceneBuilder {
       new THREE.Vector2(4, 4),
       new THREE.Vector3(-3, 0, -3)
     );
+    const block1 = [h1, h2, h3, h4, g1];
 
     // Second block above first
     const h5 = this.addHouse(HouseName.TYPE_19, new THREE.Vector3(-2, 0, -7.75));
@@ -416,8 +417,38 @@ export class SceneBuilder {
       new THREE.Vector2(4, 4),
       new THREE.Vector3(-3, 0, -9)
     );
+    const block2 = [h5, h6, h7, h8, g2];
 
-    return [h1, h2, h3, h4, g1, h5, h6, h7, h8, g2];
+    // Third block left of first
+    const h9 = this.addHouse(HouseName.TYPE_08, new THREE.Vector3(-8, 0, -3), Math.PI / 2);
+    const g3 = this.addGround(
+      GroundType.GRASS,
+      new THREE.Vector2(4, 4),
+      new THREE.Vector3(-9, 0, -3)
+    );
+    const block3 = [h9, g3];
+
+    // Fourth block to right of first
+    const h10 = this.addHouse(HouseName.TYPE_21, new THREE.Vector3(2, 0, -2), -Math.PI / 2);
+    const h11 = this.addHouse(HouseName.TYPE_20, new THREE.Vector3(2, 0, -3.85), -Math.PI / 2);
+    const g4 = this.addGround(
+      GroundType.CONCRETE,
+      new THREE.Vector2(2, 4),
+      new THREE.Vector3(2, 0, -3)
+    );
+    const block4 = [h10, h11, g4];
+
+    // Fifth block below first
+    const h12 = this.addHouse(HouseName.TYPE_18, new THREE.Vector3(-2, 0, 2));
+    const h13 = this.addHouse(HouseName.TYPE_20, new THREE.Vector3(-4, 0, 2));
+    const g5 = this.addGround(
+      GroundType.CONCRETE,
+      new THREE.Vector2(4, 2),
+      new THREE.Vector3(-3, 0, 2)
+    );
+    const block5 = [h12, h13, g5];
+
+    return [...block1, ...block2, ...block3, ...block4, ...block5];
   }
 
   private addRoad(name: RoadName, pos: THREE.Vector3, rot = 0) {
@@ -475,7 +506,7 @@ export class SceneBuilder {
     const mesh = new THREE.Mesh(geom, mat);
 
     mesh.position.x = pos.x;
-    mesh.position.y = pos.y;
+    mesh.position.y = -0.01;
     mesh.position.z = pos.z;
 
     mesh.rotation.x = -Math.PI / 2;

@@ -50,6 +50,8 @@ export enum HouseName {
   TYPE_14 = 'house_type14',
   TYPE_15 = 'house_type15',
   TYPE_16 = 'house_type16',
+  TYPE_17 = 'house_type17',
+  TYPE_18 = 'house_type18',
   TYPE_19 = 'house_type19',
   TYPE_20 = 'house_type20',
   TYPE_21 = 'house_type21',
