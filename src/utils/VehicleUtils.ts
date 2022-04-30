@@ -49,6 +49,7 @@ export class VehicleUtils {
           } else {
             // These vehicles are inside each other in the same lane - separate
             // One vehicle slows, the other ignores collisions
+            // TODO - could make the slower car fall back...
             nearby.ignoreCollisions = true;
             nearby.targetSpeed = 0.2;
           }

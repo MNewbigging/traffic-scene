@@ -66,10 +66,8 @@ export class SceneState {
   // Once models are loaded, can then piece them together as per scene
   private buildScene() {
     this.setupCamera();
-
-    // lights
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-    this.scene.add(ambientLight);
+    this.setupSkybox();
+    this.setupLights();
 
     const sceneBuilder = new SceneBuilder(this.modelLoader);
 
@@ -84,6 +82,22 @@ export class SceneState {
     this.onReady?.();
   }
 
+  private setupLights() {
+    // lights
+    // const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    // this.scene.add(ambientLight);
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    this.scene.add(ambientLight);
+
+    // const pointLight = new THREE.PointLight(0xffffff, 0.5);
+    // pointLight.position.x = 0;
+    // pointLight.position.y = 180;
+    // pointLight.position.z = 0;
+
+    // this.scene.add(pointLight);
+  }
+
   private setupCamera() {
     const camera = new THREE.PerspectiveCamera(
       75,
@@ -94,12 +108,24 @@ export class SceneState {
     camera.position.x = 8;
     camera.position.y = 15;
     camera.position.z = 8;
-
     this.camera = camera;
+
     this.controls = new OrbitControls(this.camera, this.canvasListener.canvas);
     this.controls.enableDamping = true;
+    // Target the roundabout by default
     this.controls.target.x = 8;
     this.controls.target.z = -4;
+    // Prevent going below ground level
+    this.controls.maxPolarAngle = Math.PI / 2;
+  }
+
+  private setupSkybox() {
+    // The skybox is a big sphere which the world sits inside
+    // const geom = new THREE.SphereGeometry(100, 64, 64);
+    // const mat = new THREE.MeshToonMaterial({ color: '#049ef4', side: THREE.BackSide });
+    // const sphere = new THREE.Mesh(geom, mat);
+    // this.scene.add(sphere);
+    //this.scene.background = new THREE.Color('#049ef4');
   }
 
   private onRightClick = () => {

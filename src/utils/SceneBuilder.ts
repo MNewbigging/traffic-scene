@@ -382,6 +382,7 @@ export class SceneBuilder {
       this.addCar(name);
       // this.addCar(name);
       this.addCar(name);
+      this.addCar(name);
     });
 
     return this.vehicles;
