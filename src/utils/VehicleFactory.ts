@@ -15,7 +15,7 @@ export class VehicleFactory {
     let speed = 1;
     switch (name) {
       case VehicleName.DELIVERY:
-        speed = 1.5;
+        speed = 1.6;
         break;
       case VehicleName.GARBAGE:
         speed = 1.5;

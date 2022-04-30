@@ -10,6 +10,7 @@ import { RoadUtils } from '../utils/RoadUtils';
 import { SceneBuilder } from '../utils/SceneBuilder';
 import { Vehicle } from '../model/Vehicle';
 import { VehicleFactory } from '../utils/VehicleFactory';
+import { VehicleUtils } from '../utils/VehicleUtils';
 
 /**
  * Contains all the objects in the scene
@@ -42,13 +43,19 @@ export class SceneState {
   public updateScene(deltaTime: number) {
     this.controls.update();
 
+    // Check vehicle collisions
+    VehicleUtils.checkCollisions(this.vehicles);
+
     // Update vehicles
-    this.vehicles.forEach((v) => {
-      // Check for collisions first
-      v.checkVehicleCollisions(this.vehicles);
-      // Then update
-      v.update(deltaTime);
-    });
+    this.vehicles.forEach((v) => v.update(deltaTime));
+
+    // Update vehicles
+    // this.vehicles.forEach((v) => {
+    //   // Check for collisions first
+    //   v.checkVehicleCollisions(this.vehicles);
+    //   // Then update
+    //   v.update(deltaTime);
+    // });
   }
 
   // Once models are loaded, can then piece them together as per scene
