@@ -20,6 +20,8 @@ export class SceneState {
   public camera: THREE.PerspectiveCamera;
   public roads: Road[] = [];
   public vehicles: Vehicle[] = [];
+  public checkVehicleCollisions = true;
+
   public props: THREE.Group[] = [];
 
   private controls: OrbitControls;
@@ -48,14 +50,6 @@ export class SceneState {
 
     // Update vehicles
     this.vehicles.forEach((v) => v.update(deltaTime));
-
-    // Update vehicles
-    // this.vehicles.forEach((v) => {
-    //   // Check for collisions first
-    //   v.checkVehicleCollisions(this.vehicles);
-    //   // Then update
-    //   v.update(deltaTime);
-    // });
   }
 
   // Once models are loaded, can then piece them together as per scene
