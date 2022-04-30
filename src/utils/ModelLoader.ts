@@ -61,7 +61,7 @@ export enum HouseName {
  * Responsible for loading models and storing them during runtime.
  */
 export class ModelLoader {
-  private readonly vehicleScaleModifer = 0.35;
+  private readonly vehicleScaleModifer = 0.3;
   private readonly roadScaleModifier = 2;
   private readonly houseScaleModifier = 1.5;
   private modelMap = new Map<ModelName, THREE.Group>();
@@ -128,26 +128,28 @@ export class ModelLoader {
           if (node instanceof THREE.Mesh) {
             // Adjust metalness so it shows via ambient light
             node.material.metalness = 0;
+            node.castShadow = true;
           }
         });
 
-        // Adjust scale of vehicles
-        model.scene.scale.set(
-          this.vehicleScaleModifer,
-          this.vehicleScaleModifer,
-          this.vehicleScaleModifer
-        );
-
-        // Wrap in parent to set proper facing direction
-        const parent = new THREE.Group();
-        model.scene.rotation.y = Math.PI;
-        parent.add(model.scene);
-
-        this.onLoadModel(vName, parent);
+        const vehicle = this.setupVehicle(model.scene);
+        this.onLoadModel(vName, vehicle);
       },
       undefined,
       this.onLoadError
     );
+  }
+
+  private setupVehicle(vehicle: THREE.Group) {
+    // Adjust scale of vehicles
+    vehicle.scale.set(this.vehicleScaleModifer, this.vehicleScaleModifer, this.vehicleScaleModifer);
+
+    // Wrap in parent to set proper facing direction
+    const parent = new THREE.Group();
+    vehicle.rotation.y = Math.PI;
+    parent.add(vehicle);
+
+    return parent;
   }
 
   private loadRoad(rName: RoadName, loader: GLTFLoader) {
@@ -160,6 +162,7 @@ export class ModelLoader {
           if (node instanceof THREE.Mesh) {
             // Adjust metalness so it shows via ambient light
             node.material.metalness = 0;
+            node.receiveShadow = true;
           }
         });
 
@@ -203,6 +206,8 @@ export class ModelLoader {
           if (node instanceof THREE.Mesh) {
             // Adjust metalness
             node.material.metalness = 0;
+            node.castShadow = true;
+            node.receiveShadow = true;
           }
         });
 

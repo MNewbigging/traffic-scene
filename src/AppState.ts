@@ -23,6 +23,7 @@ export class AppState {
     // Setup renderer
     this.renderer = new THREE.WebGLRenderer({ canvas });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.shadowMap.enabled = true;
     this.onCanvasResize();
 
     // Setup scene

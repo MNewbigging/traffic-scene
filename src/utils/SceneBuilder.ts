@@ -16,6 +16,8 @@ enum GroundType {
 export class SceneBuilder {
   private roads: Road[] = [];
   private vehicles: Vehicle[] = [];
+  private grassMaterial = new THREE.MeshLambertMaterial({ color: '#22f8ae' });
+  private concreteMaterial = new THREE.MeshLambertMaterial({ color: '#eaeaf0' });
 
   constructor(private modelLoader: ModelLoader) {}
 
@@ -606,10 +608,10 @@ export class SceneBuilder {
   private addGround(type: GroundType, size: THREE.Vector2, pos: THREE.Vector3) {
     const geom = new THREE.PlaneGeometry(size.x, size.y);
 
-    const color = type === GroundType.GRASS ? '#22f8ae' : '#eaeaf0';
-    const mat = new THREE.MeshLambertMaterial({ color });
+    const mat = type === GroundType.GRASS ? this.grassMaterial : this.concreteMaterial;
 
     const mesh = new THREE.Mesh(geom, mat);
+    mesh.receiveShadow = true;
 
     mesh.position.x = pos.x;
     mesh.position.y = -0.01;

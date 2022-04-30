@@ -89,13 +89,34 @@ export class SceneState {
   }
 
   private setupLights() {
-    // lights
-    // const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-    // this.scene.add(ambientLight);
-
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    // Ambient
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
     this.scene.add(ambientLight);
 
+    // Directional
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight.position.x = 10;
+    directionalLight.position.y = 10;
+    directionalLight.position.z = 10;
+    directionalLight.target.position.x = 8;
+    directionalLight.target.position.z = -4;
+    // Shadow props for light
+    directionalLight.castShadow = true;
+    directionalLight.shadow.camera.left = -30;
+    directionalLight.shadow.camera.right = 20;
+    directionalLight.shadow.camera.top = 20;
+    directionalLight.shadow.camera.bottom = -20;
+    console.log('v', directionalLight.shadow.camera.bottom);
+    directionalLight.shadow.mapSize.width = 2048;
+    directionalLight.shadow.mapSize.height = 2048;
+    directionalLight.shadow.camera.near = 0.5;
+    directionalLight.shadow.camera.far = 50;
+
+    const helper = new THREE.CameraHelper(directionalLight.shadow.camera);
+    this.scene.add(helper);
+
+    this.scene.add(directionalLight);
+    this.scene.add(directionalLight.target);
     // const pointLight = new THREE.PointLight(0xffffff, 0.5);
     // pointLight.position.x = 0;
     // pointLight.position.y = 180;
