@@ -94,7 +94,7 @@ export class SceneState {
     this.scene.add(ambientLight);
 
     // Directional
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    const directionalLight = new THREE.DirectionalLight(0xfceea7, 1);
     directionalLight.position.x = 10;
     directionalLight.position.y = 10;
     directionalLight.position.z = 10;

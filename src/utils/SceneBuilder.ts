@@ -542,6 +542,13 @@ export class SceneBuilder {
     );
     const block13 = [g15, h32, h33];
 
+    // Ground inside roundabout
+    const g16 = this.addGround(
+      GroundType.GRASS,
+      new THREE.Vector2(1, 1),
+      new THREE.Vector3(8, 0, -4)
+    );
+
     return [
       ...block1,
       ...block2,
@@ -556,6 +563,7 @@ export class SceneBuilder {
       ...block11,
       ...block12,
       ...block13,
+      g16,
     ];
   }
 

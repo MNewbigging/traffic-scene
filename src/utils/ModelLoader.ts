@@ -127,6 +127,7 @@ export class ModelLoader {
           // If this node is a mesh
           if (node instanceof THREE.Mesh) {
             // Adjust metalness so it shows via ambient light
+
             node.material.metalness = 0;
             node.castShadow = true;
           }
