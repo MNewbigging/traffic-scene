@@ -8,13 +8,13 @@ export class VehicleUtils {
     allVehicles.forEach((v) => (v.ignoreCollisions = false));
 
     for (const vehicle of allVehicles) {
-      // Firstly, reset target speed
-      vehicle.targetSpeed = vehicle.maxSpeed;
-
       // Can we ignore collisions in already-tested vehicles this pass?
       if (vehicle.ignoreCollisions) {
         continue;
       }
+
+      // Firstly, reset target speed
+      vehicle.targetSpeed = vehicle.maxSpeed;
 
       // Get other nearby vehicles
       const nearbyVehicles = RoadUtils.getCloseVehicles(
@@ -50,6 +50,7 @@ export class VehicleUtils {
             // These vehicles are inside each other in the same lane - separate
             // One vehicle slows, the other ignores collisions
             nearby.ignoreCollisions = true;
+            nearby.targetSpeed = 0.2;
           }
         }
 
