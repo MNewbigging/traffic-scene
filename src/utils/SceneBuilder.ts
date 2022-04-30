@@ -386,8 +386,6 @@ export class SceneBuilder {
 
     vehicleNames.forEach((name) => {
       this.addCar(name);
-      // this.addCar(name);
-      this.addCar(name);
       this.addCar(name);
     });
 
@@ -476,7 +474,43 @@ export class SceneBuilder {
     );
     const block7 = [h17, h18, h19, h20, g7, g8];
 
-    return [...block1, ...block2, ...block3, ...block4, ...block5, ...block6, ...block7];
+    // Eighth block is top right of roundabout
+    const h21 = this.addHouse(HouseName.TYPE_13, new THREE.Vector3(10, 0, -8), -Math.PI / 2);
+    const h22 = this.addHouse(HouseName.TYPE_14, new THREE.Vector3(12, 0, -12), Math.PI);
+    const h23 = this.addHouse(HouseName.TYPE_17, new THREE.Vector3(14, 0, -12), Math.PI);
+    const g9 = this.addGround(
+      GroundType.GRASS,
+      new THREE.Vector2(3, 6.5),
+      new THREE.Vector3(10, 0, -7)
+    );
+    const g10 = this.addGround(
+      GroundType.GRASS,
+      new THREE.Vector2(4.5, 3.5),
+      new THREE.Vector3(13, 0, -12)
+    );
+    const block8 = [g9, g10, h21, h22, h23];
+
+    // Ninth block is bot right of roundabout
+    const h24 = this.addHouse(HouseName.TYPE_07, new THREE.Vector3(10, 0, 0.3));
+    const h25 = this.addHouse(HouseName.TYPE_19, new THREE.Vector3(10.3, 0, -1.3), Math.PI / 2);
+    const g11 = this.addGround(
+      GroundType.CONCRETE,
+      new THREE.Vector2(2, 4),
+      new THREE.Vector3(10, 0, -1)
+    );
+    const block9 = [g11, h24, h25];
+
+    return [
+      ...block1,
+      ...block2,
+      ...block3,
+      ...block4,
+      ...block5,
+      ...block6,
+      ...block7,
+      ...block8,
+      ...block9,
+    ];
   }
 
   private addRoad(name: RoadName, pos: THREE.Vector3, rot = 0) {
