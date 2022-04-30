@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 
 import { CanvasListener } from './utils/CanvasListener';
+import { MouseListener } from './utils/MouseListener';
 import { SceneState } from './state/SceneState';
 
 /**
@@ -8,6 +9,7 @@ import { SceneState } from './state/SceneState';
  */
 export class AppState {
   private canvasListener: CanvasListener;
+  private mouseListener = new MouseListener();
   private renderer: THREE.WebGLRenderer;
   private masterClock = new THREE.Clock();
   private sceneState: SceneState;
@@ -24,7 +26,7 @@ export class AppState {
     this.onCanvasResize();
 
     // Setup scene
-    this.sceneState = new SceneState(this.canvasListener);
+    this.sceneState = new SceneState(this.canvasListener, this.mouseListener);
     this.sceneState.initScene(() => this.start());
   }
 
