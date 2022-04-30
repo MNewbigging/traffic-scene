@@ -500,6 +500,46 @@ export class SceneBuilder {
     );
     const block9 = [g11, h24, h25];
 
+    // Tenth block is top left of quad to right of roundabout
+    const h26 = this.addHouse(HouseName.TYPE_21, new THREE.Vector3(14, 0, -8), -Math.PI / 2);
+    const h27 = this.addHouse(HouseName.TYPE_15, new THREE.Vector3(14, 0, -6));
+    const g12 = this.addGround(
+      GroundType.CONCRETE,
+      new THREE.Vector2(2, 4),
+      new THREE.Vector3(14, 0, -7)
+    );
+    const block10 = [g12, h26, h27];
+
+    // Eleventh block is right of tenth
+    const h28 = this.addHouse(HouseName.TYPE_11, new THREE.Vector3(18, 0, -8), -Math.PI / 2);
+    const h29 = this.addHouse(HouseName.TYPE_09, new THREE.Vector3(18, 0, -6));
+    const g13 = this.addGround(
+      GroundType.CONCRETE,
+      new THREE.Vector2(2, 4),
+      new THREE.Vector3(18, 0, -7)
+    );
+    const block11 = [g13, h28, h29];
+
+    // Twelfth block is below tenth
+    const h30 = this.addHouse(HouseName.TYPE_20, new THREE.Vector3(14, 0, 0));
+    const h31 = this.addHouse(HouseName.TYPE_05, new THREE.Vector3(14, 0, -2), Math.PI);
+    const g14 = this.addGround(
+      GroundType.GRASS,
+      new THREE.Vector2(2, 4),
+      new THREE.Vector3(14, 0, -1)
+    );
+    const block12 = [g14, h30, h31];
+
+    // Thirteenth block is right of tenth
+    const h32 = this.addHouse(HouseName.TYPE_12, new THREE.Vector3(18, 0, 0), -Math.PI / 2);
+    const h33 = this.addHouse(HouseName.TYPE_14, new THREE.Vector3(18, 0, -2));
+    const g15 = this.addGround(
+      GroundType.CONCRETE,
+      new THREE.Vector2(2, 4),
+      new THREE.Vector3(18, 0, -1)
+    );
+    const block13 = [g15, h32, h33];
+
     return [
       ...block1,
       ...block2,
@@ -510,6 +550,10 @@ export class SceneBuilder {
       ...block7,
       ...block8,
       ...block9,
+      ...block10,
+      ...block11,
+      ...block12,
+      ...block13,
     ];
   }
 
