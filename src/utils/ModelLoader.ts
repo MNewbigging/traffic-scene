@@ -71,7 +71,7 @@ export class ModelLoader {
   private baseAssetPath = '';
 
   constructor() {
-    this.baseAssetPath = 'dist/assets/';
+    this.baseAssetPath = 'assets/';
     // Hack to get assets from gh-pages when published
     // const location = window.location.href;
     // if (location.includes('localhost')) {
@@ -126,11 +126,11 @@ export class ModelLoader {
         // Traverse model nodes
         model.scene.traverse((node) => {
           // If this node is a mesh
-          if (node instanceof THREE.Mesh) {
+          if ((node as THREE.Mesh).isMesh) {
             // Adjust metalness so it shows via ambient light
-
-            node.material.metalness = 0;
+            ((node as THREE.Mesh).material as THREE.MeshStandardMaterial).metalness = 0;
             node.castShadow = true;
+            node.receiveShadow = true;
           }
         });
 
@@ -161,9 +161,9 @@ export class ModelLoader {
         // Traverse model nodes
         model.scene.traverse((node) => {
           // If it's a mesh
-          if (node instanceof THREE.Mesh) {
+          if ((node as THREE.Mesh).isMesh) {
             // Adjust metalness so it shows via ambient light
-            node.material.metalness = 0;
+            ((node as THREE.Mesh).material as THREE.MeshStandardMaterial).metalness = 0;
             node.receiveShadow = true;
           }
         });
@@ -205,9 +205,9 @@ export class ModelLoader {
         // Traverse model nodes
         model.scene.traverse((node) => {
           // If it's a mesh
-          if (node instanceof THREE.Mesh) {
+          if ((node as THREE.Mesh).isMesh) {
             // Adjust metalness
-            node.material.metalness = 0;
+            ((node as THREE.Mesh).material as THREE.MeshStandardMaterial).metalness = 0;
             node.castShadow = true;
             node.receiveShadow = true;
           }
