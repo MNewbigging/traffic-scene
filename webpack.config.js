@@ -33,6 +33,21 @@ module.exports = {
         test: /\.svg$/,
         use: ['@svgr/webpack'],
       },
+      {
+        test: /\.(glb|gltf)$/,
+        //use: 'file-loader?name=[name].[ext]&outputPath=./assets/models',
+        use:
+        [
+            {
+                loader: 'file-loader',
+                options:
+                {
+                  esModule: false,
+                  outputPath: 'assets/models/'
+                }
+            }
+        ]
+      },
     ],
   },
 

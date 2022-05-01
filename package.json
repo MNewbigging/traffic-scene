@@ -20,7 +20,6 @@
   "author": "Matt",
   "license": "MIT",
   "dependencies": {
-    "file-loader": "^6.2.0",
     "mobx": "^6.5.0",
     "mobx-react": "^7.3.0",
     "react": "^18.1.0",
@@ -40,6 +39,7 @@
     "@types/react-dom": "^18.0.3",
     "@types/three": "^0.139.0",
     "css-loader": "^6.7.1",
+    "file-loader": "^6.2.0",
     "gh-pages": "^3.2.3",
     "html-webpack-plugin": "^5.5.0",
     "jest": "^28.0.3",

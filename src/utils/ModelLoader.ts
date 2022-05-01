@@ -71,13 +71,14 @@ export class ModelLoader {
   private baseAssetPath = '';
 
   constructor() {
+    this.baseAssetPath = 'dist/assets/';
     // Hack to get assets from gh-pages when published
-    const location = window.location.href;
-    if (location.includes('localhost')) {
-      this.baseAssetPath = 'dist/assets/';
-    } else {
-      this.baseAssetPath = 'assets/';
-    }
+    // const location = window.location.href;
+    // if (location.includes('localhost')) {
+    //   this.baseAssetPath = 'dist/assets/';
+    // } else {
+    //   this.baseAssetPath = 'assets/';
+    // }
   }
 
   public loadModels(modelNames: ModelNames, onLoad: () => void) {
