@@ -10,6 +10,7 @@ import { VehicleFactory } from './VehicleFactory';
 import { BufferAttribute } from 'three';
 import { posix } from 'path';
 import { group } from 'console';
+import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
 enum GroundType {
   GRASS = 'grass',
@@ -647,7 +648,7 @@ export class SceneBuilder {
   private addGrass(size: THREE.Vector2, pos: THREE.Vector3, amount: number): THREE.Group {
     const alpha = new THREE.TextureLoader().load('assets/textures/grass2_alpha.png'); // should move this out of here
     const diffuse = new THREE.TextureLoader().load('assets/textures/grass2_diffuse.png'); // should move this out of here
-    const grassMat = new THREE.MeshStandardMaterial({vertexColors: true, alphaMap: alpha, map: diffuse, transparent: true, depthWrite: false});
+    const grassMat = new THREE.MeshStandardMaterial({vertexColors: true, alphaMap: alpha, map: diffuse, transparent: true, alphaTest: 0.9});
     const grassGroup = new THREE.Group();
     grassGroup.name = 'Grass';
 
@@ -703,11 +704,11 @@ export class SceneBuilder {
     //const grass = new THREE.Mesh( grassGeo, grassMat );
 
     const mesh = new THREE.InstancedMesh(grassGeo, grassMat, amount);
-    mesh.customDepthMaterial = new THREE.MeshDepthMaterial({
-      depthPacking: THREE.RGBADepthPacking,
-      map: alpha,
-      alphaTest: 0.5
-    });
+    // mesh.customDepthMaterial = new THREE.MeshDepthMaterial({
+    //   depthPacking: THREE.RGBADepthPacking,
+    //   map: alpha,
+    //   alphaTest: 0.5
+    // });
     //mesh.castShadow = true;
     mesh.receiveShadow = true;
     const matrix = new THREE.Matrix4();
