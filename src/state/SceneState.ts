@@ -90,7 +90,8 @@ export class SceneState {
 
   private setupLights() {
     // Ambient
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+    //const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+    const ambientLight = new THREE.HemisphereLight(0xebf6ff, 0x5fa36b, 0.25);
     this.scene.add(ambientLight);
 
     // Directional
@@ -107,16 +108,24 @@ export class SceneState {
     directionalLight.shadow.camera.top = 20;
     directionalLight.shadow.camera.bottom = -20;
     console.log('v', directionalLight.shadow.camera.bottom);
-    directionalLight.shadow.mapSize.width = 2048;
-    directionalLight.shadow.mapSize.height = 2048;
+    directionalLight.shadow.mapSize.width = 4096;
+    directionalLight.shadow.mapSize.height = 4096;
     directionalLight.shadow.camera.near = 0.5;
     directionalLight.shadow.camera.far = 50;
+    directionalLight.shadow.bias = - 0.0007; // Magic number
 
+    const sunGroup = new THREE.Group();
+    sunGroup.name = 'SunGroup';
     const helper = new THREE.CameraHelper(directionalLight.shadow.camera);
-    this.scene.add(helper);
+    sunGroup.add(helper);
+    sunGroup.add(directionalLight);
+    sunGroup.add(directionalLight.target);
 
-    this.scene.add(directionalLight);
-    this.scene.add(directionalLight.target);
+    this.scene.add(sunGroup);
+    //this.scene.add(helper);
+
+    //this.scene.add(directionalLight);
+    //this.scene.add(directionalLight.target);
     // const pointLight = new THREE.PointLight(0xffffff, 0.5);
     // pointLight.position.x = 0;
     // pointLight.position.y = 180;

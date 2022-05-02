@@ -7,6 +7,9 @@ import { RoadFactory } from './RoadFactory';
 import { RoadUtils } from './RoadUtils';
 import { Vehicle } from '../model/Vehicle';
 import { VehicleFactory } from './VehicleFactory';
+import { BufferAttribute } from 'three';
+import { posix } from 'path';
+import { group } from 'console';
 
 enum GroundType {
   GRASS = 'grass',
@@ -389,6 +392,7 @@ export class SceneBuilder {
     vehicleNames.forEach((name) => {
       this.addCar(name);
       this.addCar(name);
+      this.addCar(name);
     });
 
     return this.vehicles;
@@ -629,8 +633,122 @@ export class SceneBuilder {
 
     const group = new THREE.Group();
     group.add(mesh);
+
+    if (type === GroundType.GRASS) {
+      const grass = this.addGrass(size, pos, 500);
+      group.add(grass);
+    }
+    
     const prop = new Prop(group);
 
     return prop;
+  }
+
+  private addGrass(size: THREE.Vector2, pos: THREE.Vector3, amount: number): THREE.Group {
+    const alpha = new THREE.TextureLoader().load('assets/textures/grass2_alpha.png'); // should move this out of here
+    const diffuse = new THREE.TextureLoader().load('assets/textures/grass2_diffuse.png'); // should move this out of here
+    const grassMat = new THREE.MeshStandardMaterial({vertexColors: true, alphaMap: alpha, map: diffuse, transparent: true, depthWrite: false});
+    const grassGroup = new THREE.Group();
+    grassGroup.name = 'Grass';
+
+    let vertColors = new Float32Array([
+      25, 191, 134,
+      25, 191, 134,
+      //96, 247, 136,
+      64, 255, 169,
+      64, 255, 169,
+      64, 255, 169,
+      25, 191, 134,
+    ]);
+
+    // laziness so I can use 0-255
+    vertColors = vertColors.map(x => {
+      return x / 255;
+    })
+
+     // Grass Plane
+     const square = [
+      -1, -1,  0,
+      1, -1,  0,
+      1,  1,  0,
+   
+      1,  1,  0,
+     -1,  1,  0,
+     -1, -1,  0
+    ];
+
+    const normals = [
+      0, 0.85, 0.15,
+      0, 0.85, 0.15,
+      0, 0.85, 0.15,
+      0, 0.85, 0.15,
+      0, 0.85, 0.15,
+      0, 0.85, 0.15,
+    ];
+
+    const uv = [
+      0.0, 0.0,
+      1.0, 0.0,
+      1.0, 1.0,
+      1.0, 1.0,
+      0.0, 1.0,
+      0.0, 0.0,
+    ]
+
+    const grassGeo = new THREE.BufferGeometry();
+    grassGeo.setAttribute( 'position', new THREE.Float32BufferAttribute( square, 3 ) );
+    grassGeo.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
+    grassGeo.setAttribute( 'uv', new THREE.Float32BufferAttribute( uv, 2 ) );
+    grassGeo.setAttribute('color', new BufferAttribute(vertColors, 3)); 
+    //const grass = new THREE.Mesh( grassGeo, grassMat );
+
+    const mesh = new THREE.InstancedMesh(grassGeo, grassMat, amount);
+    mesh.customDepthMaterial = new THREE.MeshDepthMaterial({
+      depthPacking: THREE.RGBADepthPacking,
+      map: alpha,
+      alphaTest: 0.5
+    });
+    //mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    const matrix = new THREE.Matrix4();
+
+    const position = new THREE.Vector3();
+    const rotation = new THREE.Quaternion();
+    const scale = new THREE.Vector3();
+    const euler = new THREE.Euler(0, 0, 0);
+
+    for (let i = 0; i < amount; i+=2) {
+      const randomX = (Math.random() * size.x) - (size.x / 2); 
+      const randomY = (Math.random() * size.y) - (size.y / 2); 
+      //const randomScale = (Math.random() + 0.1) * 0.1;
+      const randomScale = (Math.random() * 0.1) + 0.1;
+      scale.set(
+        randomScale,
+        randomScale,
+        randomScale,
+      );
+
+      position.set(
+        pos.x + randomX,
+        0 + (scale.y / 2) - 0.01,
+        pos.z + randomY
+      );
+      
+      const randomRot = Math.random() * Math.PI * 2;
+      euler.y = randomRot;
+      rotation.setFromEuler(euler, true);
+      matrix.compose( position, rotation, scale );
+      mesh.setMatrixAt(i, matrix);
+
+      // We need to add the second plane for the backface
+      // Can't use double-sided as it will break normals
+      euler.y = euler.y + Math.PI;
+      rotation.setFromEuler(euler, true);
+      matrix.compose( position, rotation, scale);
+      mesh.setMatrixAt(i+1, matrix);
+    }
+
+    grassGroup.add(mesh);
+    return grassGroup;
   }
 }
