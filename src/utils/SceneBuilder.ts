@@ -637,7 +637,9 @@ export class SceneBuilder {
 
     if (type === GroundType.GRASS) {
       const grass = this.addGrass(size, pos, 1000);
+      const bushes = this.addBushes(size, pos, 2);
       group.add(grass);
+      group.add(bushes);
     }
     
     const prop = new Prop(group);
@@ -655,12 +657,12 @@ export class SceneBuilder {
     grassGroup.name = 'Grass';
 
     let vertColors = new Float32Array([
-      21, 158, 111,
-      21, 158, 111,
+      18, 138, 97,
+      18, 138, 97,
       64, 255, 169,
       64, 255, 169,
       64, 255, 169,
-      21, 158, 111,
+      18, 138, 97,
     ]);
 
     // laziness so I can use 0-255
@@ -669,7 +671,7 @@ export class SceneBuilder {
     })
 
      // Grass Plane
-     const square = [
+    const square = [
       -1, -1,  0,
       1, -1,  0,
       1,  1,  0,
@@ -717,7 +719,6 @@ export class SceneBuilder {
     for (let i = 0; i < totalCount * 2; i+=2) {
       const randomX = (Math.random() * size.x) - (size.x / 2); 
       const randomY = (Math.random() * size.y) - (size.y / 2); 
-      //const randomScale = (Math.random() + 0.1) * 0.1;
       const randomScale = (Math.random() * 0.1) + 0.05;
       scale.set(
         randomScale,
@@ -747,5 +748,137 @@ export class SceneBuilder {
 
     grassGroup.add(mesh);
     return grassGroup;
+  }
+
+  private addBushes(size: THREE.Vector2, pos: THREE.Vector3, density: number): THREE.Group {
+    const totalCount = size.x * size.y * density;
+    const planesPerBush = 6;
+    const alpha = new THREE.TextureLoader().load('assets/textures/bushUpper_alpha.png'); // should move this out of here
+    const diffuse = new THREE.TextureLoader().load('assets/textures/bushUpper_diffuse.png'); // should move this out of here
+    const bushMat = new THREE.MeshStandardMaterial({vertexColors: true, alphaMap: alpha, map: diffuse, transparent: true, alphaTest: 0.9, roughness: 0.66});
+    const bushGroup = new THREE.Group();
+    bushGroup.name = 'Bushes';
+
+    // Grass Plane
+    const square = [
+      -1, -1,  0,
+      1, -1,  0,
+      1,  1,  0,
+    
+      1,  1,  0,
+      -1,  1,  0,
+      -1, -1,  0
+    ];
+
+    const uv = [
+      0.0, 0.0,
+      1.0, 0.0,
+      1.0, 1.0,
+      1.0, 1.0,
+      0.0, 1.0,
+      0.0, 0.0,
+    ];
+
+    // TODO - figure out how to make these spherical from origin
+    const normals = [
+      0, 0.75, 0.25,
+      0, 0.75, 0.25,
+      0, 0.75, 0.25,
+      0, 0.75, 0.25,
+      0, 0.75, 0.25,
+      0, 0.75, 0.25,
+    ];
+
+    let vertColors = new Float32Array([
+      128, 128, 128,
+      128, 128, 128,
+      255, 255, 255,
+      255, 255, 255,
+      255, 255, 255,
+      128, 128, 128,
+    ]);
+
+    // laziness so I can use 0-255
+    vertColors = vertColors.map(x => {
+      return x / 255;
+    })
+
+    const bushGeo = new THREE.BufferGeometry();
+    bushGeo.setAttribute( 'position', new THREE.Float32BufferAttribute( square, 3 ) );
+    bushGeo.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
+    bushGeo.setAttribute( 'uv', new THREE.Float32BufferAttribute( uv, 2 ) );
+    bushGeo.setAttribute('color', new BufferAttribute(vertColors, 3)); 
+
+    const mesh = new THREE.InstancedMesh(bushGeo, bushMat, totalCount);
+
+    mesh.receiveShadow = true;
+    mesh.castShadow = true;
+    const matrix = new THREE.Matrix4();
+
+    const origin = new THREE.Vector3();
+    const position = new THREE.Vector3();
+    const rotation = new THREE.Quaternion();
+    const scale = new THREE.Vector3();
+    const euler = new THREE.Euler(0, 0, 0);
+
+    // This process is a little different than grass
+    // We need x planes per bush and need to offset them relative to each other
+    for (let i = 0; i < totalCount * planesPerBush; i+= (planesPerBush * 2)) {
+      //debugger;
+      let randomRot = 0;
+      const randomX = (Math.random() * size.x) - (size.x / 2); 
+      const randomY = (Math.random() * size.y) - (size.y / 2); 
+      origin.set(
+        pos.x + randomX,
+        0 - 0.01,
+        pos.z + randomY,
+      )
+
+      for (let p = 0; p < planesPerBush * 2; p+=2) {
+        //const randomRot = Math.random() * Math.PI * 2;
+        randomRot += (Math.PI * 2) / (planesPerBush * 2) + Math.random() * 0.025;
+        const randomScale = Math.random() *  0.25 + 0.25;
+        const offset = Math.random() * 0.1;
+        scale.set(
+          randomScale,
+          randomScale,
+          randomScale
+        );
+
+        position.set(
+          origin.x + offset,
+          origin.y + offset + randomScale / 2,
+          origin.z + offset,
+        );
+
+        euler.y = randomRot;
+
+        rotation.setFromEuler(euler, true);
+        matrix.compose( position, rotation, scale );
+        mesh.setMatrixAt(i + p, matrix);
+
+        euler.y = randomRot + Math.PI;
+
+        rotation.setFromEuler(euler, true);
+        matrix.compose( position, rotation, scale);
+        mesh.setMatrixAt(i + p + 1, matrix);
+      }
+    }
+
+    bushGroup.add(mesh);
+    return bushGroup;
+
+    // for (let i = 0; i < totalCount * 2; i+=2) {
+
+
+    //   const randomScale = Math.random() *  Math.random();
+    //   scale.set(
+    //     randomScale,
+    //     randomScale,
+    //     randomScale,
+    //   );
+
+      
+    // }
   }
 }
