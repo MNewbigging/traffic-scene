@@ -20,7 +20,7 @@ enum GroundType {
 export class SceneBuilder {
   private roads: Road[] = [];
   private vehicles: Vehicle[] = [];
-  private grassMaterial = new THREE.MeshLambertMaterial({ color: '#22f8ae' });
+  private grassMaterial = new THREE.MeshLambertMaterial({ color: '#34edae' });
   private concreteMaterial = new THREE.MeshLambertMaterial({ color: '#eaeaf0' });
 
   constructor(private modelLoader: ModelLoader) {}
@@ -636,7 +636,7 @@ export class SceneBuilder {
     group.add(mesh);
 
     if (type === GroundType.GRASS) {
-      const grass = this.addGrass(size, pos, 500);
+      const grass = this.addGrass(size, pos, 5000);
       group.add(grass);
     }
     
@@ -646,6 +646,12 @@ export class SceneBuilder {
   }
 
   private addGrass(size: THREE.Vector2, pos: THREE.Vector3, amount: number): THREE.Group {
+    // const area = size.x * size.y;
+    // const diffX = size.x / size.y;
+    // const diffY = size.x / size.y;
+    // const xStep = amount * diffX;
+    // const yStep = amount * diffY;
+
     const alpha = new THREE.TextureLoader().load('assets/textures/grass2_alpha.png'); // should move this out of here
     const diffuse = new THREE.TextureLoader().load('assets/textures/grass2_diffuse.png'); // should move this out of here
     const grassMat = new THREE.MeshStandardMaterial({vertexColors: true, alphaMap: alpha, map: diffuse, transparent: true, alphaTest: 0.9});
@@ -653,13 +659,13 @@ export class SceneBuilder {
     grassGroup.name = 'Grass';
 
     let vertColors = new Float32Array([
-      25, 191, 134,
-      25, 191, 134,
+      21, 158, 111,
+      21, 158, 111,
       //96, 247, 136,
       64, 255, 169,
       64, 255, 169,
       64, 255, 169,
-      25, 191, 134,
+      21, 158, 111,
     ]);
 
     // laziness so I can use 0-255
@@ -704,12 +710,7 @@ export class SceneBuilder {
     //const grass = new THREE.Mesh( grassGeo, grassMat );
 
     const mesh = new THREE.InstancedMesh(grassGeo, grassMat, amount);
-    // mesh.customDepthMaterial = new THREE.MeshDepthMaterial({
-    //   depthPacking: THREE.RGBADepthPacking,
-    //   map: alpha,
-    //   alphaTest: 0.5
-    // });
-    //mesh.castShadow = true;
+
     mesh.receiveShadow = true;
     const matrix = new THREE.Matrix4();
 
@@ -722,7 +723,7 @@ export class SceneBuilder {
       const randomX = (Math.random() * size.x) - (size.x / 2); 
       const randomY = (Math.random() * size.y) - (size.y / 2); 
       //const randomScale = (Math.random() + 0.1) * 0.1;
-      const randomScale = (Math.random() * 0.1) + 0.1;
+      const randomScale = (Math.random() * 0.1) + 0.05;
       scale.set(
         randomScale,
         randomScale,
