@@ -636,7 +636,7 @@ export class SceneBuilder {
     group.add(mesh);
 
     if (type === GroundType.GRASS) {
-      const grass = this.addGrass(size, pos, 5000);
+      const grass = this.addGrass(size, pos, 1000);
       group.add(grass);
     }
     
@@ -645,23 +645,18 @@ export class SceneBuilder {
     return prop;
   }
 
-  private addGrass(size: THREE.Vector2, pos: THREE.Vector3, amount: number): THREE.Group {
-    // const area = size.x * size.y;
-    // const diffX = size.x / size.y;
-    // const diffY = size.x / size.y;
-    // const xStep = amount * diffX;
-    // const yStep = amount * diffY;
+  private addGrass(size: THREE.Vector2, pos: THREE.Vector3, density: number): THREE.Group {
+    const totalCount = size.x * size.y * density;
 
     const alpha = new THREE.TextureLoader().load('assets/textures/grass2_alpha.png'); // should move this out of here
     const diffuse = new THREE.TextureLoader().load('assets/textures/grass2_diffuse.png'); // should move this out of here
-    const grassMat = new THREE.MeshStandardMaterial({vertexColors: true, alphaMap: alpha, map: diffuse, transparent: true, alphaTest: 0.9});
+    const grassMat = new THREE.MeshStandardMaterial({vertexColors: true, alphaMap: alpha, map: diffuse, transparent: true, alphaTest: 0.9, roughness: 0.66});
     const grassGroup = new THREE.Group();
     grassGroup.name = 'Grass';
 
     let vertColors = new Float32Array([
       21, 158, 111,
       21, 158, 111,
-      //96, 247, 136,
       64, 255, 169,
       64, 255, 169,
       64, 255, 169,
@@ -685,12 +680,12 @@ export class SceneBuilder {
     ];
 
     const normals = [
-      0, 0.85, 0.15,
-      0, 0.85, 0.15,
-      0, 0.85, 0.15,
-      0, 0.85, 0.15,
-      0, 0.85, 0.15,
-      0, 0.85, 0.15,
+      0, 0.8, 0.2,
+      0, 0.8, 0.2,
+      0, 0.8, 0.2,
+      0, 0.8, 0.2,
+      0, 0.8, 0.2,
+      0, 0.8, 0.2,
     ];
 
     const uv = [
@@ -709,7 +704,7 @@ export class SceneBuilder {
     grassGeo.setAttribute('color', new BufferAttribute(vertColors, 3)); 
     //const grass = new THREE.Mesh( grassGeo, grassMat );
 
-    const mesh = new THREE.InstancedMesh(grassGeo, grassMat, amount);
+    const mesh = new THREE.InstancedMesh(grassGeo, grassMat, totalCount);
 
     mesh.receiveShadow = true;
     const matrix = new THREE.Matrix4();
@@ -719,7 +714,7 @@ export class SceneBuilder {
     const scale = new THREE.Vector3();
     const euler = new THREE.Euler(0, 0, 0);
 
-    for (let i = 0; i < amount; i+=2) {
+    for (let i = 0; i < totalCount * 2; i+=2) {
       const randomX = (Math.random() * size.x) - (size.x / 2); 
       const randomY = (Math.random() * size.y) - (size.y / 2); 
       //const randomScale = (Math.random() + 0.1) * 0.1;
@@ -732,7 +727,7 @@ export class SceneBuilder {
 
       position.set(
         pos.x + randomX,
-        0 + (scale.y / 2) - 0.01,
+        0 + scale.y - 0.01,
         pos.z + randomY
       );
       
