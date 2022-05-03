@@ -9,7 +9,7 @@ export enum WorldClockRate {
 export class WorldClock {
   public rate = WorldClockRate.NORMAL;
   public clock = new THREE.Clock();
-  private autoPause = false;
+  private userPaused = false;
 
   constructor() {
     document.addEventListener('visibilitychange', this.onVisibilityChange);
@@ -20,13 +20,13 @@ export class WorldClock {
   }
 
   public pause = () => {
-    console.log('pausing');
     this.clock.stop();
+    this.userPaused = true;
   };
 
   public resume = () => {
-    console.log('resuming');
     this.clock.start();
+    this.userPaused = false;
   };
 
   public fastForward() {}
@@ -34,12 +34,10 @@ export class WorldClock {
   public update(deltaTime: number) {}
 
   private onVisibilityChange = () => {
-    if (document.visibilityState === 'hidden') {
+    if (document.visibilityState === 'hidden' && !this.userPaused) {
       this.clock.stop();
-      this.autoPause = true;
-    } else if (this.autoPause) {
+    } else if (!this.userPaused) {
       this.clock.start();
-      this.autoPause = false;
     }
   };
 }
