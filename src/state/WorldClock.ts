@@ -21,10 +21,12 @@ export class WorldClock {
 
   public pause = () => {
     console.log('pausing');
+    this.clock.stop();
   };
 
   public resume = () => {
     console.log('resuming');
+    this.clock.start();
   };
 
   public fastForward() {}

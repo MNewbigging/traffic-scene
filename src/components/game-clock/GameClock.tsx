@@ -31,12 +31,13 @@ export class GameClock extends React.Component<GameClockProps, GameClockState> {
   private togglePause = () => {
     const { onPause, onResume } = this.props;
 
-    this.setState((state) => ({ paused: !state.paused }));
-
+    // If currently paused, now resuming
     if (this.state.paused) {
-      onPause();
-    } else {
       onResume();
+    } else {
+      onPause();
     }
+
+    this.setState((state) => ({ paused: !state.paused }));
   };
 }
