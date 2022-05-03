@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 
 import { NumberUtils } from '../utils/NumberUtils';
-import { Road } from './Road';
 import { RoadUtils } from '../utils/RoadUtils';
 
 /**
@@ -16,7 +15,6 @@ import { RoadUtils } from '../utils/RoadUtils';
  */
 export class Lane {
   public id = NumberUtils.createId();
-  public road: Road;
   public line: THREE.Line;
   public fromRoadIdx = 0;
   public toRoadIdx = 0;

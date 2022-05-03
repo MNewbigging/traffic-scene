@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { BufferGeometry } from 'three';
 
 import { NumberUtils } from './NumberUtils';
 import { Road } from '../model/Road';

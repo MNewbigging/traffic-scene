@@ -3,8 +3,6 @@ import * as THREE from 'three';
 import { Road } from '../model/Road';
 
 class RoadSearch {
-  public weight = 0;
-  public speedLimitDelta = 0;
   public endDistance = 0;
   public totalWeight = 0;
   public parent?: RoadSearch;
@@ -16,24 +14,11 @@ class RoadSearch {
   }
 
   public setWeights(last: RoadSearch, end: RoadSearch) {
-    // Speed limit adjustment
-    this.speedLimitDelta = 100 - this.road.speedLimit;
-
     // Distance to end
     this.endDistance = end.road.position.distanceTo(this.road.position);
 
-    // Weight per road type
-    this.weight = 1;
-    // switch (this.road.name) {
-    //   case RoadName.END:
-    //   case RoadName.STRAIGHT:
-
-    //     this.weight = 1;
-    //     break;
-    // }
-
     // Total the values for this node and last node
-    this.totalWeight = this.weight + this.speedLimitDelta + this.endDistance + last.totalWeight;
+    this.totalWeight = this.endDistance + last.totalWeight;
 
     // Set a reference to last node as this node's parent
     this.parent = last;

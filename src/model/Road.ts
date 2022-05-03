@@ -8,16 +8,12 @@ import { RoadUtils } from '../utils/RoadUtils';
 export class Road {
   public id = NumberUtils.createId();
   public neighbours: (Road | undefined)[] = [];
-  public speedLimit = 1;
-  // 'left' is according to the default forward direction (0, 0, 1)
-  public forward = new THREE.Vector3(0, 0, 1);
   public size = new THREE.Vector3();
   public edgePoints: THREE.Points;
   public edgePointPositions: THREE.Vector3[] = [];
   public lanes: Lane[] = [];
 
   constructor(public name: RoadName, public model: THREE.Group) {
-    model.getWorldDirection(this.forward);
     const box = new THREE.Box3().setFromObject(model);
     box.getSize(this.size);
   }
@@ -34,7 +30,6 @@ export class Road {
   public postTransform() {
     // Update facing direction
     this.model.updateMatrixWorld();
-    this.model.getWorldDirection(this.forward);
 
     // Update the edge points according to model transform
     RoadUtils.copyTransforms(this.model, this.edgePoints);
@@ -59,31 +54,6 @@ export class Road {
   }
 
   public getWaypoints(fromRoad: Road, toRoad: Road): THREE.Vector3[] {
-    // // Can only start and end routes on roads which only have 2 lanes
-
-    // // If we're going to this road
-    // if (toRoad.id === this.id) {
-    //   // Find a match on fromRoad within lanes
-    //   return (
-    //     this.lanes.find((lane) => this.neighbours[lane.fromRoadIdx]?.id === fromRoad.id)
-    //       .waypoints ?? []
-    //   );
-    // }
-
-    // // If we're going from this road
-    // if (fromRoad.id === this.id) {
-    //   // Find a match on toRoad within lanes
-    //   return (
-    //     this.lanes.find((lane) => this.neighbours[lane.toRoadIdx]?.id === toRoad.id).waypoints ?? []
-    //   );
-    // }
-
-    // // Otherwise, going through this road - match on both from and to
-    // let lanes = this.lanes.filter((lane) => this.neighbours[lane.toRoadIdx]?.id === toRoad.id);
-    // return (
-    //   lanes.find((lane) => this.neighbours[lane.fromRoadIdx]?.id === fromRoad.id).waypoints ?? []
-    // );
-
     return this.getConnectingLane(fromRoad, toRoad)?.waypoints ?? [];
   }
 

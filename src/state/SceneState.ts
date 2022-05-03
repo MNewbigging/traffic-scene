@@ -68,7 +68,6 @@ export class SceneState {
   // Once models are loaded, can then piece them together as per scene
   private buildScene() {
     this.setupCamera();
-    this.setupSkybox();
     this.setupLights();
 
     // Build the scene objects
@@ -90,7 +89,6 @@ export class SceneState {
 
   private setupLights() {
     // Ambient
-    //const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
     const ambientLight = new THREE.HemisphereLight(0xebf6ff, 0x5fa36b, 0.25);
     this.scene.add(ambientLight);
 
@@ -107,7 +105,6 @@ export class SceneState {
     directionalLight.shadow.camera.right = 20;
     directionalLight.shadow.camera.top = 20;
     directionalLight.shadow.camera.bottom = -20;
-    console.log('v', directionalLight.shadow.camera.bottom);
     directionalLight.shadow.mapSize.width = 4096;
     directionalLight.shadow.mapSize.height = 4096;
     directionalLight.shadow.camera.near = 0.5;
@@ -120,18 +117,7 @@ export class SceneState {
     sunGroup.add(helper);
     sunGroup.add(directionalLight);
     sunGroup.add(directionalLight.target);
-
     this.scene.add(sunGroup);
-    //this.scene.add(helper);
-
-    //this.scene.add(directionalLight);
-    //this.scene.add(directionalLight.target);
-    // const pointLight = new THREE.PointLight(0xffffff, 0.5);
-    // pointLight.position.x = 0;
-    // pointLight.position.y = 180;
-    // pointLight.position.z = 0;
-
-    // this.scene.add(pointLight);
   }
 
   private setupCamera() {
@@ -153,15 +139,6 @@ export class SceneState {
     this.controls.target.z = -4;
     // Prevent going below ground level
     this.controls.maxPolarAngle = Math.PI / 2;
-  }
-
-  private setupSkybox() {
-    // The skybox is a big sphere which the world sits inside
-    // const geom = new THREE.SphereGeometry(100, 64, 64);
-    // const mat = new THREE.MeshToonMaterial({ color: '#049ef4', side: THREE.BackSide });
-    // const sphere = new THREE.Mesh(geom, mat);
-    // this.scene.add(sphere);
-    //this.scene.background = new THREE.Color('#049ef4');
   }
 
   private onRightClick = () => {

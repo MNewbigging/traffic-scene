@@ -472,7 +472,6 @@ export class RoadFactory {
 
     const lane = new Lane();
     lane.line = line;
-    lane.road = road;
     road.lanes.push(lane);
   }
 
@@ -499,7 +498,6 @@ export class RoadFactory {
 
     const lane = new Lane();
     lane.line = line;
-    lane.road = road;
     road.lanes.push(lane);
   }
 
@@ -526,7 +524,6 @@ export class RoadFactory {
 
     const lane = new Lane();
     lane.line = line;
-    lane.road = road;
     road.lanes.push(lane);
   }
 
@@ -555,7 +552,6 @@ export class RoadFactory {
     // Create the lane object, set line and add to road
     const lane = new Lane();
     lane.line = line;
-    lane.road = road;
     road.lanes.push(lane);
   }
 
@@ -592,7 +588,6 @@ export class RoadFactory {
     // Create lane, add line and add to road
     const lane = new Lane();
     lane.line = line;
-    lane.road = road;
     road.lanes.push(lane);
   }
 
@@ -629,7 +624,6 @@ export class RoadFactory {
 
     const lane = new Lane();
     lane.line = line;
-    lane.road = road;
     road.lanes.push(lane);
   }
 }

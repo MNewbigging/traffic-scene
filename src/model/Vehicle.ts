@@ -249,11 +249,6 @@ export class Vehicle {
   }
 
   private drive(deltaTime: number) {
-    // Has the route ended?
-    if (!this.routeWaypoints.length || !this.nextWaypoint) {
-      return;
-    }
-
     // Have we reached the next waypoint?
     if (NumberUtils.vectorsEqual(this.position, this.nextWaypoint)) {
       // Target the next waypoint
@@ -267,7 +262,7 @@ export class Vehicle {
       deltaTime * this.acceleration
     );
 
-    // Otherwise, keep moving towards next target
+    // Keep moving towards next target
     const direction = this.nextWaypoint.clone().sub(this.position).normalize();
     const speed = deltaTime * this.actualSpeed;
     this.position.x += direction.x * speed;

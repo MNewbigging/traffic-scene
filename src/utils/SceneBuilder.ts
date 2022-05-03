@@ -8,9 +8,6 @@ import { RoadUtils } from './RoadUtils';
 import { Vehicle } from '../model/Vehicle';
 import { VehicleFactory } from './VehicleFactory';
 import { BufferAttribute } from 'three';
-import { posix } from 'path';
-import { group } from 'console';
-import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
 enum GroundType {
   GRASS = 'grass',
