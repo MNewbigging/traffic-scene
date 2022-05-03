@@ -9,6 +9,7 @@ import { Road } from '../model/Road';
 import { SceneBuilder } from '../utils/SceneBuilder';
 import { Vehicle } from '../model/Vehicle';
 import { VehicleUtils } from '../utils/VehicleUtils';
+import { DayNightCycle } from './DayNightCycle';
 
 /**
  * Contains all the objects in the scene
@@ -16,30 +17,22 @@ import { VehicleUtils } from '../utils/VehicleUtils';
 export class SceneState {
   public scene = new THREE.Scene();
   public camera: THREE.PerspectiveCamera;
+  private dayNightCycle: DayNightCycle;
   private roads: Road[] = [];
   private vehicles: Vehicle[] = [];
   private props: Prop[] = [];
   private targetVehicle?: Vehicle;
   private controls: OrbitControls;
-  private modelLoader = new ModelLoader();
-  private onReady?: () => void;
 
-  constructor(private canvasListener: CanvasListener, private mouseListener: MouseListener) {
+  constructor(
+    private canvasListener: CanvasListener,
+    private mouseListener: MouseListener,
+    private modelLoader: ModelLoader
+  ) {
     canvasListener.addCanvasListener(this.onCanvasResize);
     mouseListener.on('leftclickup', this.onLeftClick);
     mouseListener.on('rightclickdown', this.onRightClick);
-  }
-
-  // This kicks off the model loading required for this scene
-  public initScene(onReady: () => void) {
-    this.onReady = onReady;
-
-    const modelNames = new ModelNames();
-    modelNames.roads = Object.values(RoadName);
-    modelNames.vehicles = Object.values(VehicleName);
-    modelNames.houses = Object.values(HouseName);
-
-    this.modelLoader.loadModels(modelNames, () => this.buildScene());
+    this.dayNightCycle = new DayNightCycle(this.scene);
   }
 
   public updateScene(deltaTime: number) {
@@ -58,6 +51,9 @@ export class SceneState {
 
     // Update vehicles
     this.vehicles.forEach((v) => v.update(deltaTime));
+
+    // Day nigtht cycle
+    this.dayNightCycle.update(deltaTime);
   }
 
   private onCanvasResize = () => {
@@ -66,7 +62,7 @@ export class SceneState {
   };
 
   // Once models are loaded, can then piece them together as per scene
-  private buildScene() {
+  public buildScene() {
     this.setupCamera();
     this.setupLights();
 
@@ -82,42 +78,12 @@ export class SceneState {
     this.roads.forEach((r) => this.scene.add(r.model));
     this.vehicles.forEach((v) => this.scene.add(v.model));
     this.props.forEach((p) => this.scene.add(p.model));
-
-    // Now ready to start
-    this.onReady?.();
   }
 
   private setupLights() {
     // Ambient
     const ambientLight = new THREE.HemisphereLight(0xebf6ff, 0x5fa36b, 0.25);
     this.scene.add(ambientLight);
-
-    // Directional
-    const directionalLight = new THREE.DirectionalLight(0xfceea7, 1);
-    directionalLight.position.x = 10;
-    directionalLight.position.y = 10;
-    directionalLight.position.z = 10;
-    directionalLight.target.position.x = 8;
-    directionalLight.target.position.z = -4;
-    // Shadow props for light
-    directionalLight.castShadow = true;
-    directionalLight.shadow.camera.left = -30;
-    directionalLight.shadow.camera.right = 20;
-    directionalLight.shadow.camera.top = 20;
-    directionalLight.shadow.camera.bottom = -20;
-    directionalLight.shadow.mapSize.width = 4096;
-    directionalLight.shadow.mapSize.height = 4096;
-    directionalLight.shadow.camera.near = 0.5;
-    directionalLight.shadow.camera.far = 50;
-    directionalLight.shadow.bias = - 0.0007; // Magic number
-
-    const sunGroup = new THREE.Group();
-    sunGroup.name = 'SunGroup';
-    const helper = new THREE.CameraHelper(directionalLight.shadow.camera);
-    sunGroup.add(helper);
-    sunGroup.add(directionalLight);
-    sunGroup.add(directionalLight.target);
-    this.scene.add(sunGroup);
   }
 
   private setupCamera() {

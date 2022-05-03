@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { CanvasListener } from './utils/CanvasListener';
 import { MouseListener } from './utils/MouseListener';
 import { SceneState } from './state/SceneState';
+import { HouseName, ModelLoader, ModelNames, RoadName, VehicleName } from './utils/ModelLoader';
 
 /**
  * High level state class, handles renderer and main game loop
@@ -27,14 +28,16 @@ export class AppState {
     this.renderer.outputEncoding = THREE.sRGBEncoding;
     this.onCanvasResize();
 
-    // Setup scene
-    this.sceneState = new SceneState(this.canvasListener, this.mouseListener);
-    this.sceneState.initScene(() => this.start());
-  }
+    // Load assets
+    const modelLoader = new ModelLoader();
+    modelLoader.loadAllModels(() => {
+      // Setup scene
+      this.sceneState = new SceneState(this.canvasListener, this.mouseListener, modelLoader);
+      this.sceneState.buildScene();
 
-  private start() {
-    // Start render loop
-    this.animate();
+      // Can now start the main game loop
+      this.animate();
+    });
   }
 
   private onCanvasResize = () => {

@@ -80,6 +80,15 @@ export class ModelLoader {
     // }
   }
 
+  public loadAllModels(onLoad: () => void) {
+    const modelNames = new ModelNames();
+    modelNames.roads = Object.values(RoadName);
+    modelNames.vehicles = Object.values(VehicleName);
+    modelNames.houses = Object.values(HouseName);
+
+    this.loadModels(modelNames, onLoad);
+  }
+
   public loadModels(modelNames: ModelNames, onLoad: () => void) {
     this.onLoad = onLoad;
 
@@ -110,7 +119,6 @@ export class ModelLoader {
   private onLoadModel = (name: ModelName, group: THREE.Group) => {
     this.loadedModels++;
     this.modelMap.set(name, group);
-    //console.log(`loaded ${name}, current models:`, this.modelMap);
 
     // Check if all models are now loaded
     if (this.loadedModels === this.modelsToLoad) {
