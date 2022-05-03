@@ -5,25 +5,27 @@ import React from 'react';
 import { AppState } from './AppState';
 import { GameClock } from './components/game-clock/GameClock';
 
-export class App extends React.Component {
+interface AppCompState {
+  ready: boolean;
+}
+
+export class App extends React.Component<{}, AppCompState> {
+  state: Readonly<AppCompState> = { ready: false };
   private canvasRef = React.createRef<HTMLCanvasElement>();
   private appState: AppState;
 
   componentDidMount() {
     if (this.canvasRef.current) {
       this.appState = new AppState(this.canvasRef.current);
-      console.log('set app state');
-      this.render();
+      this.setState((_state) => ({ ready: true }));
     }
   }
 
   public render() {
-    console.log('app render', this.appState);
     return (
       <div className={'app'}>
         <canvas className={'main-canvas'} ref={this.canvasRef}></canvas>
         {this.appState && this.renderGameUI()}
-        <div>THIS RENDERS</div>
       </div>
     );
   }
@@ -32,7 +34,6 @@ export class App extends React.Component {
     console.log('render game ui!');
     return (
       <>
-        <div>HELLO THERE</div>
         <GameClock
           onPause={this.appState.worldClock.pause}
           onResume={this.appState.worldClock.resume}
