@@ -19,7 +19,7 @@ module.exports = {
     rules: [
       {
         test: /\.tsx?$/,
-        loader: 'awesome-typescript-loader',
+        loader: 'ts-loader',
       },
       {
         test: /\.(s*)css$/,
@@ -32,6 +32,21 @@ module.exports = {
       {
         test: /\.svg$/,
         use: ['@svgr/webpack'],
+      },
+      {
+        test: /\.(glb|gltf)$/,
+        //use: 'file-loader?name=[name].[ext]&outputPath=./assets/models',
+        use:
+        [
+            {
+                loader: 'file-loader',
+                options:
+                {
+                  esModule: false,
+                  outputPath: 'assets/models/'
+                }
+            }
+        ]
       },
     ],
   },
