@@ -3,26 +3,26 @@ import pauseImg from '../../../public/assets/images/pause.png';
 import resumeImg from '../../../public/assets/images/forward.png';
 
 import React from 'react';
-import { observer } from 'mobx-react';
-import { observable } from 'mobx';
 
-interface Props {
+interface GameClockProps {
   onPause: () => void;
   onResume: () => void;
 }
 
-@observer
-export class GameClock extends React.Component<Props> {
-  @observable paused = false;
+interface GameClockState {
+  paused: boolean;
+}
+
+export class GameClock extends React.Component<GameClockProps, GameClockState> {
+  state: Readonly<GameClockState> = { paused: false };
 
   public render() {
-    console.log('game clock render');
     return (
       <div className='game-clock'>
         <img
           className='icon'
           onClick={this.togglePause}
-          src={this.paused ? resumeImg : pauseImg}
+          src={this.state.paused ? resumeImg : pauseImg}
         ></img>
       </div>
     );
@@ -31,9 +31,9 @@ export class GameClock extends React.Component<Props> {
   private togglePause = () => {
     const { onPause, onResume } = this.props;
 
-    this.paused = !this.paused;
+    this.setState((state) => ({ paused: !state.paused }));
 
-    if (this.paused) {
+    if (this.state.paused) {
       onPause();
     } else {
       onResume();
