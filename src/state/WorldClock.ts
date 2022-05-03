@@ -19,9 +19,13 @@ export class WorldClock {
     return this.clock.getDelta();
   }
 
-  public pause() {}
+  public pause = () => {
+    console.log('pausing');
+  };
 
-  public resume() {}
+  public resume = () => {
+    console.log('resuming');
+  };
 
   public fastForward() {}
 

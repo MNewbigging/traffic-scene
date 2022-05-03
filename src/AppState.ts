@@ -10,10 +10,10 @@ import { WorldClock } from './state/WorldClock';
  * High level state class, handles renderer and main game loop
  */
 export class AppState {
+  public worldClock = new WorldClock();
   private canvasListener: CanvasListener;
   private mouseListener = new MouseListener();
   private renderer: THREE.WebGLRenderer;
-  private worldClock = new WorldClock();
   private sceneState: SceneState;
 
   constructor(canvas: HTMLCanvasElement) {
