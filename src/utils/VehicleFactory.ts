@@ -12,37 +12,37 @@ export class VehicleFactory {
     }
 
     // Set the speed
-    let speed = 1;
+    let speed = 0.5;
     switch (name) {
       case VehicleName.DELIVERY:
-        speed = 1.6;
+        speed = 0.8;
         break;
       case VehicleName.GARBAGE:
-        speed = 1.5;
+        speed = 0.75;
         break;
       case VehicleName.HATCHBACK:
-        speed = 1.8;
+        speed = 0.9;
         break;
       case VehicleName.POLICE:
-        speed = 2.2;
+        speed = 1.1;
         break;
       case VehicleName.SEDAN:
-        speed = 2;
+        speed = 1;
         break;
       case VehicleName.SEDAN_SPORTS:
-        speed = 2.2;
+        speed = 1.1;
         break;
       case VehicleName.SUV:
-        speed = 1.8;
+        speed = 0.9;
         break;
       case VehicleName.TAXI:
-        speed = 1.7;
+        speed = 0.85;
         break;
       case VehicleName.TRUCK:
-        speed = 1.5;
+        speed = 0.75;
         break;
       case VehicleName.VAN:
-        speed = 1.6;
+        speed = 0.8;
         break;
     }
 

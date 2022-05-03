@@ -1,12 +1,14 @@
 import './game-clock.scss';
 import pauseImg from '../../../public/assets/images/pause.png';
 import resumeImg from '../../../public/assets/images/forward.png';
+import fastForwardImg from '../../../public/assets/images/fastForward.png';
 
 import React from 'react';
 
 interface GameClockProps {
   onPause: () => void;
   onResume: () => void;
+  onFastForward: () => void;
 }
 
 interface GameClockState {
@@ -17,13 +19,16 @@ export class GameClock extends React.Component<GameClockProps, GameClockState> {
   state: Readonly<GameClockState> = { paused: false };
 
   public render() {
+    const { onFastForward } = this.props;
+
     return (
       <div className='game-clock'>
         <img
-          className='icon'
+          className={'icon'}
           onClick={this.togglePause}
           src={this.state.paused ? resumeImg : pauseImg}
         ></img>
+        <img className={'icon'} onClick={onFastForward} src={fastForwardImg}></img>
       </div>
     );
   }

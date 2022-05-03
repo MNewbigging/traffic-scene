@@ -10,13 +10,14 @@ export class WorldClock {
   public rate = WorldClockRate.NORMAL;
   public clock = new THREE.Clock();
   private userPaused = false;
+  private timeModifier = 1;
 
   constructor() {
     document.addEventListener('visibilitychange', this.onVisibilityChange);
   }
 
   public get delta() {
-    return this.clock.getDelta();
+    return this.clock.getDelta() * this.timeModifier;
   }
 
   public pause = () => {
@@ -29,7 +30,15 @@ export class WorldClock {
     this.userPaused = false;
   };
 
-  public fastForward() {}
+  // TODO - toggle fast forward on/off? have separate levels?
+  public toggleFastForward = () => {
+    if (this.userPaused) {
+      this.resume();
+    }
+
+    // Speed up delta time
+    this.timeModifier = 2;
+  };
 
   public update(deltaTime: number) {}
 
