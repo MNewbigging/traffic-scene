@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 import { CanvasListener } from '../utils/CanvasListener';
-import { HouseName, ModelLoader, ModelNames, RoadName, VehicleName } from '../utils/ModelLoader';
+import { HouseName, ModelLoader, ModelNames, RoadName, VehicleName, FoliageName } from '../utils/ModelLoader';
 import { MouseListener } from '../utils/MouseListener';
 import { Prop } from '../model/Prop';
 import { Road } from '../model/Road';
@@ -38,6 +38,7 @@ export class SceneState {
     modelNames.roads = Object.values(RoadName);
     modelNames.vehicles = Object.values(VehicleName);
     modelNames.houses = Object.values(HouseName);
+    modelNames.foliage = Object.values(FoliageName);
 
     this.modelLoader.loadModels(modelNames, () => this.buildScene());
   }

@@ -1,13 +1,12 @@
 import * as THREE from 'three';
 
-import { HouseName, ModelLoader, RoadName, VehicleName } from './ModelLoader';
+import { HouseName, ModelLoader, RoadName, VehicleName, FoliageName } from './ModelLoader';
 import { Prop } from '../model/Prop';
 import { Road } from '../model/Road';
 import { RoadFactory } from './RoadFactory';
 import { RoadUtils } from './RoadUtils';
 import { Vehicle } from '../model/Vehicle';
 import { VehicleFactory } from './VehicleFactory';
-import { BufferAttribute } from 'three';
 
 enum GroundType {
   GRASS = 'grass',
@@ -550,6 +549,8 @@ export class SceneBuilder {
       new THREE.Vector2(1, 1),
       new THREE.Vector3(8, 0, -4)
     );
+    const f1 = this.addFoliage(FoliageName.BUSH, new THREE.Vector3(8, 0, -4));
+    const r1 = [g16, f1];
 
     return [
       ...block1,
@@ -565,7 +566,7 @@ export class SceneBuilder {
       ...block11,
       ...block12,
       ...block13,
-      g16,
+      ...r1,
     ];
   }
 
@@ -634,14 +635,27 @@ export class SceneBuilder {
 
     if (type === GroundType.GRASS) {
       const grass = this.addGrass(size, pos, 1000);
-      const bushes = this.addBushes(size, pos, 2);
+      //const bushes = this.addBushes(size, pos, 2);
       group.add(grass);
-      group.add(bushes);
+      //group.add(bushes);
     }
     
     const prop = new Prop(group);
 
     return prop;
+  }
+
+  private addFoliage(name: FoliageName, pos: THREE.Vector3) {
+    const foliageModel = this.modelLoader.getModel(name);
+    const foliage = new Prop(foliageModel);
+
+    foliage.position.x = pos.x;
+    foliage.position.y = pos.y;
+    foliage.position.z = pos.z;
+
+    foliage.rotation.y = Math.random() * Math.PI * 2;
+
+    return foliage;
   }
 
   private addGrass(size: THREE.Vector2, pos: THREE.Vector3, density: number): THREE.Group {
@@ -700,7 +714,7 @@ export class SceneBuilder {
     grassGeo.setAttribute( 'position', new THREE.Float32BufferAttribute( square, 3 ) );
     grassGeo.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
     grassGeo.setAttribute( 'uv', new THREE.Float32BufferAttribute( uv, 2 ) );
-    grassGeo.setAttribute('color', new BufferAttribute(vertColors, 3)); 
+    grassGeo.setAttribute('color', new THREE.BufferAttribute(vertColors, 3)); 
     //const grass = new THREE.Mesh( grassGeo, grassMat );
 
     const mesh = new THREE.InstancedMesh(grassGeo, grassMat, totalCount);
@@ -804,7 +818,7 @@ export class SceneBuilder {
     bushGeo.setAttribute( 'position', new THREE.Float32BufferAttribute( square, 3 ) );
     bushGeo.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
     bushGeo.setAttribute( 'uv', new THREE.Float32BufferAttribute( uv, 2 ) );
-    bushGeo.setAttribute('color', new BufferAttribute(vertColors, 3)); 
+    bushGeo.setAttribute('color', new THREE.BufferAttribute(vertColors, 3)); 
 
     const mesh = new THREE.InstancedMesh(bushGeo, bushMat, totalCount);
 

@@ -1,17 +1,19 @@
 import * as THREE from 'three';
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { NumberUtils } from './NumberUtils';
 
 export class ModelNames {
   vehicles: VehicleName[] = [];
   roads: RoadName[] = [];
   houses: HouseName[] = [];
+  foliage: FoliageName[] = [];
 
   get modelCount() {
-    return this.vehicles.length + this.roads.length + this.houses.length;
+    return this.vehicles.length + this.roads.length + this.houses.length + this.foliage.length;
   }
 }
 
-type ModelName = VehicleName | RoadName | HouseName;
+type ModelName = VehicleName | RoadName | HouseName | FoliageName;
 
 export enum VehicleName {
   DELIVERY = 'delivery',
@@ -56,6 +58,10 @@ export enum HouseName {
   TYPE_21 = 'house_type21',
 }
 
+export enum FoliageName {
+  BUSH = 'bush2',
+}
+
 /**
  * Responsible for loading models and storing them during runtime.
  */
@@ -63,6 +69,7 @@ export class ModelLoader {
   private readonly vehicleScaleModifer = 0.3;
   private readonly roadScaleModifier = 2;
   private readonly houseScaleModifier = 1.5;
+  private readonly foliageScaleModifier = 0.25;
   private modelMap = new Map<ModelName, THREE.Group>();
   private loadedModels = 0;
   private modelsToLoad = 0;
@@ -97,6 +104,9 @@ export class ModelLoader {
 
     // Load houses
     modelNames.houses.forEach((hName) => this.loadHouse(hName, loader));
+
+    // Load foliage
+    modelNames.foliage.forEach((fName) => this.loadFoliage(fName, loader));
   }
 
   public getModel(name: ModelName): THREE.Group {
@@ -234,6 +244,85 @@ export class ModelLoader {
     // Wrap in parent to avoid losing above transforms
     const parent = new THREE.Group();
     parent.add(house);
+
+    return parent;
+  }
+
+  private loadFoliage(fName: FoliageName, loader: GLTFLoader) {
+    loader.load(
+      this.baseAssetPath + `nature/${fName}.glb`,
+      (model: GLTF) => {
+        // Traverse model nodes
+        model.scene.traverse((node) => {
+          // If it's a mesh
+          if ((node as THREE.Mesh).isMesh) {
+            // Adjust metalness
+            ((node as THREE.Mesh).material as THREE.MeshStandardMaterial).metalness = 0;
+
+            if (node.name === 'Leaves') {
+              const alpha = new THREE.TextureLoader().load('assets/textures/bushUpper_alpha.png'); // should move this out of here
+              const diffuse = new THREE.TextureLoader().load('assets/textures/bushUpper_diffuse.png'); // should move this out of here
+              (node as THREE.Mesh).material = new THREE.MeshStandardMaterial({alphaMap: alpha, map: diffuse, transparent: true, alphaTest: 0.9, roughness: 0.66});
+            } else {
+              (node as THREE.Mesh).geometry.computeBoundingSphere();
+              const bSphere = (node as THREE.Mesh).geometry.boundingSphere;
+              const vec = new THREE.Vector3();
+              const vertArr = (node as THREE.Mesh).geometry.attributes.position.array;
+              const vertColors = new Float32Array(vertArr.length * 3);
+              const baseColor = [46, 38, 28];
+              const tipColor = [76, 84, 47];
+              const weightStrength = 1;
+              //const baseColor = [255, 0, 0];
+              for (let i = 0; i < vertArr.length; i+=3) {
+                vec.set(
+                  vertArr[i],
+                  vertArr[i+1],
+                  vertArr[i+2],
+                );
+
+                const length = vec.length() / bSphere.radius;
+                const alpha = length * weightStrength;
+                // vertColors[i] = (baseColor[0] / 255) * (1 - length * weightStrength);
+                // vertColors[i+1] = (baseColor[1] / 255) * (1 - length * weightStrength);
+                // vertColors[i+2] = (baseColor[2] / 255) * (1 - length * weightStrength);
+
+                vertColors[i] = NumberUtils.lerp((baseColor[0] / 255), (tipColor[0] / 255), alpha);
+                vertColors[i+1] = NumberUtils.lerp((baseColor[1] / 255), (tipColor[1] / 255), alpha);
+                vertColors[i+2] = NumberUtils.lerp((baseColor[2] / 255), (tipColor[2] / 255), alpha);
+              }
+              (node as THREE.Mesh).geometry.setAttribute('color', new THREE.BufferAttribute(vertColors, 3)); 
+              (node as THREE.Mesh).material = new THREE.MeshStandardMaterial({vertexColors: true});
+              //((node as THREE.Mesh).material as THREE.MeshStandardMaterial).vertexColors = true;
+            }
+
+            //node.castShadow = true;
+            //node.receiveShadow = true;
+          }
+        });
+
+        const foliage = this.setupFoliage(model.scene);
+        this.onLoadModel(fName, foliage);
+      },
+      undefined,
+      this.onLoadError
+    );
+  }
+
+  private setupFoliage(foliage: THREE.Group) {
+    // Adjust scale of houses
+    //house.scale.set(this.houseScaleModifier, this.houseScaleModifier, this.houseScaleModifier);
+    foliage.scale.set(this.foliageScaleModifier, this.foliageScaleModifier, this.foliageScaleModifier);
+
+    // Set transform origin to center of the model
+    const box = new THREE.Box3().setFromObject(foliage);
+    box.getCenter(foliage.position).multiplyScalar(-1);
+
+    // Models are centered, move to sit at ground level
+    foliage.position.y = 0;
+
+    // Wrap in parent to avoid losing above transforms
+    const parent = new THREE.Group();
+    parent.add(foliage);
 
     return parent;
   }
