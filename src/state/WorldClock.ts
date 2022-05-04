@@ -1,13 +1,6 @@
 import * as THREE from 'three';
 
-export enum WorldClockRate {
-  PAUSED = 'paused',
-  NORMAL = 'normal',
-  FAST = 'fast',
-}
-
 export class WorldClock {
-  public rate = WorldClockRate.NORMAL;
   public clock = new THREE.Clock();
   private userPaused = false;
   private timeModifier = 1;
@@ -36,11 +29,13 @@ export class WorldClock {
       this.resume();
     }
 
-    // Speed up delta time
-    this.timeModifier = 2;
+    // Toggle between fast and normal rates
+    if (this.timeModifier === 1) {
+      this.timeModifier = 2;
+    } else {
+      this.timeModifier = 1;
+    }
   };
-
-  public update(deltaTime: number) {}
 
   private onVisibilityChange = () => {
     if (document.visibilityState === 'hidden' && !this.userPaused) {

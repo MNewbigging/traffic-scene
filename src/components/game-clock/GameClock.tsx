@@ -13,13 +13,14 @@ interface GameClockProps {
 
 interface GameClockState {
   paused: boolean;
+  ffActive: boolean;
 }
 
 export class GameClock extends React.Component<GameClockProps, GameClockState> {
-  state: Readonly<GameClockState> = { paused: false };
+  state: Readonly<GameClockState> = { paused: false, ffActive: false };
 
   public render() {
-    const { onFastForward } = this.props;
+    const ffActiveClass = this.state.ffActive ? 'active' : '';
 
     return (
       <div className='game-clock'>
@@ -28,7 +29,11 @@ export class GameClock extends React.Component<GameClockProps, GameClockState> {
           onClick={this.togglePause}
           src={this.state.paused ? resumeImg : pauseImg}
         ></img>
-        <img className={'icon'} onClick={onFastForward} src={fastForwardImg}></img>
+        <img
+          className={'icon ' + ffActiveClass}
+          onClick={this.toggleFastForward}
+          src={fastForwardImg}
+        ></img>
       </div>
     );
   }
@@ -44,5 +49,13 @@ export class GameClock extends React.Component<GameClockProps, GameClockState> {
     }
 
     this.setState((state) => ({ paused: !state.paused }));
+  };
+
+  private toggleFastForward = () => {
+    const { onFastForward } = this.props;
+
+    onFastForward();
+
+    this.setState((state) => ({ ffActive: !state.ffActive }));
   };
 }
