@@ -48,9 +48,16 @@ export class AppState {
   private animate = () => {
     requestAnimationFrame(this.animate);
 
+    // Get delta time for this frame
     const deltaTime = this.worldClock.delta;
+
+    // Update world clock
+    this.worldClock.update(deltaTime);
+
+    // Update scene
     this.sceneState.updateScene(deltaTime);
 
+    // Render
     this.renderer.render(this.sceneState.scene, this.sceneState.camera);
   };
 }

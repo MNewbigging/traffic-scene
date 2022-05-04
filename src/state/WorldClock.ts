@@ -2,6 +2,9 @@ import * as THREE from 'three';
 
 export class WorldClock {
   public clock = new THREE.Clock();
+  public hours = 0;
+  public minutes = 0;
+  private deltaAccumulator = 0;
   private userPaused = false;
   private timeModifier = 1;
 
@@ -23,7 +26,6 @@ export class WorldClock {
     this.userPaused = false;
   };
 
-  // TODO - toggle fast forward on/off? have separate levels?
   public toggleFastForward = () => {
     if (this.userPaused) {
       this.resume();
@@ -36,6 +38,14 @@ export class WorldClock {
       this.timeModifier = 1;
     }
   };
+
+  public update(deltaTime: number) {
+    // Use delta time to accumulate in-game time
+    this.deltaAccumulator += deltaTime;
+
+    const h = this.deltaAccumulator / 60;
+    const m = this.deltaAccumulator % 60;
+  }
 
   private onVisibilityChange = () => {
     if (document.visibilityState === 'hidden' && !this.userPaused) {
