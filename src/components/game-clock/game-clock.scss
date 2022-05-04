@@ -14,16 +14,28 @@
   .icon {
     width: 30px;
     height: 30px;
+    padding: 1px;
     cursor: pointer;
 
     &.active,
     &:hover {
+      padding: 0px;
       border: 1px solid white;
       border-radius: 3px;
     }
   }
 
   .clock {
+    padding: 3px;
+    position: relative;
     color: white;
+    cursor: pointer;
+
+    &.active,
+    &:hover {
+      padding: 2px;
+      border: 1px solid white;
+      border-radius: 3px;
+    }
   }
 }

@@ -10,13 +10,8 @@ import * as THREE from 'three';
  * The light should follow points along a curve til the end, then fade out.
  * Then it starts again from the same beginning on the curve, after a delay.
  *
- * It needs to be able to set the time and update the sun & light accordingly
- *
- * Should this feature the world clock? It's the only thing that uses it now...
- * Should I start with the clock? OR just make the sun move...
- *
- * The time determines the position along the curve.
- *
+ * This means that the light position, intensity and colour is relative to the
+ * current time of day.
  */
 export class DayNightCycle {
   private sunLight: THREE.DirectionalLight;

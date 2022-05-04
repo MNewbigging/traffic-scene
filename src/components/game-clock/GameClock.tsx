@@ -7,6 +7,7 @@ import './game-clock.scss';
 import pauseImg from '../../../public/assets/images/pause.png';
 import resumeImg from '../../../public/assets/images/forward.png';
 import fastForwardImg from '../../../public/assets/images/fastForward.png';
+import { GameClockSetter } from './GameClockSetter';
 
 interface GameClockProps {
   worldClock: WorldClock;
@@ -28,6 +29,8 @@ export const GameClock: React.FC<GameClockProps> = observer(({ worldClock }) => 
     mins = '0' + mins;
   }
 
+  const setClockActiveClass = worldClock.timePickerOpen ? 'active' : '';
+
   return (
     <div className='game-clock'>
       <img
@@ -35,14 +38,18 @@ export const GameClock: React.FC<GameClockProps> = observer(({ worldClock }) => 
         onClick={worldClock.togglePause}
         src={worldClock.paused ? resumeImg : pauseImg}
       ></img>
+
       <img
         className={'icon ' + ffActiveClass}
         onClick={worldClock.toggleFastForward}
         src={fastForwardImg}
       ></img>
-      <div className={'clock'}>
+
+      <div className={'clock ' + setClockActiveClass} onClick={worldClock.toggleTimePicker}>
         {hours}:{mins}
       </div>
+
+      {worldClock.timePickerOpen && <GameClockSetter />}
     </div>
   );
 });

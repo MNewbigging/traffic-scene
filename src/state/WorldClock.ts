@@ -7,6 +7,7 @@ export class WorldClock {
   public timeModifier = 1;
   public hours = 0;
   public minutes = 0;
+  public timePickerOpen = false;
   private deltaAccumulator = 0;
 
   constructor() {
@@ -21,6 +22,8 @@ export class WorldClock {
       hours: observable,
       minutes: observable,
       update: action,
+      timePickerOpen: observable,
+      toggleTimePicker: action,
     });
 
     document.addEventListener('visibilitychange', this.onVisibilityChange);
@@ -63,6 +66,10 @@ export class WorldClock {
     } else {
       this.timeModifier = 1;
     }
+  };
+
+  public toggleTimePicker = () => {
+    this.timePickerOpen = !this.timePickerOpen;
   };
 
   public setTime(hours: number) {}
