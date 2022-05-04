@@ -32,7 +32,12 @@ export class AppState {
     const modelLoader = new ModelLoader();
     modelLoader.loadAllModels(() => {
       // Setup scene
-      this.sceneState = new SceneState(this.canvasListener, this.mouseListener, modelLoader);
+      this.sceneState = new SceneState(
+        this.worldClock,
+        this.canvasListener,
+        this.mouseListener,
+        modelLoader
+      );
       this.sceneState.buildScene();
 
       // Can now start the main game loop

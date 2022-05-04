@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { WorldClock } from './WorldClock';
 /**
  * Responsible for managing the day-night cycle. Creates the directional light
  * for the sun and its target, moves across the scene and provides methods to
@@ -17,7 +18,7 @@ export class DayNightCycle {
   private sunLight: THREE.DirectionalLight;
   private trajectoryPoints: THREE.Vector3[] = [];
 
-  constructor(private scene: THREE.Scene) {
+  constructor(private scene: THREE.Scene, private worldClock: WorldClock) {
     this.createSun();
     this.trajectoryLine();
   }
@@ -28,9 +29,9 @@ export class DayNightCycle {
 
   private trajectoryLine() {
     const points = [
-      new THREE.Vector3(-100, 10, 10),
-      new THREE.Vector3(0, 50, 10),
-      new THREE.Vector3(100, 50, 10),
+      new THREE.Vector3(-50, 10, 5),
+      new THREE.Vector3(0, 50, 5),
+      new THREE.Vector3(50, 10, 5),
     ];
 
     const curve = new THREE.CatmullRomCurve3(points);
@@ -46,8 +47,8 @@ export class DayNightCycle {
 
   private createSun() {
     const directionalLight = new THREE.DirectionalLight(0xfceea7, 1);
-    directionalLight.position.x = 0;
-    directionalLight.position.y = 10;
+    directionalLight.position.x = 20;
+    directionalLight.position.y = 20;
     directionalLight.position.z = 10;
     directionalLight.target.position.x = 8;
     directionalLight.target.position.z = -4;

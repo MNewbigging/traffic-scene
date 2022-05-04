@@ -10,6 +10,7 @@ import { SceneBuilder } from '../utils/SceneBuilder';
 import { Vehicle } from '../model/Vehicle';
 import { VehicleUtils } from '../utils/VehicleUtils';
 import { DayNightCycle } from './DayNightCycle';
+import { WorldClock } from './WorldClock';
 
 /**
  * Contains all the objects in the scene
@@ -25,6 +26,7 @@ export class SceneState {
   private controls: OrbitControls;
 
   constructor(
+    private worldClock: WorldClock,
     private canvasListener: CanvasListener,
     private mouseListener: MouseListener,
     private modelLoader: ModelLoader
@@ -32,7 +34,7 @@ export class SceneState {
     canvasListener.addCanvasListener(this.onCanvasResize);
     mouseListener.on('leftclickup', this.onLeftClick);
     mouseListener.on('rightclickdown', this.onRightClick);
-    this.dayNightCycle = new DayNightCycle(this.scene);
+    this.dayNightCycle = new DayNightCycle(this.scene, this.worldClock);
   }
 
   public updateScene(deltaTime: number) {
