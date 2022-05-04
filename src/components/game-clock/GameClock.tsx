@@ -49,7 +49,7 @@ export const GameClock: React.FC<GameClockProps> = observer(({ worldClock }) => 
         {hours}:{mins}
       </div>
 
-      {worldClock.timePickerOpen && <GameClockSetter />}
+      {worldClock.timePickerOpen && <GameClockSetter worldClock={worldClock} />}
     </div>
   );
 });

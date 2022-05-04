@@ -2,8 +2,14 @@ import './game-clock-setter.scss';
 
 import React from 'react';
 import { RangeSlider } from '../common/RangeSlider';
+import { WorldClock } from '../../state/WorldClock';
+import { observer } from 'mobx-react-lite';
 
-export const GameClockSetter: React.FC = () => {
+interface GameClockSetterProps {
+  worldClock: WorldClock;
+}
+
+export const GameClockSetter: React.FC<GameClockSetterProps> = observer(({ worldClock }) => {
   return (
     <div className={'game-clock-setter'}>
       00:00
@@ -11,10 +17,10 @@ export const GameClockSetter: React.FC = () => {
         className={'game-clock-slider'}
         min={0}
         max={1439}
-        value={719}
-        onChange={(v) => console.log('value', v)}
+        value={Math.floor(worldClock.deltaAccumulator)}
+        onChange={worldClock.setTime}
       />
       23:59
     </div>
   );
-};
+});

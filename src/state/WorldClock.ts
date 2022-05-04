@@ -8,7 +8,7 @@ export class WorldClock {
   public hours = 0;
   public minutes = 0;
   public timePickerOpen = false;
-  private deltaAccumulator = 0;
+  public deltaAccumulator = 0;
 
   constructor() {
     // MobX
@@ -24,6 +24,8 @@ export class WorldClock {
       update: action,
       timePickerOpen: observable,
       toggleTimePicker: action,
+      deltaAccumulator: observable,
+      setTime: action,
     });
 
     document.addEventListener('visibilitychange', this.onVisibilityChange);
@@ -72,7 +74,9 @@ export class WorldClock {
     this.timePickerOpen = !this.timePickerOpen;
   };
 
-  public setTime(hours: number) {}
+  public setTime = (time: number) => {
+    this.deltaAccumulator = time;
+  };
 
   public update(deltaTime: number) {
     // Use delta time to accumulate in-game time
