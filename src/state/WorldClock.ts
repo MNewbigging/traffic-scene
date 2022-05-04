@@ -1,14 +1,24 @@
 import * as THREE from 'three';
+import { makeObservable, observable, action, computed } from 'mobx';
 
 export class WorldClock {
   public clock = new THREE.Clock();
+  public paused = false;
+  public timeModifier = 1;
   public hours = 0;
   public minutes = 0;
   private deltaAccumulator = 0;
-  private userPaused = false;
-  private timeModifier = 1;
 
   constructor() {
+    // MobX
+    makeObservable(this, {
+      paused: observable,
+      pause: action,
+      timeModifier: observable,
+      isFastForwardActive: computed,
+      toggleFastForward: action,
+    });
+
     document.addEventListener('visibilitychange', this.onVisibilityChange);
   }
 
@@ -16,18 +26,30 @@ export class WorldClock {
     return this.clock.getDelta() * this.timeModifier;
   }
 
+  public togglePause = () => {
+    if (this.paused) {
+      this.resume();
+    } else {
+      this.pause();
+    }
+  };
+
   public pause = () => {
     this.clock.stop();
-    this.userPaused = true;
+    this.paused = true;
   };
 
   public resume = () => {
     this.clock.start();
-    this.userPaused = false;
+    this.paused = false;
   };
 
+  public get isFastForwardActive() {
+    return this.timeModifier === 2;
+  }
+
   public toggleFastForward = () => {
-    if (this.userPaused) {
+    if (this.paused) {
       this.resume();
     }
 
@@ -48,9 +70,9 @@ export class WorldClock {
   }
 
   private onVisibilityChange = () => {
-    if (document.visibilityState === 'hidden' && !this.userPaused) {
+    if (document.visibilityState === 'hidden' && !this.paused) {
       this.clock.stop();
-    } else if (!this.userPaused) {
+    } else if (!this.paused) {
       this.clock.start();
     }
   };

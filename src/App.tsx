@@ -34,11 +34,7 @@ export class App extends React.Component<{}, AppCompState> {
     console.log('render game ui!');
     return (
       <>
-        <GameClock
-          onPause={this.appState.worldClock.pause}
-          onResume={this.appState.worldClock.resume}
-          onFastForward={this.appState.worldClock.toggleFastForward}
-        />
+        <GameClock worldClock={this.appState.worldClock} />
       </>
     );
   };
