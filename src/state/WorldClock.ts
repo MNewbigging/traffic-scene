@@ -14,9 +14,13 @@ export class WorldClock {
     makeObservable(this, {
       paused: observable,
       pause: action,
+      resume: action,
       timeModifier: observable,
       isFastForwardActive: computed,
       toggleFastForward: action,
+      hours: observable,
+      minutes: observable,
+      update: action,
     });
 
     document.addEventListener('visibilitychange', this.onVisibilityChange);
@@ -61,12 +65,22 @@ export class WorldClock {
     }
   };
 
+  public setTime(hours: number) {}
+
   public update(deltaTime: number) {
     // Use delta time to accumulate in-game time
     this.deltaAccumulator += deltaTime;
 
-    const h = this.deltaAccumulator / 60;
-    const m = this.deltaAccumulator % 60;
+    // Tick over to midnight
+    if (this.deltaAccumulator > 1439) {
+      this.deltaAccumulator = 0;
+    }
+
+    // In game hours and real-world minutes
+    this.hours = Math.floor(this.deltaAccumulator / 60);
+
+    // In game mins are real-world seconds
+    this.minutes = Math.floor(this.deltaAccumulator % 60);
   }
 
   private onVisibilityChange = () => {

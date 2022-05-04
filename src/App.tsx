@@ -31,7 +31,6 @@ export class App extends React.Component<{}, AppCompState> {
   }
 
   private renderGameUI = () => {
-    console.log('render game ui!');
     return (
       <>
         <GameClock worldClock={this.appState.worldClock} />

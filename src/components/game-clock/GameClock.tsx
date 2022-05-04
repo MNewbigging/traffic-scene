@@ -12,8 +12,21 @@ interface GameClockProps {
   worldClock: WorldClock;
 }
 
+/**
+ * Shows the game speed controls, current time and set time controls.
+ */
 export const GameClock: React.FC<GameClockProps> = observer(({ worldClock }) => {
   const ffActiveClass = worldClock.isFastForwardActive ? 'active' : '';
+
+  let hours = worldClock.hours.toString();
+  if (hours.length < 2) {
+    hours = '0' + hours;
+  }
+
+  let mins = worldClock.minutes.toString();
+  if (mins.length < 2) {
+    mins = '0' + mins;
+  }
 
   return (
     <div className='game-clock'>
@@ -27,6 +40,9 @@ export const GameClock: React.FC<GameClockProps> = observer(({ worldClock }) => 
         onClick={worldClock.toggleFastForward}
         src={fastForwardImg}
       ></img>
+      <div className={'clock'}>
+        {hours}:{mins}
+      </div>
     </div>
   );
 });
