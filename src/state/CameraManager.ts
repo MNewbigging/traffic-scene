@@ -15,16 +15,16 @@ export class CameraManager {
   private orbitControls: OrbitControls;
 
   constructor(private canvasListener: CanvasListener) {
-    this.setupCamera();
-    this.setupControls();
-
-    canvasListener.addCanvasListener(this.onCanvasResize);
-
     // Mobx
     makeObservable(this, {
       mode: observable,
       setMode: action,
     });
+
+    this.setupCamera();
+    this.setupControls();
+
+    canvasListener.addCanvasListener(this.onCanvasResize);
   }
 
   public setMode = (mode: CameraMode) => {

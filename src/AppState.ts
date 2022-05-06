@@ -21,6 +21,12 @@ export class AppState {
   private sceneState: SceneState;
 
   constructor(canvas: HTMLCanvasElement) {
+    // MobX
+    makeObservable(this, {
+      loaded: observable,
+      onAssetsLoaded: action,
+    });
+
     // Setup screen listener
     this.canvasListener = new CanvasListener(canvas);
     this.canvasListener.addCanvasListener(this.onCanvasResize);
@@ -35,19 +41,9 @@ export class AppState {
     // Load assets
     const modelLoader = new ModelLoader();
     modelLoader.loadAllModels(() => this.onAssetsLoaded(modelLoader));
-
-    // MobX
-    makeObservable(this, {
-      loaded: observable,
-    });
   }
 
-  private onCanvasResize = () => {
-    this.renderer.setSize(this.canvasListener.width, this.canvasListener.height, false);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  };
-
-  private onAssetsLoaded(modelLoader: ModelLoader) {
+  public onAssetsLoaded(modelLoader: ModelLoader) {
     // Start camera manager
     this.cameraManager = new CameraManager(this.canvasListener);
 
@@ -64,6 +60,11 @@ export class AppState {
     this.loaded = true;
     this.animate();
   }
+
+  private onCanvasResize = () => {
+    this.renderer.setSize(this.canvasListener.width, this.canvasListener.height, false);
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  };
 
   private animate = () => {
     requestAnimationFrame(this.animate);
