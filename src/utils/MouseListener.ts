@@ -14,6 +14,7 @@ export class MouseListener {
   public rmb = false;
   public drag = false;
   public screenPos = new THREE.Vector2();
+  public movement = new THREE.Vector2();
   private callbacks = new Map<MouseEventType, MouseEventCallback[]>();
 
   constructor() {
@@ -80,6 +81,9 @@ export class MouseListener {
     // May need to change window values here to canvas values if not using whole window for canvas
     this.screenPos.x = (event.clientX / window.innerWidth) * 2 - 1;
     this.screenPos.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    this.movement.x = event.movementX;
+    this.movement.y = event.movementY;
   }
 
   private fireCallbacks(eventType: MouseEventType) {

@@ -534,9 +534,9 @@ export class SceneBuilder {
     );
     const block12 = [g14, h30, h31];
 
-    // Thirteenth block is right of tenth
+    // Thirteenth block is right of twelfth
     const h32 = this.addHouse(HouseName.TYPE_12, new THREE.Vector3(18, 0, 0), -Math.PI / 2);
-    const h33 = this.addHouse(HouseName.TYPE_14, new THREE.Vector3(18, 0, -2));
+    const h33 = this.addHouse(HouseName.TYPE_14, new THREE.Vector3(18, 0, -2), Math.PI);
     const g15 = this.addGround(
       GroundType.CONCRETE,
       new THREE.Vector2(2, 4),

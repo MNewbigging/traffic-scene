@@ -31,11 +31,14 @@ export class CameraManager {
 
   public linkButtons() {
     document.getElementById('free-cam-button').addEventListener('click', () => {
+      console.log('free cam click');
       this.pointerLockControls.lock();
     });
   }
 
   public setMode = (mode: CameraMode) => {
+    console.log('set mode');
+
     if (this.mode === mode) {
       return;
     }

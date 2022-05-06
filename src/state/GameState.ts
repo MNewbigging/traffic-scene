@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { action, makeObservable, observable } from 'mobx';
 
 import { CameraManager } from './CameraManager';
 import { CanvasListener } from '../utils/CanvasListener';

@@ -15,7 +15,7 @@ interface AppProps {
 export const App: React.FC<AppProps> = observer(({ appState }) => {
   const { loading, gameState } = appState;
 
-  // Is this app still loading?
+  // Is the app still loading?
   if (loading) {
     return <div>Loading</div>;
   }
