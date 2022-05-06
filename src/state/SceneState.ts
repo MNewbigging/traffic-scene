@@ -15,8 +15,6 @@ import { WorldClock } from './WorldClock';
  * Contains all the objects in the scene
  */
 export class SceneState {
-  public scene = new THREE.Scene();
-  //public camera: THREE.PerspectiveCamera;
   private dayNightCycle: DayNightCycle;
   private roads: Road[] = [];
   private vehicles: Vehicle[] = [];
@@ -24,6 +22,7 @@ export class SceneState {
   private targetVehicle?: Vehicle;
 
   constructor(
+    private scene: THREE.Scene,
     private cameraManager: CameraManager,
     private worldClock: WorldClock,
     private mouseListener: MouseListener,

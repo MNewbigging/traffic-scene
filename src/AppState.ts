@@ -17,6 +17,7 @@ export class AppState {
   public cameraManager: CameraManager;
   private canvasListener: CanvasListener;
   private mouseListener = new MouseListener();
+  private scene = new THREE.Scene();
   private renderer: THREE.WebGLRenderer;
   private sceneState: SceneState;
 
@@ -45,10 +46,11 @@ export class AppState {
 
   public onAssetsLoaded(modelLoader: ModelLoader) {
     // Start camera manager
-    this.cameraManager = new CameraManager(this.canvasListener);
+    this.cameraManager = new CameraManager(this.canvasListener, this.scene);
 
     // Setup scene
     this.sceneState = new SceneState(
+      this.scene,
       this.cameraManager,
       this.worldClock,
       this.mouseListener,
@@ -82,6 +84,6 @@ export class AppState {
     this.cameraManager.update(deltaTime);
 
     // Render
-    this.renderer.render(this.sceneState.scene, this.cameraManager.camera);
+    this.renderer.render(this.scene, this.cameraManager.camera);
   };
 }
