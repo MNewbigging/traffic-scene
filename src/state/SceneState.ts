@@ -1,15 +1,14 @@
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
-import { CanvasListener } from '../utils/CanvasListener';
-import { HouseName, ModelLoader, ModelNames, RoadName, VehicleName } from '../utils/ModelLoader';
+import { CameraManager } from './CameraManager';
+import { DayNightCycle } from './DayNightCycle';
+import { ModelLoader } from '../utils/ModelLoader';
 import { MouseListener } from '../utils/MouseListener';
 import { Prop } from '../model/Prop';
 import { Road } from '../model/Road';
 import { SceneBuilder } from '../utils/SceneBuilder';
 import { Vehicle } from '../model/Vehicle';
 import { VehicleUtils } from '../utils/VehicleUtils';
-import { DayNightCycle } from './DayNightCycle';
 import { WorldClock } from './WorldClock';
 
 /**
@@ -17,21 +16,19 @@ import { WorldClock } from './WorldClock';
  */
 export class SceneState {
   public scene = new THREE.Scene();
-  public camera: THREE.PerspectiveCamera;
+  //public camera: THREE.PerspectiveCamera;
   private dayNightCycle: DayNightCycle;
   private roads: Road[] = [];
   private vehicles: Vehicle[] = [];
   private props: Prop[] = [];
   private targetVehicle?: Vehicle;
-  private controls: OrbitControls;
 
   constructor(
+    private cameraManager: CameraManager,
     private worldClock: WorldClock,
-    private canvasListener: CanvasListener,
     private mouseListener: MouseListener,
     private modelLoader: ModelLoader
   ) {
-    canvasListener.addCanvasListener(this.onCanvasResize);
     mouseListener.on('leftclickup', this.onLeftClick);
     mouseListener.on('rightclickdown', this.onRightClick);
     this.dayNightCycle = new DayNightCycle(this.scene, this.worldClock);
@@ -39,14 +36,13 @@ export class SceneState {
 
   public updateScene(deltaTime: number) {
     // Update camera and controls
-    this.controls.update();
-    if (this.targetVehicle) {
-      this.controls.target.set(
-        this.targetVehicle.position.x,
-        this.targetVehicle.position.y,
-        this.targetVehicle.position.z
-      );
-    }
+    // if (this.targetVehicle) {
+    //   this.controls.target.set(
+    //     this.targetVehicle.position.x,
+    //     this.targetVehicle.position.y,
+    //     this.targetVehicle.position.z
+    //   );
+    // }
 
     // Check vehicle collisions
     VehicleUtils.checkCollisions(this.vehicles);
@@ -58,14 +54,8 @@ export class SceneState {
     this.dayNightCycle.update(deltaTime);
   }
 
-  private onCanvasResize = () => {
-    this.camera.aspect = this.canvasListener.width / this.canvasListener.height;
-    this.camera.updateProjectionMatrix();
-  };
-
   // Once models are loaded, can then piece them together as per scene
   public buildScene() {
-    this.setupCamera();
     this.setupLights();
 
     // Build the scene objects
@@ -88,27 +78,6 @@ export class SceneState {
     this.scene.add(ambientLight);
   }
 
-  private setupCamera() {
-    const camera = new THREE.PerspectiveCamera(
-      75,
-      this.canvasListener.width / this.canvasListener.height,
-      0.1,
-      1000
-    );
-    camera.position.x = 8;
-    camera.position.y = 15;
-    camera.position.z = 8;
-    this.camera = camera;
-
-    this.controls = new OrbitControls(this.camera, this.canvasListener.canvas);
-    this.controls.enableDamping = true;
-    // Target the roundabout by default
-    this.controls.target.x = 8;
-    this.controls.target.z = -4;
-    // Prevent going below ground level
-    this.controls.maxPolarAngle = Math.PI / 2;
-  }
-
   private onRightClick = () => {
     // Clear the target vehicle
     this.targetVehicle = undefined;
@@ -117,7 +86,7 @@ export class SceneState {
   private onLeftClick = () => {
     // Determine if clicked on a selectable object
     const raycaster = new THREE.Raycaster();
-    raycaster.setFromCamera(this.mouseListener.screenPos, this.camera);
+    raycaster.setFromCamera(this.mouseListener.screenPos, this.cameraManager.camera);
 
     for (const vehicle of this.vehicles) {
       const intersects = raycaster.intersectObject(vehicle.bounds);

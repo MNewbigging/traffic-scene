@@ -1,13 +1,13 @@
+import './game-clock.scss';
+
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 
-import { WorldClock } from '../../state/WorldClock';
-
-import './game-clock.scss';
+import fastForwardImg from '../../../public/assets/images/fastForward.png';
 import pauseImg from '../../../public/assets/images/pause.png';
 import resumeImg from '../../../public/assets/images/forward.png';
-import fastForwardImg from '../../../public/assets/images/fastForward.png';
 import { GameClockSetter } from './GameClockSetter';
+import { WorldClock } from '../../state/WorldClock';
 
 interface GameClockProps {
   worldClock: WorldClock;

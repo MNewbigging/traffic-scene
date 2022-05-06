@@ -1,8 +1,10 @@
 import './app.scss';
 
 import React from 'react';
+import { Observer } from 'mobx-react-lite';
 
 import { AppState } from './AppState';
+import { CameraNavButtons } from './components/camera-controls/CameraNavButtons';
 import { GameClock } from './components/game-clock/GameClock';
 import { TopNavbar } from './components/top-navbar/TopNavbar';
 
@@ -33,11 +35,19 @@ export class App extends React.Component<{}, AppCompState> {
 
   private renderGameUI = () => {
     return (
-      <>
-        <TopNavbar>
-          <GameClock worldClock={this.appState.worldClock} />
-        </TopNavbar>
-      </>
+      <Observer>
+        {() =>
+          this.appState.loaded && (
+            <TopNavbar>
+              <CameraNavButtons
+                currentMode={this.appState.cameraManager.mode}
+                setCameraMode={this.appState.cameraManager.setMode}
+              />
+              <GameClock worldClock={this.appState.worldClock} />
+            </TopNavbar>
+          )
+        }
+      </Observer>
     );
   };
 }
