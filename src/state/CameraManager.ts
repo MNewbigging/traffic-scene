@@ -29,6 +29,12 @@ export class CameraManager {
     canvasListener.addCanvasListener(this.onCanvasResize);
   }
 
+  public linkButtons() {
+    document.getElementById('free-cam-button').addEventListener('click', () => {
+      this.pointerLockControls.lock();
+    });
+  }
+
   public setMode = (mode: CameraMode) => {
     if (this.mode === mode) {
       return;

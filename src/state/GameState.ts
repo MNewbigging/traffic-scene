@@ -47,6 +47,9 @@ export class GameState {
   }
 
   public start() {
+    // Pre-start setup
+    this.cameraManager.linkButtons();
+
     // Can now start the main game loop
     this.update();
   }
