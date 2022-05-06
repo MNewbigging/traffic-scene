@@ -1,11 +1,7 @@
 .game-clock {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: auto;
-  height: 40px;
-  padding: 5px;
-  background-color: black;
+  align-self: flex-end;
+  width: 120px;
+  height: 30px;
 
   display: flex;
   align-items: center;

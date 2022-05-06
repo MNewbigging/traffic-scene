@@ -4,6 +4,7 @@ import React from 'react';
 
 import { AppState } from './AppState';
 import { GameClock } from './components/game-clock/GameClock';
+import { TopNavbar } from './components/top-navbar/TopNavbar';
 
 interface AppCompState {
   ready: boolean;
@@ -33,7 +34,9 @@ export class App extends React.Component<{}, AppCompState> {
   private renderGameUI = () => {
     return (
       <>
-        <GameClock worldClock={this.appState.worldClock} />
+        <TopNavbar>
+          <GameClock worldClock={this.appState.worldClock} />
+        </TopNavbar>
       </>
     );
   };
