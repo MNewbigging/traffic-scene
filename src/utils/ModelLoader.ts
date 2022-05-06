@@ -208,6 +208,10 @@ export class ModelLoader {
   }
 
   private loadHouse(hName: HouseName, loader: GLTFLoader) {
+    const glassDiffuse = new THREE.TextureLoader().load('assets/textures/window_blinds_diffuse.png'); // should move this out of here
+    const glassEmissive = new THREE.TextureLoader().load('assets/textures/window_blinds_emissive.png'); // should move this out of here
+    const glassMat = new THREE.MeshStandardMaterial({roughness: 1, emissive: 0xffb73b, emissiveIntensity: 1});
+
     loader.load(
       this.baseAssetPath + `houses/${hName}.glb`,
       (model: GLTF) => {
@@ -219,6 +223,10 @@ export class ModelLoader {
             ((node as THREE.Mesh).material as THREE.MeshStandardMaterial).metalness = 0;
             node.castShadow = true;
             node.receiveShadow = true;
+
+            if (((node as THREE.Mesh).material as THREE.MeshStandardMaterial).name === 'window') {
+              (node as THREE.Mesh).material = glassMat;
+            }
           }
         });
 

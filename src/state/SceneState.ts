@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { Sky } from 'three/examples/jsm/objects/Sky.js';
 
 import { CanvasListener } from '../utils/CanvasListener';
 import { HouseName, ModelLoader, ModelNames, RoadName, VehicleName, FoliageName } from '../utils/ModelLoader';
@@ -90,7 +91,7 @@ export class SceneState {
 
   private setupLights() {
     // Ambient
-    const ambientLight = new THREE.HemisphereLight(0xebf6ff, 0x5fa36b, 0.25);
+    const ambientLight = new THREE.HemisphereLight(0xebf6ff, 0x5fa36b, 0.05);
     this.scene.add(ambientLight);
 
     // Directional
@@ -118,7 +119,35 @@ export class SceneState {
     sunGroup.add(helper);
     sunGroup.add(directionalLight);
     sunGroup.add(directionalLight.target);
+
+    const moon = directionalLight.clone(true);
+    moon.color = new THREE.Color(0x2d7fa8);
+    moon.intensity = 0.1;
+    const moonGroup = new THREE.Group();
+    moonGroup.name = 'MoonGroup';
+    moonGroup.add(moon);
+    moonGroup.add(moon.target);
+
     this.scene.add(sunGroup);
+    //this.scene.add(moonGroup);
+
+    // Sky
+    const sky = new Sky();
+    sky.scale.setScalar( 450000 );
+    this.scene.add(sky);
+    const sunPosition = new THREE.Vector3();
+    const uniforms = sky.material.uniforms;
+
+    // elevation
+    const phi = THREE.MathUtils.degToRad( 90 - 5 );
+    // azimuth
+    const theta = THREE.MathUtils.degToRad( 15 );
+
+    sunPosition.setFromSphericalCoords( 1, phi, theta );
+    const dirLightPos = sunPosition.clone().multiplyScalar(15);
+    directionalLight.position.copy(dirLightPos);
+    directionalLight.target.position.set(0,0,0);
+    uniforms[ 'sunPosition' ].value.copy( sunPosition );
   }
 
   private setupCamera() {
