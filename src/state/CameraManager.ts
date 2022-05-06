@@ -27,8 +27,6 @@ export class CameraManager {
     this.setupControls();
 
     canvasListener.addCanvasListener(this.onCanvasResize);
-
-    this.setMode(CameraMode.FREE);
   }
 
   public setMode = (mode: CameraMode) => {
@@ -86,8 +84,7 @@ export class CameraManager {
         break;
       case CameraMode.FREE:
         this.scene.add(this.pointerLockControls.getObject());
-        this.pointerLockControls.lock();
-
+        //  this.pointerLockControls.lock();
         break;
     }
   }
@@ -100,7 +97,6 @@ export class CameraManager {
       case CameraMode.FREE:
         this.scene.remove(this.pointerLockControls.getObject());
         this.pointerLockControls.unlock();
-
         break;
     }
   }

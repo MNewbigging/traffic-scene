@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
 import { CameraManager } from './CameraManager';
 import { DayNightCycle } from './DayNightCycle';
-import { ModelLoader } from '../utils/ModelLoader';
+import { ModelLoader } from '../loaders/ModelLoader';
 import { MouseListener } from '../utils/MouseListener';
 import { Prop } from '../model/Prop';
 import { Road } from '../model/Road';

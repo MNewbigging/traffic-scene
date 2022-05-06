@@ -4,7 +4,7 @@ import { Lane } from './Lane';
 import { NumberUtils } from '../utils/NumberUtils';
 import { Road } from './Road';
 import { RoadUtils } from '../utils/RoadUtils';
-import { VehicleName } from '../utils/ModelLoader';
+import { VehicleName } from '../loaders/ModelLoader';
 import { VehicleUtils } from '../utils/VehicleUtils';
 
 export class Vehicle {

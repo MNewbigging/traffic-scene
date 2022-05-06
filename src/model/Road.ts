@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
 import { Lane } from './Lane';
 import { NumberUtils } from '../utils/NumberUtils';
-import { RoadName } from '../utils/ModelLoader';
+import { RoadName } from '../loaders/ModelLoader';
 import { RoadUtils } from '../utils/RoadUtils';
 
 export class Road {

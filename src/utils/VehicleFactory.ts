@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 import { Vehicle } from '../model/Vehicle';
-import { VehicleName } from './ModelLoader';
+import { VehicleName } from '../loaders/ModelLoader';
 
 export class VehicleFactory {
   public static createVehicle(name: VehicleName, model: THREE.Group, color?: THREE.Color) {

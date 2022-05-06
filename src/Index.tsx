@@ -1,6 +1,15 @@
+import './index.scss';
+
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 
 import { App } from './App';
+import { AppState } from './AppState';
 
-ReactDOM.render(<App />, document.getElementById('app-root'));
+const appState = new AppState();
+
+const root = createRoot(document.getElementById('ui-root'));
+
+root.render(<App appState={appState} />);
+
+appState.loadGame();

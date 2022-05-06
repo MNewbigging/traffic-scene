@@ -21,7 +21,11 @@ export const CameraNavButtons: React.FC<CameraNavButtonsProps> = ({
       <div className={'button ' + orbitActiveClass} onClick={() => setCameraMode(CameraMode.ORBIT)}>
         Orbit
       </div>
-      <div className={'button ' + freeActiveClass} onClick={() => setCameraMode(CameraMode.FREE)}>
+      <div
+        id={'free-cam-button'}
+        className={'button ' + freeActiveClass}
+        onClick={() => setCameraMode(CameraMode.FREE)}
+      >
         Free
       </div>
     </div>

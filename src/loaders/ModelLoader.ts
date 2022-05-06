@@ -56,6 +56,11 @@ export enum HouseName {
   TYPE_21 = 'house_type21',
 }
 
+export interface LoadProgressProps {
+  current: number;
+  total: number;
+}
+
 /**
  * Responsible for loading models and storing them during runtime.
  */
@@ -67,6 +72,7 @@ export class ModelLoader {
   private loadedModels = 0;
   private modelsToLoad = 0;
   private onLoad?: () => void;
+  private onProgress?: (progress: LoadProgressProps) => void;
   private baseAssetPath = '';
 
   constructor() {
@@ -80,18 +86,19 @@ export class ModelLoader {
     // }
   }
 
-  public loadAllModels(onLoad: () => void) {
+  public load(onLoad: () => void, onProgress?: (progress: LoadProgressProps) => void) {
+    this.onLoad = onLoad;
+    this.onProgress = onProgress;
+
     const modelNames = new ModelNames();
     modelNames.roads = Object.values(RoadName);
     modelNames.vehicles = Object.values(VehicleName);
     modelNames.houses = Object.values(HouseName);
 
-    this.loadModels(modelNames, onLoad);
+    this.loadModels(modelNames);
   }
 
-  public loadModels(modelNames: ModelNames, onLoad: () => void) {
-    this.onLoad = onLoad;
-
+  public loadModels(modelNames: ModelNames) {
     // Setup load counters
     this.loadedModels = 0;
     this.modelsToLoad = modelNames.modelCount;
@@ -123,6 +130,8 @@ export class ModelLoader {
     // Check if all models are now loaded
     if (this.loadedModels === this.modelsToLoad) {
       this.onLoad?.();
+    } else {
+      this.onProgress?.({ current: this.loadedModels, total: this.modelsToLoad });
     }
   };
 
