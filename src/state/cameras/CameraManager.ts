@@ -69,8 +69,6 @@ export class CameraManager {
   // }
 
   public setControlScheme = (name: CameraControlSchemeName) => {
-    console.log('set control scheme', name);
-
     if (this.currentSchemeName === name) {
       return;
     }

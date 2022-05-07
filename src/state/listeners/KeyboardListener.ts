@@ -30,6 +30,16 @@ export class KeyboardListener {
     return this.pressedKeys.has(key);
   }
 
+  public anyKeysPressed(keys: string[]) {
+    for (const key of keys) {
+      if (this.isKeyPressed(key)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   private readonly onKeyDown = (e: KeyboardEvent) => {
     const key = e.key.toLocaleLowerCase();
 
@@ -43,6 +53,6 @@ export class KeyboardListener {
   };
 
   private readonly onKeyUp = (e: KeyboardEvent) => {
-    this.pressedKeys.delete(e.key);
+    this.pressedKeys.delete(e.key.toLocaleLowerCase());
   };
 }
