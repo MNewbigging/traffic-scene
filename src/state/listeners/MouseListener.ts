@@ -29,6 +29,11 @@ export class MouseListener {
     this.callbacks.set(eventType, existing);
   }
 
+  public postUpdate() {
+    this.movement.x = 0;
+    this.movement.y = 0;
+  }
+
   private onMouseDown = (event: MouseEvent) => {
     this.saveMousePosition(event);
 
@@ -73,17 +78,17 @@ export class MouseListener {
     this.drag = false;
   };
 
-  private onMouseMove = () => {
+  private onMouseMove = (event: MouseEvent) => {
     this.drag = this.lmb;
+
+    this.movement.x = event.movementX;
+    this.movement.y = event.movementY;
   };
 
   private saveMousePosition(event: MouseEvent) {
     // May need to change window values here to canvas values if not using whole window for canvas
     this.screenPos.x = (event.clientX / window.innerWidth) * 2 - 1;
     this.screenPos.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-    this.movement.x = event.movementX;
-    this.movement.y = event.movementY;
   }
 
   private fireCallbacks(eventType: MouseEventType) {

@@ -81,5 +81,8 @@ export class GameState {
 
     // Render
     this.renderer.render(this.scene, this.cameraManager.camera);
+
+    // Post update
+    this.mouseListener.postUpdate();
   };
 }

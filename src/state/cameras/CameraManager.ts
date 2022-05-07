@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { action, makeObservable, observable } from 'mobx';
+import { action, computed, makeObservable, observable } from 'mobx';
 
 import { CameraControlScheme, CameraControlSchemeName } from '../../model/CameraControlScheme';
 import { CanvasListener } from '../listeners/CanvasListener';
@@ -17,11 +17,15 @@ export interface CameraManagerBuildProps {
 export class CameraManager {
   public camera: THREE.PerspectiveCamera;
   public controlSchemes: CameraControlScheme[] = [];
-  public currentControlScheme: CameraControlScheme;
+  public currentControlScheme: CameraControlScheme | undefined = undefined;
 
   constructor(private canvasListener: CanvasListener) {
     // Mobx
-    makeObservable(this, {});
+    makeObservable(this, {
+      currentControlScheme: observable,
+      currentSchemeName: computed,
+      setControlScheme: action,
+    });
 
     this.setupCamera();
 
@@ -39,6 +43,7 @@ export class CameraManager {
       canvasListener: buildProps.canvasListener,
       mouseListener: buildProps.mouseListener,
       keyboardListener: buildProps.keyboardListener,
+      onExit: () => cameraManager.setControlScheme(CameraControlSchemeName.ORBIT),
     });
 
     cameraManager.setControlSchemes([orbitCamera, freeCamera]);
@@ -63,7 +68,23 @@ export class CameraManager {
   //   });
   // }
 
-  public setControlScheme = (name: CameraControlSchemeName) => {};
+  public setControlScheme = (name: CameraControlSchemeName) => {
+    console.log('set control scheme', name);
+
+    if (this.currentSchemeName === name) {
+      return;
+    }
+
+    this.currentControlScheme?.disable();
+
+    const nextScheme = this.controlSchemes.find((scheme) => scheme.name === name);
+    if (!nextScheme) {
+      return;
+    }
+
+    this.currentControlScheme = nextScheme;
+    this.currentControlScheme.enable();
+  };
 
   public update(deltaTime: number) {
     this.currentControlScheme?.update(deltaTime);
