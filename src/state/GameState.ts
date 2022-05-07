@@ -5,7 +5,6 @@ import { CanvasListener } from './listeners/CanvasListener';
 import { KeyboardListener } from './listeners/KeyboardListener';
 import { ModelLoader } from '../loaders/ModelLoader';
 import { MouseListener } from './listeners/MouseListener';
-import { OrbitCamera } from './cameras/OrbitCamera';
 import { SceneState } from './SceneState';
 import { WorldClock } from './WorldClock';
 
@@ -53,8 +52,6 @@ export class GameState {
   }
 
   public start() {
-    // Pre-start setup
-
     // Can now start the main game loop
     this.update();
   }

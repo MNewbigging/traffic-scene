@@ -61,13 +61,6 @@ export class CameraManager {
     return this.currentControlScheme?.name ?? CameraControlSchemeName.ORBIT;
   }
 
-  // public linkButtons() {
-  //   document.getElementById('free-cam-button').addEventListener('click', () => {
-  //     console.log('free cam click');
-  //     this.pointerLockControls.lock();
-  //   });
-  // }
-
   public setControlScheme = (name: CameraControlSchemeName) => {
     if (this.currentSchemeName === name) {
       return;

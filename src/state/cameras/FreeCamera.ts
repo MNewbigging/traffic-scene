@@ -17,7 +17,7 @@ export class FreeCamera implements CameraControlScheme {
   public name = CameraControlSchemeName.FREE;
   private lookEuler = new THREE.Euler(0, 0, 0, 'YXZ');
   private readonly halfPi = Math.PI / 2;
-  private readonly lookSpeed = 1.5;
+  private readonly lookSpeed = 1.6;
   private readonly minPolarAngle = 0;
   private readonly maxPolarAngle = Math.PI;
   private readonly normalSpeed = 3;
