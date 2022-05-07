@@ -24,8 +24,8 @@ export const App: React.FC<AppProps> = observer(({ appState }) => {
     <>
       <TopNavbar>
         <CameraNavButtons
-          currentMode={gameState.cameraManager.mode}
-          setCameraMode={gameState.cameraManager.setMode}
+          currentMode={gameState.cameraManager.currentSchemeName}
+          setCameraMode={gameState.cameraManager.setControlScheme}
         />
         <GameClock worldClock={gameState.worldClock} />
       </TopNavbar>

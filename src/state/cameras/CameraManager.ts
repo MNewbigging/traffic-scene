@@ -1,17 +1,12 @@
 import * as THREE from 'three';
 import { action, makeObservable, observable } from 'mobx';
 
-import { CameraControlScheme } from '../../model/CameraControlScheme';
+import { CameraControlScheme, CameraControlSchemeName } from '../../model/CameraControlScheme';
 import { CanvasListener } from '../listeners/CanvasListener';
 import { FreeCamera } from './FreeCamera';
 import { KeyboardListener } from '../listeners/KeyboardListener';
 import { MouseListener } from '../listeners/MouseListener';
 import { OrbitCamera } from './OrbitCamera';
-
-export enum CameraMode {
-  ORBIT = 'orbit',
-  FREE = 'free',
-}
 
 export interface CameraManagerBuildProps {
   canvasListener: CanvasListener;
@@ -20,17 +15,13 @@ export interface CameraManagerBuildProps {
 }
 
 export class CameraManager {
-  public mode = CameraMode.ORBIT;
   public camera: THREE.PerspectiveCamera;
   public controlSchemes: CameraControlScheme[] = [];
-  public currentControlScheme?: CameraControlScheme;
+  public currentControlScheme: CameraControlScheme;
 
   constructor(private canvasListener: CanvasListener) {
     // Mobx
-    makeObservable(this, {
-      mode: observable,
-      setMode: action,
-    });
+    makeObservable(this, {});
 
     this.setupCamera();
 
@@ -61,6 +52,10 @@ export class CameraManager {
     this.currentControlScheme = this.controlSchemes[0];
   }
 
+  public get currentSchemeName() {
+    return this.currentControlScheme?.name ?? CameraControlSchemeName.ORBIT;
+  }
+
   // public linkButtons() {
   //   document.getElementById('free-cam-button').addEventListener('click', () => {
   //     console.log('free cam click');
@@ -68,7 +63,7 @@ export class CameraManager {
   //   });
   // }
 
-  public setMode = (mode: CameraMode) => {};
+  public setControlScheme = (name: CameraControlSchemeName) => {};
 
   public update(deltaTime: number) {
     this.currentControlScheme?.update(deltaTime);
