@@ -1,22 +1,31 @@
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls';
 import { action, makeObservable, observable } from 'mobx';
 
+import { CameraControlScheme } from '../../model/CameraControlScheme';
 import { CanvasListener } from '../listeners/CanvasListener';
+import { FreeCamera } from './FreeCamera';
+import { KeyboardListener } from '../listeners/KeyboardListener';
+import { MouseListener } from '../listeners/MouseListener';
+import { OrbitCamera } from './OrbitCamera';
 
 export enum CameraMode {
   ORBIT = 'orbit',
   FREE = 'free',
 }
 
+export interface CameraManagerBuildProps {
+  canvasListener: CanvasListener;
+  mouseListener: MouseListener;
+  keyboardListener: KeyboardListener;
+}
+
 export class CameraManager {
   public mode = CameraMode.ORBIT;
   public camera: THREE.PerspectiveCamera;
-  private orbitControls: OrbitControls;
-  private pointerLockControls: PointerLockControls;
+  public controlSchemes: CameraControlScheme[] = [];
+  public currentControlScheme?: CameraControlScheme;
 
-  constructor(private canvasListener: CanvasListener, private scene: THREE.Scene) {
+  constructor(private canvasListener: CanvasListener) {
     // Mobx
     makeObservable(this, {
       mode: observable,
@@ -24,36 +33,45 @@ export class CameraManager {
     });
 
     this.setupCamera();
-    this.setupControls();
 
     canvasListener.addCanvasListener(this.onCanvasResize);
   }
 
-  public linkButtons() {
-    document.getElementById('free-cam-button').addEventListener('click', () => {
-      console.log('free cam click');
-      this.pointerLockControls.lock();
+  public static build(buildProps: CameraManagerBuildProps) {
+    // Create the camera manager, which creates the camera
+    const cameraManager = new CameraManager(buildProps.canvasListener);
+
+    // Use manager's camera to build the control schemes
+    const orbitCamera = new OrbitCamera(cameraManager.camera, buildProps.canvasListener.canvas);
+    const freeCamera = new FreeCamera({
+      camera: cameraManager.camera,
+      canvasListener: buildProps.canvasListener,
+      mouseListener: buildProps.mouseListener,
+      keyboardListener: buildProps.keyboardListener,
     });
+
+    cameraManager.setControlSchemes([orbitCamera, freeCamera]);
+
+    return cameraManager;
   }
 
-  public setMode = (mode: CameraMode) => {
-    console.log('set mode');
+  public setControlSchemes(schemes: CameraControlScheme[]) {
+    schemes.forEach((scheme) => this.controlSchemes.push(scheme));
 
-    if (this.mode === mode) {
-      return;
-    }
+    this.currentControlScheme = this.controlSchemes[0];
+  }
 
-    // Disable the current mode
-    this.disableMode(this.mode);
+  // public linkButtons() {
+  //   document.getElementById('free-cam-button').addEventListener('click', () => {
+  //     console.log('free cam click');
+  //     this.pointerLockControls.lock();
+  //   });
+  // }
 
-    // Enable the new mode
-    this.enableMode(mode);
+  public setMode = (mode: CameraMode) => {};
 
-    this.mode = mode;
-  };
-
-  public update(_deltaTime: number) {
-    this.orbitControls.update();
+  public update(deltaTime: number) {
+    this.currentControlScheme?.update(deltaTime);
   }
 
   private setupCamera() {
@@ -69,44 +87,8 @@ export class CameraManager {
     this.camera = camera;
   }
 
-  private setupControls() {
-    // Orbit
-    this.orbitControls = new OrbitControls(this.camera, this.canvasListener.canvas);
-    this.orbitControls.enableDamping = true;
-    this.orbitControls.maxPolarAngle = Math.PI / 2;
-    this.orbitControls.target.x = 8;
-    this.orbitControls.target.z = -4;
-
-    // Pointer lock
-    this.pointerLockControls = new PointerLockControls(this.camera, this.canvasListener.canvas);
-  }
-
   private onCanvasResize = () => {
     this.camera.aspect = this.canvasListener.width / this.canvasListener.height;
     this.camera.updateProjectionMatrix();
   };
-
-  private enableMode(mode: CameraMode) {
-    switch (mode) {
-      case CameraMode.ORBIT:
-        this.orbitControls.enabled = true;
-        break;
-      case CameraMode.FREE:
-        this.scene.add(this.pointerLockControls.getObject());
-        //  this.pointerLockControls.lock();
-        break;
-    }
-  }
-
-  private disableMode(mode: CameraMode) {
-    switch (mode) {
-      case CameraMode.ORBIT:
-        this.orbitControls.enabled = false;
-        break;
-      case CameraMode.FREE:
-        this.scene.remove(this.pointerLockControls.getObject());
-        this.pointerLockControls.unlock();
-        break;
-    }
-  }
 }

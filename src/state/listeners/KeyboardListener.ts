@@ -1,6 +1,6 @@
 export type KeyEventCallback = () => void;
 
-export class KeyboardObserver {
+export class KeyboardListener {
   private pressedKeys = new Set<string>();
   private callbacks = new Map<string, KeyEventCallback[]>();
 

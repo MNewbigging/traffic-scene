@@ -2,8 +2,10 @@ import * as THREE from 'three';
 
 import { CameraManager } from './cameras/CameraManager';
 import { CanvasListener } from './listeners/CanvasListener';
+import { KeyboardListener } from './listeners/KeyboardListener';
 import { ModelLoader } from '../loaders/ModelLoader';
 import { MouseListener } from './listeners/MouseListener';
+import { OrbitCamera } from './cameras/OrbitCamera';
 import { SceneState } from './SceneState';
 import { WorldClock } from './WorldClock';
 
@@ -15,6 +17,7 @@ export class GameState {
   public cameraManager: CameraManager;
   private canvasListener: CanvasListener;
   private mouseListener = new MouseListener();
+  private keyboardListener = new KeyboardListener();
   private scene = new THREE.Scene();
   private renderer: THREE.WebGLRenderer;
   private sceneState: SceneState;
@@ -31,8 +34,12 @@ export class GameState {
     this.renderer.outputEncoding = THREE.sRGBEncoding;
     this.onCanvasResize();
 
-    // Start camera manager
-    this.cameraManager = new CameraManager(this.canvasListener, this.scene);
+    // Build the camera manager
+    this.cameraManager = CameraManager.build({
+      canvasListener: this.canvasListener,
+      mouseListener: this.mouseListener,
+      keyboardListener: this.keyboardListener,
+    });
 
     // Setup scene
     this.sceneState = new SceneState(
@@ -47,7 +54,6 @@ export class GameState {
 
   public start() {
     // Pre-start setup
-    this.cameraManager.linkButtons();
 
     // Can now start the main game loop
     this.update();
