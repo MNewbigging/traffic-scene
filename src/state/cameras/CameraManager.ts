@@ -3,7 +3,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls';
 import { action, makeObservable, observable } from 'mobx';
 
-import { CanvasListener } from '../utils/CanvasListener';
+import { CanvasListener } from '../listeners/CanvasListener';
 
 export enum CameraMode {
   ORBIT = 'orbit',

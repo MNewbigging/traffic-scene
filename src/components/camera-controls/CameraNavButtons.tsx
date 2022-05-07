@@ -2,7 +2,7 @@ import './camera-nav-buttons.scss';
 
 import React from 'react';
 
-import { CameraMode } from '../../state/CameraManager';
+import { CameraMode } from '../../state/cameras/CameraManager';
 
 interface CameraNavButtonsProps {
   currentMode: CameraMode;

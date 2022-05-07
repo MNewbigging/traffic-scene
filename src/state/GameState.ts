@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 
-import { CameraManager } from './CameraManager';
-import { CanvasListener } from '../utils/CanvasListener';
+import { CameraManager } from './cameras/CameraManager';
+import { CanvasListener } from './listeners/CanvasListener';
 import { ModelLoader } from '../loaders/ModelLoader';
-import { MouseListener } from '../utils/MouseListener';
+import { MouseListener } from './listeners/MouseListener';
 import { SceneState } from './SceneState';
 import { WorldClock } from './WorldClock';
 
