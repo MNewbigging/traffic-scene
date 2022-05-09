@@ -6,6 +6,7 @@ import { GameEventListener } from './listeners/GameEventListener';
 import { KeyboardListener } from './listeners/KeyboardListener';
 import { ModelLoader } from '../loaders/ModelLoader';
 import { MouseListener } from './listeners/MouseListener';
+import { SceneSelector } from '../utils/SceneSelector';
 import { SceneState } from './SceneState';
 import { WorldClock } from './WorldClock';
 
@@ -22,6 +23,7 @@ export class GameState {
   private scene = new THREE.Scene();
   private renderer: THREE.WebGLRenderer;
   private sceneState: SceneState;
+  private sceneSelector: SceneSelector;
 
   constructor(canvas: HTMLCanvasElement, modelLoader: ModelLoader) {
     // Setup screen listener
@@ -44,15 +46,16 @@ export class GameState {
     });
 
     // Setup scene
-    this.sceneState = new SceneState(
-      this.scene,
+    this.sceneState = new SceneState(this.scene, this.worldClock, modelLoader);
+    this.sceneState.buildScene();
+
+    // Scene selector
+    this.sceneSelector = new SceneSelector(
+      this.sceneState,
       this.cameraManager,
-      this.worldClock,
       this.mouseListener,
-      modelLoader,
       this.gameEventListener
     );
-    this.sceneState.buildScene();
   }
 
   public start() {

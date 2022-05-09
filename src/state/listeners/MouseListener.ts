@@ -6,7 +6,8 @@ export type MouseEventType =
   | 'mouseup'
   | 'leftclickup'
   | 'rightclickup'
-  | 'rightclickdown';
+  | 'rightclickdown'
+  | 'doubleclick';
 
 export class MouseListener {
   public lmb = false;
@@ -21,12 +22,21 @@ export class MouseListener {
     window.addEventListener('mousedown', this.onMouseDown);
     window.addEventListener('mouseup', this.onMouseUp);
     window.addEventListener('mousemove', this.onMouseMove);
+    window.addEventListener('dblclick', () => this.fireCallbacks('doubleclick'));
   }
 
   public on(eventType: MouseEventType, callback: MouseEventCallback) {
     const existing = this.callbacks.get(eventType) ?? [];
     existing.push(callback);
     this.callbacks.set(eventType, existing);
+  }
+
+  public off(eventType: MouseEventType, callback: MouseEventCallback) {
+    let existing = this.callbacks.get(eventType);
+    if (existing.length) {
+      existing = existing.filter((cb) => cb !== callback);
+      this.callbacks.set(eventType, existing);
+    }
   }
 
   public postUpdate() {

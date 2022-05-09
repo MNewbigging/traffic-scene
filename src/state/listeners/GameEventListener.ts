@@ -1,13 +1,15 @@
+import * as THREE from 'three';
+
 import { Vehicle } from '../../model/Vehicle';
 
 export enum GameEventType {
   SELECTED_VEHICLE = 'selected-vehicle',
-  GENERIC = 'another',
+  DOUBLE_CLICK_OBJECT = 'double-click-road',
 }
 
 export type GameEvent =
   | { type: GameEventType.SELECTED_VEHICLE; vehicle: Vehicle }
-  | { type: GameEventType.GENERIC; num: number };
+  | { type: GameEventType.DOUBLE_CLICK_OBJECT; intersectPos: THREE.Vector3 };
 
 export type GameEventCallback = (event: GameEvent) => void;
 

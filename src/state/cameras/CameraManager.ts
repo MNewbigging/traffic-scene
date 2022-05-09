@@ -21,10 +21,7 @@ export class CameraManager {
   public controlSchemes: CameraControlScheme[] = [];
   public currentControlScheme: CameraControlScheme | undefined = undefined;
 
-  constructor(
-    private canvasListener: CanvasListener,
-    private gameEventListener: GameEventListener
-  ) {
+  constructor(private canvasListener: CanvasListener) {
     // Mobx
     makeObservable(this, {
       currentControlScheme: observable,
@@ -39,15 +36,14 @@ export class CameraManager {
 
   public static build(buildProps: CameraManagerBuildProps) {
     // Create the camera manager, which creates the camera
-    const cameraManager = new CameraManager(
-      buildProps.canvasListener,
-      buildProps.gameEventListener
-    );
+    const cameraManager = new CameraManager(buildProps.canvasListener);
 
     // Use manager's camera to build the control schemes
     const orbitCamera = new OrbitCamera(
       cameraManager.camera,
       buildProps.canvasListener.canvas,
+      buildProps.mouseListener,
+      buildProps.keyboardListener,
       buildProps.gameEventListener
     );
     const freeCamera = new FreeCamera({
@@ -58,7 +54,11 @@ export class CameraManager {
       onExit: () => cameraManager.setControlScheme(CameraControlSchemeName.ORBIT),
     });
 
+    // Give the controls schemes to manager
     cameraManager.setControlSchemes([orbitCamera, freeCamera]);
+
+    // Activate orbit scheme by default
+    cameraManager.setControlScheme(CameraControlSchemeName.ORBIT);
 
     return cameraManager;
   }
@@ -66,7 +66,7 @@ export class CameraManager {
   public setControlSchemes(schemes: CameraControlScheme[]) {
     schemes.forEach((scheme) => this.controlSchemes.push(scheme));
 
-    this.currentControlScheme = this.controlSchemes[0];
+    //this.currentControlScheme = this.controlSchemes[0];
   }
 
   public get currentSchemeName() {
@@ -74,7 +74,7 @@ export class CameraManager {
   }
 
   public setControlScheme = (name: CameraControlSchemeName) => {
-    if (this.currentSchemeName === name) {
+    if (this.currentControlScheme?.name === name) {
       return;
     }
 
