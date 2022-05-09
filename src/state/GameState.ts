@@ -16,7 +16,7 @@ import { WorldClock } from './WorldClock';
 export class GameState {
   public worldClock = new WorldClock();
   public cameraManager: CameraManager;
-  private gameEventListener = new GameEventListener();
+  public gameEventListener = new GameEventListener();
   private canvasListener: CanvasListener;
   private mouseListener = new MouseListener();
   private keyboardListener = new KeyboardListener();

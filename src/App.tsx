@@ -6,6 +6,7 @@ import { observer } from 'mobx-react-lite';
 import { AppState } from './AppState';
 import { CameraNavButtons } from './components/camera-controls/CameraNavButtons';
 import { GameClock } from './components/game-clock/GameClock';
+import { InfoPanels } from './components/info-panels/InfoPanels';
 import { TopNavbar } from './components/top-navbar/TopNavbar';
 
 interface AppProps {
@@ -29,6 +30,7 @@ export const App: React.FC<AppProps> = observer(({ appState }) => {
         />
         <GameClock worldClock={gameState.worldClock} />
       </TopNavbar>
+      <InfoPanels uiState={appState.uiState} />
     </>
   );
 });

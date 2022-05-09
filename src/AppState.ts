@@ -2,10 +2,12 @@ import { action, makeObservable, observable } from 'mobx';
 
 import { GameState } from './state/GameState';
 import { ModelLoader } from './loaders/ModelLoader';
+import { UIState } from './state/UIState';
 
 export class AppState {
   public loading = true;
   public gameState: GameState;
+  public uiState = new UIState();
 
   // TODO - will need a general game loader that loads models, textures, fonts etc
   private modelLoader: ModelLoader;
@@ -27,6 +29,8 @@ export class AppState {
       document.getElementById('main-canvas') as HTMLCanvasElement,
       this.modelLoader
     );
+
+    this.uiState.setGameEventListener(this.gameState.gameEventListener);
 
     this.loading = false;
 

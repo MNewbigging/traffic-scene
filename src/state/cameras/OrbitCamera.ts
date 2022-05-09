@@ -40,7 +40,7 @@ export class OrbitCamera implements CameraControlScheme {
   public enable() {
     this.mouseListener.on('rightclickdown', this.removeTargetVehicle);
     this.keyboardListener.on('escape', this.removeTargetVehicle);
-    this.gameEventListener.on(GameEventType.SELECTED_VEHICLE, this.targetSelectedVehicle);
+    this.gameEventListener.on(GameEventType.SELECT_VEHICLE, this.targetSelectedVehicle);
     this.gameEventListener.on(GameEventType.DOUBLE_CLICK_OBJECT, this.setTargetPoint);
 
     this.orbitControls.enabled = true;
@@ -49,9 +49,10 @@ export class OrbitCamera implements CameraControlScheme {
   public disable() {
     this.mouseListener.off('rightclickdown', this.removeTargetVehicle);
     this.keyboardListener.off('escape', this.removeTargetVehicle);
-    this.gameEventListener.off(GameEventType.SELECTED_VEHICLE, this.targetSelectedVehicle);
+    this.gameEventListener.off(GameEventType.SELECT_VEHICLE, this.targetSelectedVehicle);
     this.gameEventListener.off(GameEventType.DOUBLE_CLICK_OBJECT, this.setTargetPoint);
 
+    this.removeTargetVehicle();
     this.orbitControls.enabled = false;
   }
 
@@ -66,7 +67,7 @@ export class OrbitCamera implements CameraControlScheme {
   };
 
   private targetSelectedVehicle = (gameEvent: GameEvent) => {
-    if (gameEvent.type !== GameEventType.SELECTED_VEHICLE) {
+    if (gameEvent.type !== GameEventType.SELECT_VEHICLE) {
       return;
     }
 
