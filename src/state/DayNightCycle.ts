@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { WorldClock } from './WorldClock';
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
-import { IUniform } from 'three';
+
 /**
  * Responsible for managing the day-night cycle. Creates the directional light
  * for the sun and its target, moves across the scene and provides methods to
@@ -43,30 +43,17 @@ export class DayNightCycle {
   public update(deltaTime: number) {
     //this.sunLight.position.x -= deltaTime * 3;
 
-    const progress = (this.worldClock.hours + (this.worldClock.minutes / 60)) / 24;
+    //const progress = (this.worldClock.hours + this.worldClock.minutes / 60) / 24;
+    const progress = this.worldClock.deltaAccumulator / 1439;
     const rotation = progress; // Radians
-
-    //const horzRotation = THREE.MathUtils.radToDeg(rotation);
-    //console.log(progress);
-    //this.skyUniforms.phi = THREE.MathUtils.degToRad( vertRotation );
-    //this.skyUniforms.phi = -Math.sin(progress * Math.PI);
-    //this.skyUniforms.theta = 1 - Math.sin(progress * Math.PI);
-    //this.skyUniforms.theta = THREE.MathUtils.degToRad( horzRotation);
-
-    //this.sunLight.intensity = Math.max(0, Math.min((progress * 2) - 0.5, 1));
-    // 0 - midnight
-    // 0.5 daylight
-    // 1 - midnight
-
-    // -1
-    // 0
-    // 1
     
     this.sunLight.intensity = Math.sin(progress * (Math.PI));
-    console.log(this.sunLight.intensity);
+    //console.log(this.sunLight.intensity);
 
     this.skyUniforms.elevation = THREE.MathUtils.radToDeg(progress) * (Math.PI * 2);
-    this.skyUniforms.azimuth = -THREE.MathUtils.radToDeg(progress) * (Math.PI * 2);
+    //this.skyUniforms.elevation = Math.sin(progress * Math.PI * 2);
+    //this.skyUniforms.elevation = THREE.MathUtils.radToDeg(0);
+    this.skyUniforms.azimuth = -THREE.MathUtils.radToDeg(progress) * (Math.PI);
 
     this.skyUniforms.phi = THREE.MathUtils.degToRad( 180 - this.skyUniforms.elevation);
     this.skyUniforms.theta = THREE.MathUtils.degToRad( this.skyUniforms.azimuth);
