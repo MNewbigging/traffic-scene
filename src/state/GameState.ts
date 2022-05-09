@@ -2,6 +2,7 @@ import * as THREE from 'three';
 
 import { CameraManager } from './cameras/CameraManager';
 import { CanvasListener } from './listeners/CanvasListener';
+import { GameEventListener } from './listeners/GameEventListener';
 import { KeyboardListener } from './listeners/KeyboardListener';
 import { ModelLoader } from '../loaders/ModelLoader';
 import { MouseListener } from './listeners/MouseListener';
@@ -14,6 +15,7 @@ import { WorldClock } from './WorldClock';
 export class GameState {
   public worldClock = new WorldClock();
   public cameraManager: CameraManager;
+  private gameEventListener = new GameEventListener();
   private canvasListener: CanvasListener;
   private mouseListener = new MouseListener();
   private keyboardListener = new KeyboardListener();
@@ -38,6 +40,7 @@ export class GameState {
       canvasListener: this.canvasListener,
       mouseListener: this.mouseListener,
       keyboardListener: this.keyboardListener,
+      gameEventListener: this.gameEventListener,
     });
 
     // Setup scene
@@ -46,7 +49,8 @@ export class GameState {
       this.cameraManager,
       this.worldClock,
       this.mouseListener,
-      modelLoader
+      modelLoader,
+      this.gameEventListener
     );
     this.sceneState.buildScene();
   }

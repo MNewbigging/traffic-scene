@@ -2,6 +2,7 @@ import * as THREE from 'three';
 
 import { CameraManager } from './cameras/CameraManager';
 import { DayNightCycle } from './DayNightCycle';
+import { GameEventListener, GameEventType } from './listeners/GameEventListener';
 import { ModelLoader } from '../loaders/ModelLoader';
 import { MouseListener } from './listeners/MouseListener';
 import { Prop } from '../model/Prop';
@@ -19,14 +20,14 @@ export class SceneState {
   private roads: Road[] = [];
   private vehicles: Vehicle[] = [];
   private props: Prop[] = [];
-  private targetVehicle?: Vehicle;
 
   constructor(
     private scene: THREE.Scene,
     private cameraManager: CameraManager,
     private worldClock: WorldClock,
     private mouseListener: MouseListener,
-    private modelLoader: ModelLoader
+    private modelLoader: ModelLoader,
+    private gameEventListener: GameEventListener
   ) {
     mouseListener.on('leftclickup', this.onLeftClick);
     mouseListener.on('rightclickdown', this.onRightClick);
@@ -34,15 +35,6 @@ export class SceneState {
   }
 
   public updateScene(deltaTime: number) {
-    // Update camera and controls
-    // if (this.targetVehicle) {
-    //   this.controls.target.set(
-    //     this.targetVehicle.position.x,
-    //     this.targetVehicle.position.y,
-    //     this.targetVehicle.position.z
-    //   );
-    // }
-
     // Check vehicle collisions
     VehicleUtils.checkCollisions(this.vehicles);
 
@@ -79,7 +71,7 @@ export class SceneState {
 
   private onRightClick = () => {
     // Clear the target vehicle
-    this.targetVehicle = undefined;
+    //this.targetVehicle = undefined;
   };
 
   private onLeftClick = () => {
@@ -90,7 +82,7 @@ export class SceneState {
     for (const vehicle of this.vehicles) {
       const intersects = raycaster.intersectObject(vehicle.bounds);
       if (intersects.length) {
-        this.targetVehicle = vehicle;
+        this.gameEventListener.fireEvent({ type: GameEventType.SELECTED_VEHICLE, vehicle });
         break;
       }
     }

@@ -4,6 +4,7 @@ import { action, computed, makeObservable, observable } from 'mobx';
 import { CameraControlScheme, CameraControlSchemeName } from '../../model/CameraControlScheme';
 import { CanvasListener } from '../listeners/CanvasListener';
 import { FreeCamera } from './FreeCamera';
+import { GameEventListener } from '../listeners/GameEventListener';
 import { KeyboardListener } from '../listeners/KeyboardListener';
 import { MouseListener } from '../listeners/MouseListener';
 import { OrbitCamera } from './OrbitCamera';
@@ -12,6 +13,7 @@ export interface CameraManagerBuildProps {
   canvasListener: CanvasListener;
   mouseListener: MouseListener;
   keyboardListener: KeyboardListener;
+  gameEventListener: GameEventListener;
 }
 
 export class CameraManager {
@@ -19,7 +21,10 @@ export class CameraManager {
   public controlSchemes: CameraControlScheme[] = [];
   public currentControlScheme: CameraControlScheme | undefined = undefined;
 
-  constructor(private canvasListener: CanvasListener) {
+  constructor(
+    private canvasListener: CanvasListener,
+    private gameEventListener: GameEventListener
+  ) {
     // Mobx
     makeObservable(this, {
       currentControlScheme: observable,
@@ -34,10 +39,17 @@ export class CameraManager {
 
   public static build(buildProps: CameraManagerBuildProps) {
     // Create the camera manager, which creates the camera
-    const cameraManager = new CameraManager(buildProps.canvasListener);
+    const cameraManager = new CameraManager(
+      buildProps.canvasListener,
+      buildProps.gameEventListener
+    );
 
     // Use manager's camera to build the control schemes
-    const orbitCamera = new OrbitCamera(cameraManager.camera, buildProps.canvasListener.canvas);
+    const orbitCamera = new OrbitCamera(
+      cameraManager.camera,
+      buildProps.canvasListener.canvas,
+      buildProps.gameEventListener
+    );
     const freeCamera = new FreeCamera({
       camera: cameraManager.camera,
       canvasListener: buildProps.canvasListener,
