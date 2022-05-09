@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import { WorldClock } from './WorldClock';
+import { Sky } from 'three/examples/jsm/objects/Sky.js';
+import { IUniform } from 'three';
 /**
  * Responsible for managing the day-night cycle. Creates the directional light
  * for the sun and its target, moves across the scene and provides methods to
@@ -14,9 +16,24 @@ import { WorldClock } from './WorldClock';
  * This means that the light position, intensity and colour is relative to the
  * current time of day.
  */
+
+// interface SkyUniforms {
+//   turbidity: IUniform;
+//   rayleigh: IUniform;
+//   minCoefficient: IUniform;
+//   mieDirectionalG: IUniform;
+//   elevation: number;
+//   azimuth: number;
+//   exposure: IUniform;
+//   phi: number;
+//   theta: number;
+// }
+
 export class DayNightCycle {
   private sunLight: THREE.DirectionalLight;
   private trajectoryPoints: THREE.Vector3[] = [];
+  private sky: Sky;
+  private skyUniforms: any;
 
   constructor(private scene: THREE.Scene, private worldClock: WorldClock) {
     this.createSun();
@@ -25,6 +42,40 @@ export class DayNightCycle {
 
   public update(deltaTime: number) {
     //this.sunLight.position.x -= deltaTime * 3;
+
+    const progress = (this.worldClock.hours + (this.worldClock.minutes / 60)) / 24;
+    const rotation = progress; // Radians
+
+    //const horzRotation = THREE.MathUtils.radToDeg(rotation);
+    //console.log(progress);
+    //this.skyUniforms.phi = THREE.MathUtils.degToRad( vertRotation );
+    //this.skyUniforms.phi = -Math.sin(progress * Math.PI);
+    //this.skyUniforms.theta = 1 - Math.sin(progress * Math.PI);
+    //this.skyUniforms.theta = THREE.MathUtils.degToRad( horzRotation);
+
+    //this.sunLight.intensity = Math.max(0, Math.min((progress * 2) - 0.5, 1));
+    // 0 - midnight
+    // 0.5 daylight
+    // 1 - midnight
+
+    // -1
+    // 0
+    // 1
+    
+    this.sunLight.intensity = Math.sin(progress * (Math.PI));
+    console.log(this.sunLight.intensity);
+
+    this.skyUniforms.elevation = THREE.MathUtils.radToDeg(progress) * (Math.PI * 2);
+    this.skyUniforms.azimuth = -THREE.MathUtils.radToDeg(progress) * (Math.PI * 2);
+
+    this.skyUniforms.phi = THREE.MathUtils.degToRad( 180 - this.skyUniforms.elevation);
+    this.skyUniforms.theta = THREE.MathUtils.degToRad( this.skyUniforms.azimuth);
+
+    this.sunLight.position.setFromSphericalCoords(1, this.skyUniforms.phi, this.skyUniforms.theta);
+    //this.sunLight.position.setFromSphericalCoords(1, this.skyUniforms.elevation, this.skyUniforms.azimuth);
+    this.sunLight.position.multiplyScalar(15);
+    this.sunLight.target.position.set(0,0,0);
+    this.skyUniforms[ 'sunPosition' ].value.copy( this.sunLight.position );
   }
 
   private trajectoryLine() {
@@ -46,6 +97,19 @@ export class DayNightCycle {
   }
 
   private createSun() {
+    this.sky = new Sky();
+    this.sky.scale.setScalar( 450000 );
+    this.scene.add( this.sky );
+    this.skyUniforms = this.sky.material.uniforms;
+    this.skyUniforms.elevation = 15;
+    this.skyUniforms.azimuth = 15;
+    // this.skyUniforms.azimuth = 0;
+    // this.skyUniforms.elevation = 0;
+    // this.skyUniforms.turbidity = this.sky.material.uniforms.turbidity;
+    // this.skyUniforms.rayleigh = this.sky.material.uniforms.rayleigh;
+    // this.skyUniforms.minCoefficient = this.sky.material.uniforms.minCoefficient;
+    // this.skyUniforms.exposure = this.sky.material.uniforms.exposure;
+
     const directionalLight = new THREE.DirectionalLight(0xfceea7, 1);
     directionalLight.position.x = 20;
     directionalLight.position.y = 20;
