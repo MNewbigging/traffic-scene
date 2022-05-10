@@ -1,26 +1,19 @@
 import { action, makeObservable, observable } from 'mobx';
 
-import { GameEvent, GameEventListener, GameEventType } from './listeners/GameEventListener';
-import { Vehicle } from '../model/Vehicle';
+import { GameEvent, GameEventListener, GameEventType } from '../listeners/GameEventListener';
+import { Vehicle } from '../../model/Vehicle';
 
-// Holds observables to toggle various UI elements
-export class UIState {
+export class VehiclePanelState {
   public focusedVehicle?: Vehicle = undefined;
 
-  private gameEventListener?: GameEventListener;
-
-  constructor() {
+  constructor(private gameEventListener: GameEventListener) {
     makeObservable(this, {
       focusedVehicle: observable,
       onSelectVehicle: action,
       closeVehiclePanel: action,
     });
-  }
 
-  public setGameEventListener(gameEventListener: GameEventListener) {
-    this.gameEventListener = gameEventListener;
-
-    this.gameEventListener.on(GameEventType.SELECT_VEHICLE, this.onSelectVehicle);
+    gameEventListener.on(GameEventType.SELECT_VEHICLE, this.onSelectVehicle);
   }
 
   public onSelectVehicle = (gameEvent: GameEvent) => {

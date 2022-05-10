@@ -1,7 +1,7 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 
-import { UIState } from '../../state/UIState';
+import { UIState } from '../../state/ui/UIState';
 import { VehiclePanel } from './vehicle-panel/VehiclePanel';
 
 interface InfoPanelsProps {
@@ -9,10 +9,15 @@ interface InfoPanelsProps {
 }
 
 export const InfoPanels: React.FC<InfoPanelsProps> = observer(({ uiState }) => {
+  const { vehiclePanelState } = uiState;
+
   return (
     <>
-      {uiState.focusedVehicle && (
-        <VehiclePanel vehicle={uiState.focusedVehicle} onClose={uiState.closeVehiclePanel} />
+      {vehiclePanelState.focusedVehicle && (
+        <VehiclePanel
+          vehicle={vehiclePanelState.focusedVehicle}
+          onClose={vehiclePanelState.closeVehiclePanel}
+        />
       )}
     </>
   );
