@@ -13,16 +13,4 @@
 
   display: flex;
   gap: 5px;
-
-  .button {
-    padding: 1px;
-    cursor: pointer;
-
-    &.active,
-    &:hover {
-      padding: 0px;
-      border: 1px solid white;
-      border-radius: 3px;
-    }
-  }
 }

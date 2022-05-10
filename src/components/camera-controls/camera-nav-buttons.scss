@@ -1,23 +1,5 @@
-@import '../../styles/sizes.scss';
-
 .camera-nav-buttons {
-  height: $topNavbarButtonHeight;
-
   display: flex;
   align-items: center;
   gap: 5px;
-
-  .button {
-    width: auto;
-    height: $topNavbarButtonHeight;
-    padding: 1px;
-    cursor: pointer;
-
-    &.active,
-    &:hover {
-      padding: 0px;
-      border: 1px solid white;
-      border-radius: 3px;
-    }
-  }
 }

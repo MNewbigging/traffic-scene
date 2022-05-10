@@ -1,0 +1,30 @@
+@import '../styles/palette.scss';
+@import '../styles/sizes.scss';
+
+.active {
+  padding: 0px;
+  border: 1px solid $activeColor;
+}
+
+.button {
+  width: auto;
+  height: $buttonHeight;
+  padding: 1px;
+  color: $primaryColor;
+  border-radius: 3px;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+
+  &.active,
+  &.active:hover {
+    padding: 0px;
+    border: 1px solid $activeColor;
+  }
+
+  &:hover {
+    padding: 0px;
+    border: 1px solid $primaryColor;
+  }
+}

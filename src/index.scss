@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+@import './styles/palette.scss';
 
 body {
   margin: 0;
@@ -37,7 +38,7 @@ html {
   bottom: 0;
   pointer-events: none;
 
-  color: white;
+  color: $primaryColor;
   font-family: 'Poppins', sans-serif;
 
   display: flex;

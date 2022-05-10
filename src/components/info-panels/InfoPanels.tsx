@@ -13,12 +13,7 @@ export const InfoPanels: React.FC<InfoPanelsProps> = observer(({ uiState }) => {
 
   return (
     <>
-      {vehiclePanelState.focusedVehicle && (
-        <VehiclePanel
-          vehicle={vehiclePanelState.focusedVehicle}
-          onClose={vehiclePanelState.closeVehiclePanel}
-        />
-      )}
+      {vehiclePanelState.focusedVehicle && <VehiclePanel vehiclePanelState={vehiclePanelState} />}
     </>
   );
 });

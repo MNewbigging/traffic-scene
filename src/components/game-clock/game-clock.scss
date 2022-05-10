@@ -1,38 +1,12 @@
 @import '../../styles/sizes.scss';
+@import '../../styles/palette.scss';
 
 .game-clock {
   align-self: flex-end;
   width: 120px;
-  height: $topNavbarButtonHeight;
+  height: $buttonHeight;
 
   display: flex;
   align-items: center;
   gap: 2px;
-
-  .icon {
-    width: $topNavbarButtonHeight;
-    height: $topNavbarButtonHeight;
-    padding: 1px;
-    cursor: pointer;
-
-    &.active,
-    &:hover {
-      padding: 0px;
-      border: 1px solid white;
-      border-radius: 3px;
-    }
-  }
-
-  .clock {
-    padding: 3px;
-    position: relative;
-    cursor: pointer;
-
-    &.active,
-    &:hover {
-      padding: 2px;
-      border: 1px solid white;
-      border-radius: 3px;
-    }
-  }
 }

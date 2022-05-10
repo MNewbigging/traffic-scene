@@ -34,18 +34,18 @@ export const GameClock: React.FC<GameClockProps> = observer(({ worldClock }) => 
   return (
     <div className='game-clock'>
       <img
-        className={'icon'}
+        className={'button'}
         onClick={worldClock.togglePause}
         src={worldClock.paused ? resumeImg : pauseImg}
       ></img>
 
       <img
-        className={'icon ' + ffActiveClass}
+        className={'button ' + ffActiveClass}
         onClick={worldClock.toggleFastForward}
         src={fastForwardImg}
       ></img>
 
-      <div className={'clock ' + setClockActiveClass} onClick={worldClock.toggleTimePicker}>
+      <div className={'button ' + setClockActiveClass} onClick={worldClock.toggleTimePicker}>
         {hours}:{mins}
       </div>
 

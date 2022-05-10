@@ -3,11 +3,10 @@ import './vehicle-panel.scss';
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 
-import { Vehicle } from '../../../model/Vehicle';
+import { VehiclePanelState, VehicleViewMode } from '../../../state/ui/VehiclePanelState';
 
 interface VehiclePanelProps {
-  vehicle: Vehicle;
-  onClose: () => void;
+  vehiclePanelState: VehiclePanelState;
 }
 
 /**
@@ -25,13 +24,32 @@ interface VehiclePanelProps {
  * - losing focus of the vehicle (double click)
  * - entering free cam mode
  */
-export const VehiclePanel: React.FC<VehiclePanelProps> = observer(({ vehicle, onClose }) => {
+export const VehiclePanel: React.FC<VehiclePanelProps> = observer(({ vehiclePanelState }) => {
+  const lookAtClass = vehiclePanelState.getModeActiveClassname(VehicleViewMode.LOOK_AT);
+  const followClass = vehiclePanelState.getModeActiveClassname(VehicleViewMode.FOLLOW);
+  const bonnetClass = vehiclePanelState.getModeActiveClassname(VehicleViewMode.BONNET);
+
   return (
     <div className={'vehicle-panel'}>
-      <div className={'button'}>Look at</div>
-      <div className={'button'}>Follow</div>
-      <div className={'button'}>Bonnet</div>
-      <div className={'button'} onClick={onClose}>
+      <div
+        className={'button ' + lookAtClass}
+        onClick={() => vehiclePanelState.setViewMode(VehicleViewMode.LOOK_AT)}
+      >
+        Look at
+      </div>
+      <div
+        className={'button ' + followClass}
+        onClick={() => vehiclePanelState.setViewMode(VehicleViewMode.FOLLOW)}
+      >
+        Follow
+      </div>
+      <div
+        className={'button ' + bonnetClass}
+        onClick={() => vehiclePanelState.setViewMode(VehicleViewMode.BONNET)}
+      >
+        Bonnet
+      </div>
+      <div className={'button'} onClick={vehiclePanelState.closeVehiclePanel}>
         Close
       </div>
     </div>
