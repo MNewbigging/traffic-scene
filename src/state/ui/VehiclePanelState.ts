@@ -41,6 +41,11 @@ export class VehiclePanelState {
 
   public setViewMode = (mode: VehicleViewMode) => {
     this.viewMode = mode;
+
+    switch (mode) {
+      case VehicleViewMode.FOLLOW:
+        break;
+    }
   };
 
   public closeVehiclePanel = () => {

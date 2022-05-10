@@ -21,7 +21,10 @@ export class CameraManager {
   public controlSchemes: CameraControlScheme[] = [];
   public currentControlScheme: CameraControlScheme | undefined = undefined;
 
-  constructor(private canvasListener: CanvasListener) {
+  constructor(
+    private canvasListener: CanvasListener,
+    private gameEventListener: GameEventListener
+  ) {
     // Mobx
     makeObservable(this, {
       currentControlScheme: observable,
@@ -36,7 +39,10 @@ export class CameraManager {
 
   public static build(buildProps: CameraManagerBuildProps) {
     // Create the camera manager, which creates the camera
-    const cameraManager = new CameraManager(buildProps.canvasListener);
+    const cameraManager = new CameraManager(
+      buildProps.canvasListener,
+      buildProps.gameEventListener
+    );
 
     // Use manager's camera to build the control schemes
     const orbitCamera = new OrbitCamera(
