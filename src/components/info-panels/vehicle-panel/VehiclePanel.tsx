@@ -25,13 +25,15 @@ interface VehiclePanelProps {
  * - losing focus of the vehicle (double click)
  * - entering free cam mode
  */
-export const VehiclePanel: React.FC<VehiclePanelProps> = observer(({ vehicle }) => {
+export const VehiclePanel: React.FC<VehiclePanelProps> = observer(({ vehicle, onClose }) => {
   return (
     <div className={'vehicle-panel'}>
       <div className={'button'}>Look at</div>
       <div className={'button'}>Follow</div>
       <div className={'button'}>Bonnet</div>
-      <div className={'button'}>Close</div>
+      <div className={'button'} onClick={onClose}>
+        Close
+      </div>
     </div>
   );
 });

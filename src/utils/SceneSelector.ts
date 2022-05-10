@@ -20,6 +20,11 @@ export class SceneSelector {
   }
 
   private onLeftClick = () => {
+    // No selection in free cam mode
+    if (this.cameraManager.inFreeCamMode()) {
+      return;
+    }
+
     // Determine if clicked on a selectable object
     const raycaster = new THREE.Raycaster();
     raycaster.setFromCamera(this.mouseListener.screenPos, this.cameraManager.camera);

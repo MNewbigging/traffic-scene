@@ -63,6 +63,10 @@ export class CameraManager {
     return cameraManager;
   }
 
+  public inFreeCamMode() {
+    return this.currentSchemeName === CameraControlSchemeName.FREE;
+  }
+
   public setControlSchemes(schemes: CameraControlScheme[]) {
     schemes.forEach((scheme) => this.controlSchemes.push(scheme));
 
