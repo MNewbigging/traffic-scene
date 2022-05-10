@@ -30,11 +30,7 @@ export class VehiclePanelState {
     return this.viewMode === mode ? 'active' : '';
   }
 
-  public onSelectVehicle = (gameEvent: GameEvent) => {
-    if (gameEvent.type !== GameEventType.VEHICLE_SELECT) {
-      return;
-    }
-
+  public onSelectVehicle = (gameEvent: GameEvent<GameEventType.VEHICLE_SELECT>) => {
     this.focusedVehicle = gameEvent.vehicle;
     this.viewMode = VehicleViewMode.LOOK_AT;
   };

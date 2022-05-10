@@ -14,28 +14,26 @@ export enum GameEventType {
   VEHICLE_SELECT = 'vehicle-select',
 }
 
-export type GameEvent =
+export type GameEvent<T extends GameEventType> = Extract<
   | { type: GameEventType.DOUBLE_CLICK_OBJECT; intersectPos: THREE.Vector3 }
   | { type: GameEventType.CAMERA_MODE_REQUEST; scheme: CameraControlSchemeName }
   | { type: GameEventType.CAMERA_MODE_CHANGE; scheme: CameraControlSchemeName }
-  | { type: GameEventType.VEHICLE_SELECT; vehicle: Vehicle };
+  | { type: GameEventType.VEHICLE_SELECT; vehicle: Vehicle },
+  { type: T }
+>;
 
-export type A<T> = (props: T) => void;
-
-export type GameEventCallback = (event: GameEvent) => void;
+export type GameEventCallback<T extends GameEventType> = (event: GameEvent<T>) => void;
 
 export class GameEventListener {
-  private callbacks = new Map<GameEventType, GameEventCallback[]>();
+  private callbacks = new Map<GameEventType, GameEventCallback<any>[]>();
 
-  private cbs = new Map<GameEventType, A<any>[]>();
-
-  public on(eventType: GameEventType, callback: GameEventCallback) {
+  public on<T extends GameEventType>(eventType: GameEventType, callback: GameEventCallback<T>) {
     const existing = this.callbacks.get(eventType) ?? [];
     existing.push(callback);
     this.callbacks.set(eventType, existing);
   }
 
-  public off(eventType: GameEventType, callback: GameEventCallback) {
+  public off<T extends GameEventType>(eventType: GameEventType, callback: GameEventCallback<T>) {
     let existing = this.callbacks.get(eventType) ?? [];
     if (existing.length) {
       existing = existing.filter((cb) => cb !== callback);
@@ -43,13 +41,8 @@ export class GameEventListener {
     }
   }
 
-  public fireEvent(event: GameEvent) {
+  public fireEvent<T extends GameEventType>(event: GameEvent<T>) {
     const listeners = this.callbacks.get(event.type) ?? [];
     listeners.forEach((cb) => cb(event));
-  }
-
-  public fire<T>(type: GameEventType, props: T) {
-    const callbacks = this.cbs.get(type) ?? [];
-    callbacks.forEach((cb) => cb(props));
   }
 }

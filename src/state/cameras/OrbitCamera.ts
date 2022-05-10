@@ -56,21 +56,13 @@ export class OrbitCamera implements CameraControlScheme {
     this.orbitControls.enabled = false;
   }
 
-  private setTargetPoint = (gameEvent: GameEvent) => {
-    if (gameEvent.type !== GameEventType.DOUBLE_CLICK_OBJECT) {
-      return;
-    }
-
+  private setTargetPoint = (gameEvent: GameEvent<GameEventType.DOUBLE_CLICK_OBJECT>) => {
     this.targetPoint = gameEvent.intersectPos;
     this.orbitControls.target = this.targetPoint;
     this.removeTargetVehicle();
   };
 
-  private targetSelectedVehicle = (gameEvent: GameEvent) => {
-    if (gameEvent.type !== GameEventType.VEHICLE_SELECT) {
-      return;
-    }
-
+  private targetSelectedVehicle = (gameEvent: GameEvent<GameEventType.VEHICLE_SELECT>) => {
     this.targetVehicle = gameEvent.vehicle;
   };
 
