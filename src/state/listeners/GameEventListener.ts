@@ -3,13 +3,15 @@ import * as THREE from 'three';
 import { Vehicle } from '../../model/Vehicle';
 
 export enum GameEventType {
-  SELECT_VEHICLE = 'select-vehicle',
   DOUBLE_CLICK_OBJECT = 'double-click-object',
+  VEHICLE_SELECT = 'vehicle-select',
+  VEHICLE_BONNET_CAM = 'enter-bonnet-cam',
 }
 
 export type GameEvent =
-  | { type: GameEventType.SELECT_VEHICLE; vehicle: Vehicle }
-  | { type: GameEventType.DOUBLE_CLICK_OBJECT; intersectPos: THREE.Vector3 };
+  | { type: GameEventType.DOUBLE_CLICK_OBJECT; intersectPos: THREE.Vector3 }
+  | { type: GameEventType.VEHICLE_SELECT; vehicle: Vehicle }
+  | { type: GameEventType.VEHICLE_BONNET_CAM; vehicle: Vehicle };
 
 export type GameEventCallback = (event: GameEvent) => void;
 

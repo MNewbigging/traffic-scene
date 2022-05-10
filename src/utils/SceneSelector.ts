@@ -32,7 +32,7 @@ export class SceneSelector {
     for (const vehicle of this.sceneState.vehicles) {
       const intersects = raycaster.intersectObject(vehicle.bounds);
       if (intersects.length) {
-        this.gameEventListener.fireEvent({ type: GameEventType.SELECT_VEHICLE, vehicle });
+        this.gameEventListener.fireEvent({ type: GameEventType.VEHICLE_SELECT, vehicle });
         return;
       }
     }

@@ -22,7 +22,7 @@ export class VehiclePanelState {
       setViewMode: action,
     });
 
-    gameEventListener.on(GameEventType.SELECT_VEHICLE, this.onSelectVehicle);
+    gameEventListener.on(GameEventType.VEHICLE_SELECT, this.onSelectVehicle);
     gameEventListener.on(GameEventType.DOUBLE_CLICK_OBJECT, this.closeVehiclePanel);
   }
 
@@ -31,7 +31,7 @@ export class VehiclePanelState {
   }
 
   public onSelectVehicle = (gameEvent: GameEvent) => {
-    if (gameEvent.type !== GameEventType.SELECT_VEHICLE) {
+    if (gameEvent.type !== GameEventType.VEHICLE_SELECT) {
       return;
     }
 
