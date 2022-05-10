@@ -4,7 +4,7 @@ import { Vehicle } from '../../model/Vehicle';
 
 export enum GameEventType {
   SELECT_VEHICLE = 'select-vehicle',
-  DOUBLE_CLICK_OBJECT = 'double-click-road',
+  DOUBLE_CLICK_OBJECT = 'double-click-object',
 }
 
 export type GameEvent =

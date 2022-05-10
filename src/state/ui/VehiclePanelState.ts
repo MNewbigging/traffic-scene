@@ -23,6 +23,7 @@ export class VehiclePanelState {
     });
 
     gameEventListener.on(GameEventType.SELECT_VEHICLE, this.onSelectVehicle);
+    gameEventListener.on(GameEventType.DOUBLE_CLICK_OBJECT, this.closeVehiclePanel);
   }
 
   public getModeActiveClassname(mode: VehicleViewMode) {
