@@ -39,7 +39,6 @@ export class CameraFactory {
     const lookAtVehicleCam = new LookAtVehicleCam(
       cameraManager.camera,
       buildProps.canvasListener.canvas,
-      buildProps.mouseListener,
       buildProps.keyboardListener,
       buildProps.gameEventListener
     );
