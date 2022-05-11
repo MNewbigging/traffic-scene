@@ -19,6 +19,7 @@ export class VehiclePanelState {
 
     gameEventListener.on(GameEventType.VEHICLE_SELECT, this.onSelectVehicle);
     gameEventListener.on(GameEventType.DOUBLE_CLICK_OBJECT, this.closeVehiclePanel);
+    gameEventListener.on(GameEventType.CAMERA_MODE_CHANGE, this.onCameraModeChange);
   }
 
   public getModeActiveClassname(mode: CameraControlSchemeName) {
@@ -32,10 +33,6 @@ export class VehiclePanelState {
     if (this.focusedVehicle?.id === selectedVehicleId) {
       return;
     }
-
-    // Revert view mode state for this new vehicle
-    this.viewMode = undefined;
-    // Should we also revert to orbit cam at this point?
 
     // The panel should open
     this.focusedVehicle = gameEvent.vehicle;
@@ -52,5 +49,15 @@ export class VehiclePanelState {
   // When user closes vehicle panel - should it go back to orbit cam?
   public closeVehiclePanel = () => {
     this.focusedVehicle = undefined;
+  };
+
+  private onCameraModeChange = (event: GameEvent<GameEventType.CAMERA_MODE_CHANGE>) => {
+    switch (event.scheme) {
+      case CameraControlSchemeName.ORBIT:
+      case CameraControlSchemeName.FREE:
+        this.focusedVehicle = undefined;
+        this.viewMode = undefined;
+        break;
+    }
   };
 }

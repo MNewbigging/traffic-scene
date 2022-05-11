@@ -47,6 +47,11 @@ export class CameraManager {
 
     this.currentControlScheme = nextScheme;
     this.currentControlScheme.enable();
+
+    this.gameEventListener.fireEvent({
+      type: GameEventType.CAMERA_MODE_CHANGE,
+      scheme: this.currentSchemeName,
+    });
   };
 
   public onModeRequest = (event: GameEvent<GameEventType.CAMERA_MODE_REQUEST>) => {

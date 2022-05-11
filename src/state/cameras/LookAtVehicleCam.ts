@@ -41,19 +41,10 @@ export class LookAtVehicleCam implements CameraControlScheme {
   }
 
   public enable() {
-    this.mouseListener.on('rightclickdown', this.removeTargetVehicle);
-    this.keyboardListener.on('escape', this.removeTargetVehicle);
-    //this.gameEventListener.on(GameEventType.VEHICLE_SELECT, this.targetSelectedVehicle);
-
     this.orbitControls.enabled = true;
-    console.log('look at enabled');
   }
 
   public disable() {
-    this.mouseListener.off('rightclickdown', this.removeTargetVehicle);
-    this.keyboardListener.off('escape', this.removeTargetVehicle);
-    //this.gameEventListener.off(GameEventType.VEHICLE_SELECT, this.targetSelectedVehicle);
-
     this.removeTargetVehicle();
     this.orbitControls.enabled = false;
   }
