@@ -48,12 +48,9 @@ export class DayNightCycle {
     const rotation = progress; // Radians
     
     this.sunLight.intensity = Math.sin(progress * (Math.PI));
-    //console.log(this.sunLight.intensity);
 
     this.skyUniforms.elevation = THREE.MathUtils.radToDeg(progress) * (Math.PI * 2);
-    //this.skyUniforms.elevation = Math.sin(progress * Math.PI * 2);
-    //this.skyUniforms.elevation = THREE.MathUtils.radToDeg(0);
-    this.skyUniforms.azimuth = -THREE.MathUtils.radToDeg(progress) * (Math.PI);
+    this.skyUniforms.azimuth = THREE.MathUtils.radToDeg(Math.sin(progress * Math.PI));
 
     this.skyUniforms.phi = THREE.MathUtils.degToRad( 180 - this.skyUniforms.elevation);
     this.skyUniforms.theta = THREE.MathUtils.degToRad( this.skyUniforms.azimuth);
