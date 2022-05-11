@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 
+import { CameraControlSchemeName } from '../model/CameraControlScheme';
 import { CameraManager } from '../state/cameras/CameraManager';
 import { GameEventListener, GameEventType } from '../state/listeners/GameEventListener';
 import { MouseListener } from '../state/listeners/MouseListener';
@@ -21,7 +22,7 @@ export class SceneSelector {
 
   private onLeftClick = () => {
     // No selection in free cam mode
-    if (this.cameraManager.inFreeCamMode()) {
+    if (this.cameraManager.currentSchemeName === CameraControlSchemeName.FREE) {
       return;
     }
 

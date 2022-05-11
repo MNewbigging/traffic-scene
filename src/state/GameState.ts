@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 
+import { CameraFactory } from './cameras/CameraFactory';
 import { CameraManager } from './cameras/CameraManager';
 import { CanvasListener } from './listeners/CanvasListener';
 import { GameEventListener } from './listeners/GameEventListener';
@@ -38,7 +39,7 @@ export class GameState {
     this.onCanvasResize();
 
     // Build the camera manager
-    this.cameraManager = CameraManager.build({
+    this.cameraManager = CameraFactory.buildCameraManager({
       canvasListener: this.canvasListener,
       mouseListener: this.mouseListener,
       keyboardListener: this.keyboardListener,

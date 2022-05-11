@@ -3,18 +3,7 @@ import { action, computed, makeObservable, observable } from 'mobx';
 
 import { CameraControlScheme, CameraControlSchemeName } from '../../model/CameraControlScheme';
 import { CanvasListener } from '../listeners/CanvasListener';
-import { FreeCamera } from './FreeCamera';
 import { GameEventListener } from '../listeners/GameEventListener';
-import { KeyboardListener } from '../listeners/KeyboardListener';
-import { MouseListener } from '../listeners/MouseListener';
-import { OrbitCamera } from './OrbitCamera';
-
-export interface CameraManagerBuildProps {
-  canvasListener: CanvasListener;
-  mouseListener: MouseListener;
-  keyboardListener: KeyboardListener;
-  gameEventListener: GameEventListener;
-}
 
 export class CameraManager {
   public camera: THREE.PerspectiveCamera;
@@ -35,48 +24,6 @@ export class CameraManager {
     this.setupCamera();
 
     canvasListener.addCanvasListener(this.onCanvasResize);
-  }
-
-  public static build(buildProps: CameraManagerBuildProps) {
-    // Create the camera manager, which creates the camera
-    const cameraManager = new CameraManager(
-      buildProps.canvasListener,
-      buildProps.gameEventListener
-    );
-
-    // Use manager's camera to build the control schemes
-    const orbitCamera = new OrbitCamera(
-      cameraManager.camera,
-      buildProps.canvasListener.canvas,
-      buildProps.mouseListener,
-      buildProps.keyboardListener,
-      buildProps.gameEventListener
-    );
-    const freeCamera = new FreeCamera({
-      camera: cameraManager.camera,
-      canvasListener: buildProps.canvasListener,
-      mouseListener: buildProps.mouseListener,
-      keyboardListener: buildProps.keyboardListener,
-      onExit: () => cameraManager.setControlScheme(CameraControlSchemeName.ORBIT),
-    });
-
-    // Give the controls schemes to manager
-    cameraManager.setControlSchemes([orbitCamera, freeCamera]);
-
-    // Activate orbit scheme by default
-    cameraManager.setControlScheme(CameraControlSchemeName.ORBIT);
-
-    return cameraManager;
-  }
-
-  public inFreeCamMode() {
-    return this.currentSchemeName === CameraControlSchemeName.FREE;
-  }
-
-  public setControlSchemes(schemes: CameraControlScheme[]) {
-    schemes.forEach((scheme) => this.controlSchemes.push(scheme));
-
-    //this.currentControlScheme = this.controlSchemes[0];
   }
 
   public get currentSchemeName() {
