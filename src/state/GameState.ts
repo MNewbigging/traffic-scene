@@ -10,6 +10,9 @@ import { MouseListener } from './listeners/MouseListener';
 import { SceneSelector } from '../utils/SceneSelector';
 import { SceneState } from './SceneState';
 import { WorldClock } from './WorldClock';
+import { PostProcessHandler } from '../model/PostProcessHandler';
+
+import { HalftonePass } from 'three/examples/jsm/postprocessing/halftonePass.js';
 
 /**
  * High level state class, handles renderer and main game loop
@@ -24,6 +27,7 @@ export class GameState {
   private scene = new THREE.Scene();
   private renderer: THREE.WebGLRenderer;
   private sceneState: SceneState;
+  private renderPass: PostProcessHandler;
   private sceneSelector: SceneSelector;
 
   constructor(
@@ -38,7 +42,7 @@ export class GameState {
     this.canvasListener.addCanvasListener(this.onCanvasResize);
 
     // Setup renderer
-    this.renderer = new THREE.WebGLRenderer({ canvas });
+    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.shadowMap.enabled = true;
     this.renderer.outputEncoding = THREE.sRGBEncoding;
@@ -63,6 +67,11 @@ export class GameState {
       this.mouseListener,
       this.gameEventListener
     );
+
+    // Render pass controller
+    this.renderPass = new PostProcessHandler(this.renderer, this.scene, this.cameraManager.camera);
+    this.renderPass.addPass(new HalftonePass(512, 512, undefined));
+    console.log(this.renderPass.getPasses());
   }
 
   public start() {
@@ -91,7 +100,8 @@ export class GameState {
     this.cameraManager.update(deltaTime);
 
     // Render
-    this.renderer.render(this.scene, this.cameraManager.camera);
+    //this.renderer.render(this.scene, this.cameraManager.camera);
+    this.renderPass.composer.render();
 
     // Post update
     this.mouseListener.postUpdate();
