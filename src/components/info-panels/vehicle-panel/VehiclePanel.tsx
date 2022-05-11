@@ -3,49 +3,41 @@ import './vehicle-panel.scss';
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 
-import { VehiclePanelState, VehicleViewMode } from '../../../state/ui/VehiclePanelState';
+import { CameraControlSchemeName } from '../../../model/CameraControlScheme';
+import { VehiclePanelState } from '../../../state/ui/VehiclePanelState';
 
 interface VehiclePanelProps {
   vehiclePanelState: VehiclePanelState;
 }
 
-/**
- * UI Panel that shows when:
- * - selecting a vehicle
- *
- * It provides a few buttons:
- * - Look at - sets vehicle as orbit cam target, selects orbit cam mode
- * - Follow - selects follow cam mode targeting this vehicle
- * - Bonnet - selects bonnet cam mode, targeting this vehicle
- * - Close - closes the window
- *
- * The panel should close when:
- * - pressing Close
- * - losing focus of the vehicle (double click)
- * - entering free cam mode
- */
 export const VehiclePanel: React.FC<VehiclePanelProps> = observer(({ vehiclePanelState }) => {
-  const lookAtClass = vehiclePanelState.getModeActiveClassname(VehicleViewMode.LOOK_AT);
-  const followClass = vehiclePanelState.getModeActiveClassname(VehicleViewMode.FOLLOW);
-  const bonnetClass = vehiclePanelState.getModeActiveClassname(VehicleViewMode.BONNET);
+  const lookAtClass = vehiclePanelState.getModeActiveClassname(
+    CameraControlSchemeName.LOOK_AT_VEHICLE
+  );
+  const followClass = vehiclePanelState.getModeActiveClassname(
+    CameraControlSchemeName.FOLLOW_VEHICLE
+  );
+  const bonnetClass = vehiclePanelState.getModeActiveClassname(
+    CameraControlSchemeName.BONNET_VEHICLE
+  );
 
   return (
     <div className={'vehicle-panel'}>
       <div
         className={'button ' + lookAtClass}
-        onClick={() => vehiclePanelState.setViewMode(VehicleViewMode.LOOK_AT)}
+        onClick={() => vehiclePanelState.setViewMode(CameraControlSchemeName.LOOK_AT_VEHICLE)}
       >
         Look at
       </div>
       <div
         className={'button ' + followClass}
-        onClick={() => vehiclePanelState.setViewMode(VehicleViewMode.FOLLOW)}
+        onClick={() => vehiclePanelState.setViewMode(CameraControlSchemeName.FOLLOW_VEHICLE)}
       >
         Follow
       </div>
       <div
         className={'button ' + bonnetClass}
-        onClick={() => vehiclePanelState.setViewMode(VehicleViewMode.BONNET)}
+        onClick={() => vehiclePanelState.setViewMode(CameraControlSchemeName.BONNET_VEHICLE)}
       >
         Bonnet
       </div>

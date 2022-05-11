@@ -3,7 +3,7 @@ import { action, computed, makeObservable, observable } from 'mobx';
 
 import { CameraControlScheme, CameraControlSchemeName } from '../../model/CameraControlScheme';
 import { CanvasListener } from '../listeners/CanvasListener';
-import { GameEventListener } from '../listeners/GameEventListener';
+import { GameEvent, GameEventListener, GameEventType } from '../listeners/GameEventListener';
 
 export class CameraManager {
   public camera: THREE.PerspectiveCamera;
@@ -21,9 +21,12 @@ export class CameraManager {
       setControlScheme: action,
     });
 
+    // Setup
     this.setupCamera();
 
+    // Listeners
     canvasListener.addCanvasListener(this.onCanvasResize);
+    //gameEventListener.on(GameEventType.CAMERA_MODE_REQUEST, this.onModeRequest);
   }
 
   public get currentSchemeName() {
@@ -44,6 +47,10 @@ export class CameraManager {
 
     this.currentControlScheme = nextScheme;
     this.currentControlScheme.enable();
+  };
+
+  public onModeRequest = (event: GameEvent<GameEventType.CAMERA_MODE_REQUEST>) => {
+    this.setControlScheme(event.scheme);
   };
 
   public update(deltaTime: number) {

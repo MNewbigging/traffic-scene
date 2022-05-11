@@ -25,6 +25,7 @@ export class OrbitCamera implements CameraControlScheme {
     this.orbitControls.enableDamping = true;
     this.orbitControls.maxPolarAngle = Math.PI / 2;
     this.orbitControls.target = this.targetPoint;
+    this.orbitControls.enabled = false;
   }
 
   public update(_deltaTime: number) {

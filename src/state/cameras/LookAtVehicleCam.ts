@@ -24,6 +24,7 @@ export class LookAtVehicleCam implements CameraControlScheme {
     this.orbitControls.enableDamping = true;
     this.orbitControls.maxPolarAngle = Math.PI / 2;
     this.orbitControls.enablePan = false;
+    this.orbitControls.enabled = false;
 
     // Always listen for newly selected vehicles
     this.gameEventListener.on(GameEventType.VEHICLE_SELECT, this.targetSelectedVehicle);
@@ -45,6 +46,7 @@ export class LookAtVehicleCam implements CameraControlScheme {
     //this.gameEventListener.on(GameEventType.VEHICLE_SELECT, this.targetSelectedVehicle);
 
     this.orbitControls.enabled = true;
+    console.log('look at enabled');
   }
 
   public disable() {
