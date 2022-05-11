@@ -51,8 +51,6 @@ export class LookAtVehicleCam implements CameraControlScheme {
 
   private targetSelectedVehicle = (gameEvent: GameEvent<GameEventType.VEHICLE_SELECT>) => {
     this.targetVehicle = gameEvent.vehicle;
-
-    console.log('look at set vehcile', this.targetVehicle);
   };
 
   private removeTargetVehicle = () => {

@@ -27,8 +27,6 @@ export class CameraFactory {
     const orbitCamera = new OrbitCamera(
       cameraManager.camera,
       buildProps.canvasListener.canvas,
-      buildProps.mouseListener,
-      buildProps.keyboardListener,
       buildProps.gameEventListener
     );
     const freeCamera = new FreeCamera({
