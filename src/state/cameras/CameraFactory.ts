@@ -1,6 +1,7 @@
 import { CameraControlSchemeName } from '../../model/CameraControlScheme';
 import { CameraManager } from './CameraManager';
 import { CanvasListener } from '../listeners/CanvasListener';
+import { FollowVehicleCam } from './FollowVehicleCam';
 import { FreeCamera } from './FreeCamera';
 import { GameEventListener } from '../listeners/GameEventListener';
 import { KeyboardListener } from '../listeners/KeyboardListener';
@@ -42,9 +43,14 @@ export class CameraFactory {
       buildProps.keyboardListener,
       buildProps.gameEventListener
     );
+    const followVehicleCam = new FollowVehicleCam(
+      cameraManager.camera,
+      buildProps.keyboardListener,
+      buildProps.gameEventListener
+    );
 
     // Give the controls schemes to manager
-    [orbitCamera, freeCamera, lookAtVehicleCam].forEach((scheme) =>
+    [orbitCamera, freeCamera, lookAtVehicleCam, followVehicleCam].forEach((scheme) =>
       cameraManager.controlSchemes.push(scheme)
     );
 

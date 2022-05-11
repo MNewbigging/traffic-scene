@@ -5,6 +5,8 @@ import { VehicleName } from '../loaders/ModelLoader';
 import { VehicleUtils } from './VehicleUtils';
 
 export class VehicleFactory {
+  private static pointsMat = new THREE.PointsMaterial({ color: 'white', size: 0.1 });
+
   public static createVehicle(name: VehicleName, model: THREE.Group, color?: THREE.Color) {
     const vehicle = new Vehicle(name, model);
 
@@ -58,6 +60,7 @@ export class VehicleFactory {
     // Dimensions
     const box = new THREE.Box3().setFromObject(vehicle.model);
     const dimensions = new THREE.Vector3().subVectors(box.max, box.min);
+    vehicle.dimensions = dimensions;
 
     // Set vehicle half length
     vehicle.halfLength = dimensions.z * 0.5;
@@ -83,6 +86,4 @@ export class VehicleFactory {
     const routeLineGeom = new THREE.BufferGeometry();
     vehicle.routeLine = new THREE.Line(routeLineGeom, routeLineMat);
   }
-
-  private static createCameraAnchorPoints(vehicle: Vehicle) {}
 }

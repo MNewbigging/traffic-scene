@@ -12,13 +12,14 @@ export class Vehicle {
   public raycaster = new THREE.Raycaster();
   public ignoreCollisions = false;
   public bounds: THREE.Mesh;
+  public dimensions = new THREE.Vector3();
   public halfLength = 0;
   public routeLine?: THREE.Line;
   public currentRoad?: Road;
   public maxSpeed = 2;
   public targetSpeed = 2;
   public actualSpeed = 2;
-  public acceleration = 1.2;
+  private acceleration = 1.2;
   private route: Road[] = [];
   public currentLane?: Lane;
   private routeWaypoints: THREE.Vector3[] = [];
