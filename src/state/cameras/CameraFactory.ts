@@ -4,6 +4,7 @@ import { CanvasListener } from '../listeners/CanvasListener';
 import { FreeCamera } from './FreeCamera';
 import { GameEventListener } from '../listeners/GameEventListener';
 import { KeyboardListener } from '../listeners/KeyboardListener';
+import { LookAtVehicleCam } from './LookAtVehicleCam';
 import { MouseListener } from '../listeners/MouseListener';
 import { OrbitCamera } from './OrbitCamera';
 
@@ -37,9 +38,18 @@ export class CameraFactory {
       keyboardListener: buildProps.keyboardListener,
       onExit: () => cameraManager.setControlScheme(CameraControlSchemeName.ORBIT),
     });
+    const lookAtVehicleCam = new LookAtVehicleCam(
+      cameraManager.camera,
+      buildProps.canvasListener.canvas,
+      buildProps.mouseListener,
+      buildProps.keyboardListener,
+      buildProps.gameEventListener
+    );
 
     // Give the controls schemes to manager
-    [orbitCamera, freeCamera].forEach((scheme) => cameraManager.controlSchemes.push(scheme));
+    [orbitCamera, freeCamera, lookAtVehicleCam].forEach((scheme) =>
+      cameraManager.controlSchemes.push(scheme)
+    );
 
     // Activate orbit scheme by default
     cameraManager.setControlScheme(CameraControlSchemeName.ORBIT);

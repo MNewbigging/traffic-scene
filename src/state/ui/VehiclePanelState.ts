@@ -1,7 +1,6 @@
 import { action, makeObservable, observable } from 'mobx';
 
 import { GameEvent, GameEventListener, GameEventType } from '../listeners/GameEventListener';
-import { Vehicle } from '../../model/Vehicle';
 
 export enum VehicleViewMode {
   LOOK_AT = 'Look at',
@@ -10,7 +9,7 @@ export enum VehicleViewMode {
 }
 
 export class VehiclePanelState {
-  public focusedVehicle?: Vehicle = undefined;
+  public focusedVehicle = false;
   public viewMode?: VehicleViewMode = undefined;
 
   constructor(private gameEventListener: GameEventListener) {
@@ -31,8 +30,7 @@ export class VehiclePanelState {
   }
 
   public onSelectVehicle = (gameEvent: GameEvent<GameEventType.VEHICLE_SELECT>) => {
-    this.focusedVehicle = gameEvent.vehicle;
-    this.viewMode = VehicleViewMode.LOOK_AT;
+    this.focusedVehicle = true;
   };
 
   public setViewMode = (mode: VehicleViewMode) => {

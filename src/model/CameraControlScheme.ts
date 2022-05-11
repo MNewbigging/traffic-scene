@@ -1,6 +1,7 @@
 export enum CameraControlSchemeName {
-  ORBIT = 'Orbit',
-  FREE = 'Free',
+  ORBIT = 'orbit',
+  FREE = 'free',
+  LOOK_AT_VEHICLE = 'look-at-vehicle',
 }
 
 export interface CameraControlScheme {
