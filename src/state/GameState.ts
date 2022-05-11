@@ -17,7 +17,7 @@ import { WorldClock } from './WorldClock';
 export class GameState {
   public worldClock = new WorldClock();
   public cameraManager: CameraManager;
-  public gameEventListener = new GameEventListener();
+  private gameEventListener: GameEventListener;
   private canvasListener: CanvasListener;
   private mouseListener = new MouseListener();
   private keyboardListener = new KeyboardListener();
@@ -26,7 +26,13 @@ export class GameState {
   private sceneState: SceneState;
   private sceneSelector: SceneSelector;
 
-  constructor(canvas: HTMLCanvasElement, modelLoader: ModelLoader) {
+  constructor(
+    canvas: HTMLCanvasElement,
+    modelLoader: ModelLoader,
+    eventListener: GameEventListener
+  ) {
+    this.gameEventListener = eventListener;
+
     // Setup screen listener
     this.canvasListener = new CanvasListener(canvas);
     this.canvasListener.addCanvasListener(this.onCanvasResize);

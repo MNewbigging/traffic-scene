@@ -1,5 +1,6 @@
 import { action, makeObservable, observable } from 'mobx';
 
+import { GameEventListener } from './state/listeners/GameEventListener';
 import { GameState } from './state/GameState';
 import { ModelLoader } from './loaders/ModelLoader';
 import { UIState } from './state/ui/UIState';
@@ -7,6 +8,7 @@ import { UIState } from './state/ui/UIState';
 export class AppState {
   public loading = true;
   public gameState: GameState = undefined;
+  public eventListener = new GameEventListener();
   public uiState: UIState = undefined;
 
   // TODO - will need a general game loader that loads models, textures, fonts etc
@@ -27,10 +29,11 @@ export class AppState {
   public onAssetsLoaded = () => {
     this.gameState = new GameState(
       document.getElementById('main-canvas') as HTMLCanvasElement,
-      this.modelLoader
+      this.modelLoader,
+      this.eventListener
     );
 
-    this.uiState = new UIState(this.gameState.gameEventListener);
+    this.uiState = new UIState(this.eventListener);
     this.loading = false;
 
     // Start game after short delay to allow time for UI to mount
