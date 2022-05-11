@@ -22,27 +22,32 @@ export const VehiclePanel: React.FC<VehiclePanelProps> = observer(({ vehiclePane
   );
 
   return (
-    <div className={'vehicle-panel'}>
-      <div
-        className={'button ' + lookAtClass}
-        onClick={() => vehiclePanelState.setViewMode(CameraControlSchemeName.LOOK_AT_VEHICLE)}
-      >
-        Look at
+    <div className='vehicle-panel'>
+      <div className='vehicle-panel-header'>
+        <div className='vehicle-name'>{vehiclePanelState.focusedVehicle.name}</div>
+        <div className='button close' onClick={vehiclePanelState.closeVehiclePanel}>
+          Close
+        </div>
       </div>
-      <div
-        className={'button ' + followClass}
-        onClick={() => vehiclePanelState.setViewMode(CameraControlSchemeName.FOLLOW_VEHICLE)}
-      >
-        Follow
-      </div>
-      <div
-        className={'button ' + bonnetClass}
-        onClick={() => vehiclePanelState.setViewMode(CameraControlSchemeName.BONNET_VEHICLE)}
-      >
-        Bonnet
-      </div>
-      <div className={'button'} onClick={vehiclePanelState.closeVehiclePanel}>
-        Close
+      <div className='vehicle-camera-controls'>
+        <div
+          className={'button ' + lookAtClass}
+          onClick={() => vehiclePanelState.setViewMode(CameraControlSchemeName.LOOK_AT_VEHICLE)}
+        >
+          Look at
+        </div>
+        <div
+          className={'button ' + followClass}
+          onClick={() => vehiclePanelState.setViewMode(CameraControlSchemeName.FOLLOW_VEHICLE)}
+        >
+          Follow
+        </div>
+        <div
+          className={'button ' + bonnetClass}
+          onClick={() => vehiclePanelState.setViewMode(CameraControlSchemeName.BONNET_VEHICLE)}
+        >
+          Bonnet
+        </div>
       </div>
     </div>
   );

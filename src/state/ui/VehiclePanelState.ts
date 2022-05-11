@@ -27,18 +27,18 @@ export class VehiclePanelState {
 
   // When user selects a vehicle, open the vehicle panel
   public onSelectVehicle = (gameEvent: GameEvent<GameEventType.VEHICLE_SELECT>) => {
-    // The panel should open
-    this.focusedVehicle = gameEvent.vehicle;
-
     // Are we selecting a new vehicle?
     const selectedVehicleId = gameEvent.vehicle.id;
-    if (this.focusedVehicle.id === selectedVehicleId) {
+    if (this.focusedVehicle?.id === selectedVehicleId) {
       return;
     }
 
     // Revert view mode state for this new vehicle
     this.viewMode = undefined;
     // Should we also revert to orbit cam at this point?
+
+    // The panel should open
+    this.focusedVehicle = gameEvent.vehicle;
   };
 
   // When user selects a vehicle camera mode, request camera manager mode change

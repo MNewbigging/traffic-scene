@@ -11,6 +11,24 @@
   border: 1px solid white;
   border-radius: 5px;
 
-  display: flex;
-  gap: 5px;
+  .vehicle-panel-header {
+    display: flex;
+    gap: 5px;
+
+    .vehicle-name {
+      flex: 1 1 100%;
+    }
+
+    .close {
+      flex: 0 0 auto;
+      height: $buttonHeight;
+    }
+  }
+
+  .vehicle-camera-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    gap: 5px;
+  }
 }
