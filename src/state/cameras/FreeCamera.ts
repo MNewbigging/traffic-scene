@@ -22,6 +22,8 @@ export class FreeCamera implements CameraControlScheme {
   private readonly maxPolarAngle = Math.PI;
   private readonly normalSpeed = 3;
   private readonly fastSpeed = 10;
+  private heightLocked = false;
+  private height = 0;
 
   constructor(private props: FreeCameraProps) {
     document.addEventListener('pointerlockchange', () => {
@@ -37,10 +39,12 @@ export class FreeCamera implements CameraControlScheme {
   }
 
   public enable() {
+    this.props.keyboardListener.on('l', this.toggleHeightLock);
     this.props.canvasListener.canvas.requestPointerLock();
   }
 
   public disable() {
+    this.props.keyboardListener.off('l', this.toggleHeightLock);
     document.exitPointerLock();
   }
 
@@ -64,44 +68,63 @@ export class FreeCamera implements CameraControlScheme {
     const kb = this.props.keyboardListener;
     const cam = this.props.camera;
 
+    let nextPosition = cam.position.clone();
+
     const forward = new THREE.Vector3();
     cam.getWorldDirection(forward);
 
     const rate = kb.isKeyPressed('shift') ? this.fastSpeed : this.normalSpeed;
-
     const moveSpeed = rate * deltaTime;
 
     // Forward
     if (kb.anyKeysPressed(['w', 'arrowup'])) {
       const moveStep = forward.clone().multiplyScalar(moveSpeed);
-      cam.position.add(moveStep);
+      nextPosition.add(moveStep);
     }
     // Backward
     if (kb.anyKeysPressed(['s', 'arrowdown'])) {
       const moveStep = forward.clone().multiplyScalar(-moveSpeed);
-      cam.position.add(moveStep);
+      nextPosition.add(moveStep);
     }
     // Left
     if (kb.anyKeysPressed(['a', 'arrowleft'])) {
       const leftDir = forward.clone().cross(cam.up);
       const moveStep = leftDir.multiplyScalar(-moveSpeed);
-      cam.position.add(moveStep);
+      nextPosition.add(moveStep);
     }
     // Right
     if (kb.anyKeysPressed(['d', 'arrowright'])) {
       const leftDir = forward.clone().cross(cam.up);
       const moveStep = leftDir.multiplyScalar(moveSpeed);
-      cam.position.add(moveStep);
+      nextPosition.add(moveStep);
     }
     // Up
     if (kb.isKeyPressed('q')) {
       const moveStep = cam.up.clone().multiplyScalar(moveSpeed);
-      cam.position.add(moveStep);
+      nextPosition.add(moveStep);
+      this.height = nextPosition.y;
     }
     // Down
     if (kb.isKeyPressed('e')) {
       const moveStep = cam.up.clone().multiplyScalar(-moveSpeed);
-      cam.position.add(moveStep);
+      nextPosition.add(moveStep);
+      this.height = nextPosition.y;
     }
+
+    // Account for height lock
+    if (this.heightLocked) {
+      nextPosition.y = this.height;
+    }
+
+    // Apply movement
+    cam.position.set(nextPosition.x, nextPosition.y, nextPosition.z);
   }
+
+  private toggleHeightLock = () => {
+    this.heightLocked = !this.heightLocked;
+
+    if (this.heightLocked) {
+      this.height = this.props.camera.position.y;
+    }
+  };
 }
