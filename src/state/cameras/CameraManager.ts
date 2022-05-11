@@ -26,7 +26,7 @@ export class CameraManager {
 
     // Listeners
     canvasListener.addCanvasListener(this.onCanvasResize);
-    //gameEventListener.on(GameEventType.CAMERA_MODE_REQUEST, this.onModeRequest);
+    gameEventListener.on(GameEventType.CAMERA_MODE_REQUEST, this.onModeRequest);
   }
 
   public get currentSchemeName() {

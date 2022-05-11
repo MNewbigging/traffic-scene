@@ -2,11 +2,11 @@ import { action, makeObservable, observable } from 'mobx';
 
 import { CameraControlSchemeName } from '../../model/CameraControlScheme';
 import { GameEvent, GameEventListener, GameEventType } from '../listeners/GameEventListener';
+import { Vehicle } from '../../model/Vehicle';
 
 export class VehiclePanelState {
-  public focusedVehicle = false;
+  public focusedVehicle?: Vehicle = undefined;
   public viewMode?: CameraControlSchemeName = undefined;
-  private focusedVehicleId = '';
 
   constructor(private gameEventListener: GameEventListener) {
     makeObservable(this, {
@@ -28,16 +28,14 @@ export class VehiclePanelState {
   // When user selects a vehicle, open the vehicle panel
   public onSelectVehicle = (gameEvent: GameEvent<GameEventType.VEHICLE_SELECT>) => {
     // The panel should open
-    this.focusedVehicle = true;
+    this.focusedVehicle = gameEvent.vehicle;
 
     // Are we selecting a new vehicle?
     const selectedVehicleId = gameEvent.vehicle.id;
-    if (this.focusedVehicleId === selectedVehicleId) {
+    if (this.focusedVehicle.id === selectedVehicleId) {
       return;
     }
 
-    // It's a different vehicle, save new vehicle id
-    this.focusedVehicleId = selectedVehicleId;
     // Revert view mode state for this new vehicle
     this.viewMode = undefined;
     // Should we also revert to orbit cam at this point?
@@ -53,6 +51,6 @@ export class VehiclePanelState {
 
   // When user closes vehicle panel - should it go back to orbit cam?
   public closeVehiclePanel = () => {
-    this.focusedVehicle = false;
+    this.focusedVehicle = undefined;
   };
 }
