@@ -25,32 +25,7 @@ export class Vehicle {
   private nextWaypoint?: THREE.Vector3;
   private nextLookAt = new THREE.Quaternion();
 
-  constructor(public name: VehicleName, public model: THREE.Group) {
-    // Setup bounds for raycaster
-    const box = new THREE.Box3().setFromObject(model);
-    const dimensions = new THREE.Vector3().subVectors(box.max, box.min);
-    this.halfLength = dimensions.z * 0.5;
-    const boxGeom = new THREE.BoxBufferGeometry(dimensions.x, dimensions.y, dimensions.z);
-    const matrix = new THREE.Matrix4().setPosition(
-      dimensions.addVectors(box.min, box.max).multiplyScalar(0.5)
-    );
-    boxGeom.applyMatrix4(matrix);
-
-    this.bounds = new THREE.Mesh(
-      boxGeom,
-      new THREE.MeshBasicMaterial({ color: 'white', wireframe: true })
-    );
-
-    // Setup raycaster
-    this.raycaster.near = 0;
-    // Raycaster length needs to be enough to clear the car, plus standard length
-    this.raycaster.far = this.halfLength + VehicleUtils.raycastLength;
-
-    // Create the route line
-    const mat = new THREE.LineBasicMaterial({ color: 'blue' });
-    const geom = new THREE.BufferGeometry();
-    this.routeLine = new THREE.Line(geom, mat);
-  }
+  constructor(public name: VehicleName, public model: THREE.Group) {}
 
   public get position() {
     return this.model.position;

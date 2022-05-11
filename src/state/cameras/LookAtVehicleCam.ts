@@ -43,16 +43,12 @@ export class LookAtVehicleCam implements CameraControlScheme {
 
   public disable() {
     this.keyboardListener.off('escape', this.forceExitMode);
-    this.removeTargetVehicle();
+    this.targetVehicle = undefined;
     this.orbitControls.enabled = false;
   }
 
   private targetSelectedVehicle = (gameEvent: GameEvent<GameEventType.VEHICLE_SELECT>) => {
     this.targetVehicle = gameEvent.vehicle;
-  };
-
-  private removeTargetVehicle = () => {
-    this.targetVehicle = undefined;
   };
 
   private forceExitMode = () => {
