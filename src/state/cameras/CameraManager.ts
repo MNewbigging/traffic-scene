@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { action, computed, makeObservable, observable } from 'mobx';
 
-import { CameraControlScheme, CameraControlSchemeName } from '../../model/CameraControlScheme';
+import { CameraControlScheme, CameraControlSchemeName } from './CameraControlScheme';
 import { CanvasListener } from '../listeners/CanvasListener';
 import { GameEvent, GameEventListener, GameEventType } from '../listeners/GameEventListener';
 

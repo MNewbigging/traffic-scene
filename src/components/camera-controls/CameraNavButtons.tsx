@@ -2,7 +2,7 @@ import './camera-nav-buttons.scss';
 
 import React from 'react';
 
-import { CameraControlSchemeName } from '../../model/CameraControlScheme';
+import { CameraControlSchemeName } from '../../state/cameras/CameraControlScheme';
 import { GameEventListener, GameEventType } from '../../state/listeners/GameEventListener';
 
 interface CameraNavButtonsProps {

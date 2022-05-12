@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-import { CameraControlSchemeName } from '../../model/CameraControlScheme';
+import { CameraControlSchemeName } from '../cameras/CameraControlScheme';
 import { Vehicle } from '../../model/Vehicle';
 
 export enum GameEventType {

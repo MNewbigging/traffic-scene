@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-import { CameraControlSchemeName } from '../model/CameraControlScheme';
+import { CameraControlSchemeName } from '../state/cameras/CameraControlScheme';
 import { CameraManager } from '../state/cameras/CameraManager';
 import { GameEventListener, GameEventType } from '../state/listeners/GameEventListener';
 import { MouseListener } from '../state/listeners/MouseListener';

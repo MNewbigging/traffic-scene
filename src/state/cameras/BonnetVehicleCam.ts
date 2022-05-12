@@ -5,8 +5,8 @@ import { GameEvent, GameEventListener, GameEventType } from '../listeners/GameEv
 import { KeyboardListener } from '../listeners/KeyboardListener';
 import { Vehicle } from '../../model/Vehicle';
 
-export class FollowVehicleCam implements CameraControlScheme {
-  public name = CameraControlSchemeName.FOLLOW_VEHICLE;
+export class BonnetVehicleCam implements CameraControlScheme {
+  public name = CameraControlSchemeName.BONNET_VEHICLE;
   private targetVehicle?: Vehicle;
 
   constructor(
@@ -25,12 +25,15 @@ export class FollowVehicleCam implements CameraControlScheme {
     const vDir = new THREE.Vector3();
     this.targetVehicle.model.getWorldDirection(vDir);
 
-    // Move camera into position above and behind car
-    const behind = vPos.clone().add(vDir.clone().multiplyScalar(-1));
-    this.camera.position.set(behind.x, behind.y + 0.8, behind.z);
+    const step = vDir.multiplyScalar(0.5);
 
-    // Look at car
-    this.camera.lookAt(vPos);
+    // Move camera into position above bonnet
+    const bonnet = vPos.clone().add(step);
+    this.camera.position.set(bonnet.x, bonnet.y + 0.2, bonnet.z);
+
+    // Look ahead
+    const target = bonnet.add(step);
+    this.camera.lookAt(target);
   }
 
   public enable() {

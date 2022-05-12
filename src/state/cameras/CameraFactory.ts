@@ -1,4 +1,5 @@
-import { CameraControlSchemeName } from '../../model/CameraControlScheme';
+import { BonnetVehicleCam } from './BonnetVehicleCam';
+import { CameraControlSchemeName } from './CameraControlScheme';
 import { CameraManager } from './CameraManager';
 import { CanvasListener } from '../listeners/CanvasListener';
 import { FollowVehicleCam } from './FollowVehicleCam';
@@ -48,10 +49,15 @@ export class CameraFactory {
       buildProps.keyboardListener,
       buildProps.gameEventListener
     );
+    const bonnetVehicleCam = new BonnetVehicleCam(
+      cameraManager.camera,
+      buildProps.keyboardListener,
+      buildProps.gameEventListener
+    );
 
     // Give the controls schemes to manager
-    [orbitCamera, freeCamera, lookAtVehicleCam, followVehicleCam].forEach((scheme) =>
-      cameraManager.controlSchemes.push(scheme)
+    [orbitCamera, freeCamera, lookAtVehicleCam, followVehicleCam, bonnetVehicleCam].forEach(
+      (scheme) => cameraManager.controlSchemes.push(scheme)
     );
 
     // Activate orbit scheme by default

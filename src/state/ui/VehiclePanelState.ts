@@ -1,6 +1,6 @@
 import { action, makeObservable, observable } from 'mobx';
 
-import { CameraControlSchemeName } from '../../model/CameraControlScheme';
+import { CameraControlSchemeName } from '../cameras/CameraControlScheme';
 import { GameEvent, GameEventListener, GameEventType } from '../listeners/GameEventListener';
 import { Vehicle } from '../../model/Vehicle';
 

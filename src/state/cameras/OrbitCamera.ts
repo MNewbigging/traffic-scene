@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
-import { CameraControlScheme, CameraControlSchemeName } from '../../model/CameraControlScheme';
+import { CameraControlScheme, CameraControlSchemeName } from './CameraControlScheme';
 import { GameEvent, GameEventListener, GameEventType } from '../listeners/GameEventListener';
 
 export class OrbitCamera implements CameraControlScheme {

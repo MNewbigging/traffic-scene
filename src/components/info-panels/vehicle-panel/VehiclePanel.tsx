@@ -3,7 +3,7 @@ import './vehicle-panel.scss';
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 
-import { CameraControlSchemeName } from '../../../model/CameraControlScheme';
+import { CameraControlSchemeName } from '../../../state/cameras/CameraControlScheme';
 import { VehiclePanelState } from '../../../state/ui/VehiclePanelState';
 
 interface VehiclePanelProps {
