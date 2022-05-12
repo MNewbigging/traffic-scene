@@ -44,6 +44,8 @@ export class GameState {
       keyboardListener: this.keyboardListener,
     });
 
+    this.scene.add(this.cameraManager.debugBall);
+
     // Setup scene
     this.sceneState = new SceneState(
       this.scene,
@@ -56,8 +58,8 @@ export class GameState {
 
     // Render pass controller
     this.renderPass = new PostProcessHandler(this.renderer, this.scene, this.cameraManager.camera);
-    this.renderPass.addPass(new HalftonePass(512, 512, undefined));
-    console.log(this.renderPass.getPasses());
+    //this.renderPass.addPass(new HalftonePass(512, 512, undefined));
+    //console.log(this.renderPass.getPasses());
   }
 
   public start() {
@@ -83,7 +85,7 @@ export class GameState {
     this.sceneState.updateScene(deltaTime);
 
     // Update cameras
-    this.cameraManager.update(deltaTime);
+    this.cameraManager.update(deltaTime, this.scene.children);
 
     // Render
     //this.renderer.render(this.scene, this.cameraManager.camera);

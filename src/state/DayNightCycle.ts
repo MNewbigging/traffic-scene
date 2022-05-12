@@ -47,7 +47,8 @@ export class DayNightCycle {
     const progress = this.worldClock.deltaAccumulator / 1439;
     const rotation = progress; // Radians
     
-    this.sunLight.intensity = Math.sin(progress * (Math.PI));
+    this.sunLight.intensity = Math.sin(progress * (Math.PI * 2));
+    //console.log(this.sunLight.intensity);
 
     this.skyUniforms.elevation = THREE.MathUtils.radToDeg(progress) * (Math.PI * 2);
     this.skyUniforms.azimuth = THREE.MathUtils.radToDeg(Math.sin(progress * Math.PI));
