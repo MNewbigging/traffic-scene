@@ -43,7 +43,6 @@ export class LookAtVehicleCam implements CameraControlScheme {
 
   public disable() {
     this.keyboardListener.off('escape', this.forceExitMode);
-    this.targetVehicle = undefined;
     this.orbitControls.enabled = false;
   }
 

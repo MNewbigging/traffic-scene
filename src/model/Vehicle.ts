@@ -245,7 +245,7 @@ export class Vehicle {
     this.position.z += direction.z * speed;
 
     // Rotate towards next target
-    const rotateSpeed = speed * 1.5;
+    const rotateSpeed = speed * 1.35;
     this.model.quaternion.rotateTowards(this.nextLookAt, rotateSpeed);
   }
 

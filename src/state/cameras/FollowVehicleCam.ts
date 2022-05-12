@@ -18,49 +18,32 @@ export class FollowVehicleCam implements CameraControlScheme {
     this.gameEventListener.on(GameEventType.VEHICLE_SELECT, this.targetSelectedVehicle);
   }
 
-  public update(deltaTime: number) {}
+  public update(_deltaTime: number) {
+    const vPos = this.targetVehicle.position;
+
+    // Vehicle direction
+    const vDir = new THREE.Vector3();
+    this.targetVehicle.model.getWorldDirection(vDir);
+
+    // Move camera into position above and behind car
+    const behind = vPos.clone().add(vDir.clone().multiplyScalar(-1));
+    this.camera.position.set(behind.x, behind.y + 0.8, behind.z);
+
+    // Look at car
+    this.camera.lookAt(vPos);
+  }
 
   public enable() {
-    this.setFollowPosition();
     this.keyboardListener.on('escape', this.forceExitMode);
   }
 
   public disable() {
-    this.targetVehicle.model.remove(this.camera);
-
     this.keyboardListener.off('escape', this.forceExitMode);
-    this.targetVehicle = undefined;
   }
 
   private targetSelectedVehicle = (gameEvent: GameEvent<GameEventType.VEHICLE_SELECT>) => {
     this.targetVehicle = gameEvent.vehicle;
   };
-
-  private setFollowPosition() {
-    const v = this.targetVehicle.model;
-
-    const forward = new THREE.Vector3();
-    v.getWorldDirection(forward);
-
-    const backward = forward.clone().multiplyScalar(-1);
-
-    // Create the anchor point for the camera - above and behind vehicle
-    const backPos = v.position.clone().add(backward.clone().multiplyScalar(0.2));
-    backPos.y = this.targetVehicle.dimensions.y + 0.2;
-
-    // Create the target point for the camera - in front of the vehicle
-    const forwardPos = v.position.clone().add(forward.clone().multiplyScalar(0.2));
-    forwardPos.y = v.position.y;
-
-    // Set camera at back pos
-    this.camera.position.set(v.position.x, v.position.y, v.position.z);
-
-    // Camera looks at forward pos
-    this.camera.lookAt(forwardPos);
-
-    // Now attach camera to vehicle
-    //v.add(this.camera);
-  }
 
   private forceExitMode = () => {
     // Stop this camera mode; request change to default orbit mode
