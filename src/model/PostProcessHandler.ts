@@ -7,7 +7,6 @@ import { BokehPass } from 'three/examples/jsm/postprocessing/BokehPass.js';
 export class PostProcessHandler {
     private readonly renderer: WebGLRenderer;
     private readonly renderPass: RenderPass;
-    private passes: Pass[] = [];
     public readonly composer: EffectComposer;
     public camera: Camera;
 
@@ -27,25 +26,24 @@ export class PostProcessHandler {
     }
 
     public addPass(pass: Pass): void {
-        this.passes.push(pass);
         this.composer.addPass(pass);
     }
 
     public removePass(index: number, pass: Pass): void {
-        this.passes.splice(index);
         this.composer.removePass(pass);
     }
 
     public getPasses(): Pass[] {
-        return this.passes;
+        return this.composer.passes;
     }
 
     public removePasses(): void {
-        this.passes.length = 0;
+        this.composer.passes.splice(1, this.composer.passes.length);
     }
 
     public update (): void {
+        if (this.composer.passes[1]) { // need proper checks
         (this.composer.passes[1] as BokehPass).materialBokeh.uniforms['focus'].value = this.camera.userData.focusLength;
-        console.log((this.composer.passes[1] as BokehPass).materialBokeh.uniforms['focus'].value);
+        }
     }
 }
