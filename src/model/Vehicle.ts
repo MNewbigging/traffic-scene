@@ -25,6 +25,7 @@ export class Vehicle {
   private routeWaypoints: THREE.Vector3[] = [];
   private nextWaypoint?: THREE.Vector3;
   private nextLookAt = new THREE.Quaternion();
+  public pauseDriving: boolean = false;
 
   constructor(public name: VehicleName, public model: THREE.Group) {}
 
@@ -231,11 +232,21 @@ export class Vehicle {
       this.targetNextWaypoint();
     }
 
+    if (this.pauseDriving) {
+      this.actualSpeed = THREE.MathUtils.lerp(
+        this.actualSpeed,
+        0,
+        deltaTime * 10
+      )
+
+      return;
+    }
+
     // Lerp speed towards the target speed
     this.actualSpeed = THREE.MathUtils.lerp(
       this.actualSpeed,
       this.targetSpeed,
-      deltaTime * this.acceleration
+      deltaTime * this.acceleration * (this.targetSpeed < this.actualSpeed ? 5 : 1)
     );
 
     // Keep moving towards next target

@@ -47,7 +47,7 @@ export class DayNightCycle {
     const progress = this.worldClock.deltaAccumulator / 1439;
     const rotation = progress; // Radians
     
-    this.sunLight.intensity = Math.sin(progress * (Math.PI * 2));
+    this.sunLight.intensity = Math.sin(progress * (Math.PI));
     //console.log(this.sunLight.intensity);
 
     this.skyUniforms.elevation = THREE.MathUtils.radToDeg(progress) * (Math.PI * 2);
@@ -111,7 +111,7 @@ export class DayNightCycle {
     directionalLight.shadow.mapSize.height = 4096;
     directionalLight.shadow.camera.near = 0.5;
     directionalLight.shadow.camera.far = 50;
-    directionalLight.shadow.bias = -0.0007; // Magic number
+    directionalLight.shadow.bias = -0.00001; // Magic number
     this.sunLight = directionalLight;
 
     const sunGroup = new THREE.Group();

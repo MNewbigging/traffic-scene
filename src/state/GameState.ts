@@ -56,11 +56,11 @@ export class GameState {
       gameEventListener: this.gameEventListener,
     });
 
-    this.scene.add(this.cameraManager.debugBall);
-
     // Setup scene
     this.sceneState = new SceneState(this.scene, this.worldClock, modelLoader);
     this.sceneState.buildScene();
+
+    this.cameraManager.sceneState = this.sceneState;
 
     // Scene selector
     this.sceneSelector = new SceneSelector(
@@ -79,6 +79,7 @@ export class GameState {
   public start() {
     // Can now start the main game loop
     this.update();
+    this.scene.add(this.cameraManager.debugBall);
   }
 
   private onCanvasResize = () => {
@@ -99,10 +100,11 @@ export class GameState {
     this.sceneState.updateScene(deltaTime);
 
     // Update cameras
-    this.cameraManager.update(deltaTime, this.scene.children);
+    this.cameraManager.update(deltaTime);
 
     // Render
     //this.renderer.render(this.scene, this.cameraManager.camera);
+    this.renderPass.update();
     this.renderPass.composer.render();
 
     // Post update

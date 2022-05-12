@@ -1,4 +1,4 @@
-import { WebGLRenderer, Scene, Camera } from 'three';
+import { WebGLRenderer, Scene, Camera, Uniform } from 'three';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { Pass } from 'three/examples/jsm/postprocessing/Pass.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
@@ -21,7 +21,7 @@ export class PostProcessHandler {
         this.composer.addPass(new BokehPass(scene, camera, {
             focus: 1,
             aspect: this.camera.userData.focusLength,
-            aperture: 0.005,
+            aperture: 0.0025,
             maxblur: 1,
         }))
     }
@@ -45,6 +45,7 @@ export class PostProcessHandler {
     }
 
     public update (): void {
-        (this.passes[1] as BokehPass).materialBokeh.uniforms['focus'] = this.camera.userData.focusLength; 
+        (this.composer.passes[1] as BokehPass).materialBokeh.uniforms['focus'].value = this.camera.userData.focusLength;
+        console.log((this.composer.passes[1] as BokehPass).materialBokeh.uniforms['focus'].value);
     }
 }
