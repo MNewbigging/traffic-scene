@@ -1,11 +1,11 @@
 import './game-clock.scss';
 
 import React from 'react';
+import fastForwardImg from '/dist/assets/images/fastForward.png';
+import pauseImg from '/dist/assets/images/pause.png';
+import resumeImg from '/dist/assets/images/forward.png';
 import { observer } from 'mobx-react-lite';
 
-import fastForwardImg from '../../../public/assets/images/fastForward.png';
-import pauseImg from '../../../public/assets/images/pause.png';
-import resumeImg from '../../../public/assets/images/forward.png';
 import { GameClockSetter } from './GameClockSetter';
 import { WorldClock } from '../../state/WorldClock';
 
