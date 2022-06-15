@@ -632,12 +632,12 @@ export class SceneBuilder {
     const group = new THREE.Group();
     group.add(mesh);
 
-    if (type === GroundType.GRASS) {
-      const grass = this.addGrass(size, pos, 1000);
-      const bushes = this.addBushes(size, pos, 2);
-      group.add(grass);
-      group.add(bushes);
-    }
+    // if (type === GroundType.GRASS) {
+    //   const grass = this.addGrass(size, pos, 1000);
+    //   const bushes = this.addBushes(size, pos, 2);
+    //   group.add(grass);
+    //   group.add(bushes);
+    // }
 
     const prop = new Prop(group);
 

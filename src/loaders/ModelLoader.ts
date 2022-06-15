@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
+import house1 from 'assets/house_type01.glb';
+
 export class ModelNames {
   vehicles: VehicleName[] = [];
   roads: RoadName[] = [];
